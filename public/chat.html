@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Чат поддержки оборудования</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="page page--chat">
+      <section class="card card--chat">
+        <header class="chat-header">
+          <h1 class="chat-title">Чат поддержки оборудования</h1>
+          <div class="equipment-badge" id="equipmentBadge">
+            Оборудование: не выбрано
+          </div>
+          <p class="chat-subtitle" id="chatSubtitle"></p>
+        </header>
+
+        <section class="chat-shell" aria-label="Диалог с ассистентом">
+          <div class="chat-messages" id="chatMessages"></div>
+
+          <form class="chat-form" id="chatForm">
+            <div class="chat-compose">
+              <div class="chat-input-wrap">
+                <textarea
+                  class="chat-input"
+                  id="chatInput"
+                  name="message"
+                  rows="3"
+                  placeholder="Введите ваш запрос..."
+                  required
+                ></textarea>
+                <button
+                  class="chat-submit-button"
+                  type="submit"
+                  aria-label="Отправить вопрос"
+                  title="Отправить вопрос"
+                >
+                  <svg
+                    class="chat-submit-icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M3.4 11.2 19.6 4.5c.9-.4 1.8.5 1.4 1.4l-6.7 16.2c-.4.9-1.7.8-1.9-.1l-1.5-6-6-1.5c-.9-.2-1-.5-.1-1.3Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <div class="chat-footer-actions">
+          <a
+            class="chat-back-link"
+            id="backToEquipmentLink"
+            href="/equipment/wattsan-1313a"
+          >
+            Вернуться к оборудованию
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">Система поддержки оборудования</footer>
+
+    <script src="/chat.js"></script>
+  </body>
+</html>

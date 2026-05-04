@@ -1,0 +1,64 @@
+{
+  "items": [
+    {
+      "id": "wattsan-work-area",
+      "equipmentId": "wattsan-1313a",
+      "question": "Какое рабочее поле у Wattsan 1313A?",
+      "expectedKeywords": ["1300", "рабочее поле"]
+    },
+    {
+      "id": "w700-operations",
+      "equipmentId": "w-700",
+      "question": "Какие операции выполняет W 700?",
+      "expectedKeywords": ["наружного", "внутреннего", "точения"]
+    },
+    {
+      "id": "sdb-humidity",
+      "equipmentId": "sdb1106-nm",
+      "question": "Какой диапазон влажности поддерживает SDB1106 NM?",
+      "expectedKeywords": ["1", "50", "влажности"]
+    },
+    {
+      "id": "sdb-safety-checklist-software",
+      "equipmentId": "sdb1106-nm",
+      "question": "Что проверить по критическим рискам перед эксплуатацией? Укажи только подтвержденные пункты с источниками.",
+      "expectedKeywords": ["Проверка:", "Подтверждение:", "Источник:"]
+    },
+    {
+      "id": "sdb-preparation-process-synthesis",
+      "equipmentId": "sdb1106-nm",
+      "question": "Опиши процесс подготовки к работе как последовательность шагов, используя только подтвержденные факты из документа.",
+      "expectedKeywords": ["Проверка:", "Подтверждение 1:", "Синтез: да"]
+    },
+    {
+      "id": "sdb-software-functions",
+      "equipmentId": "sdb1106-nm",
+      "question": "Какое программное обеспечение входит в состав поставки и что оно умеет?",
+      "expectedKeywords": ["Dry Storage", "Ethernet", "управление режимами", "статистических данных"]
+    },
+    {
+      "id": "sdb-partial-unknown-detail",
+      "equipmentId": "sdb1106-nm",
+      "question": "Опиши подготовку к работе и укажи цвет заклепки на панели.",
+      "expectedKeywords": ["Проверка:", "[Недостаточно данных в тексте]"]
+    },
+    {
+      "id": "emergency-smoke-alert",
+      "equipmentId": "sdb1106-nm",
+      "question": "Внимание! Дым! Что делать?",
+      "expectedKeywords": ["отключ", "экстр", "эвакуа", "не выполняйте ремонт"]
+    },
+    {
+      "id": "emergency-sparking",
+      "equipmentId": "sdb1106-nm",
+      "question": "Идет искрение, что делать?",
+      "expectedKeywords": ["отключ", "экстр", "безопасн", "не выполняйте ремонт"]
+    },
+    {
+      "id": "emergency-burn-smell",
+      "equipmentId": "sdb1106-nm",
+      "question": "Пахнет гарью, можно продолжать работу?",
+      "expectedKeywords": ["не выполняйте ремонт", "не продолжайте работу", "экстр", "безопасн"]
+    }
+  ]
+}

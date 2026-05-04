@@ -1,0 +1,21 @@
+{
+  "name": "equipment-support-mvp",
+  "version": "1.0.0",
+  "description": "MVP веб-приложения для производственного оборудования",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "ingest:knowledge": "node scripts/ingest-knowledge.js",
+    "eval:rag": "node scripts/eval-rag.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "mammoth": "^1.12.0",
+    "pdf-parse": "^1.1.1",
+    "pg": "^8.16.3",
+    "word-extractor": "^1.0.4"
+  }
+}
