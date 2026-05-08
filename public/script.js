@@ -42,6 +42,12 @@ function getEquipmentCardActions(equipment, isDetail) {
     `<a class="action-button" href="/chat?equipment=${equipment.id}">Задать вопрос</a>`
   );
 
+  if (equipment.guideUrl) {
+    actions.push(
+      `<a class="action-button" href="${equipment.guideUrl}" target="_blank" rel="noopener noreferrer">Руководство</a>`
+    );
+  }
+
   if (equipment.manualUrl) {
     actions.push(
       `<a class="action-button" href="${equipment.manualUrl}" target="_blank" rel="noopener noreferrer">Инструкции / схемы</a>`

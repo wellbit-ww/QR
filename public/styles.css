@@ -304,8 +304,93 @@ h1 {
   padding: 14px 16px;
   border-radius: 18px;
   line-height: 1.6;
-  white-space: pre-wrap;
   word-break: break-word;
+}
+
+.message-body.md-body {
+  white-space: normal;
+}
+
+.message-body.md-body > :first-child {
+  margin-top: 0;
+}
+
+.message-body.md-body > :last-child {
+  margin-bottom: 0;
+}
+
+.message-body.md-body p {
+  margin: 0.55em 0;
+}
+
+.message-body.md-body ul,
+.message-body.md-body ol {
+  margin: 0.45em 0;
+  padding-left: 1.35em;
+}
+
+.message-body.md-body li {
+  margin: 0.2em 0;
+}
+
+.message-body.md-body h1,
+.message-body.md-body h2,
+.message-body.md-body h3 {
+  margin: 0.65em 0 0.4em;
+  font-size: 1.05em;
+  line-height: 1.35;
+}
+
+.message-body.md-body a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.message-body.md-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88em;
+  padding: 0.12em 0.38em;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.message-body.md-body pre {
+  margin: 0.55em 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  overflow-x: auto;
+  background: rgba(0, 0, 0, 0.05);
+  font-size: 0.88em;
+}
+
+.message-body.md-body pre code {
+  padding: 0;
+  background: none;
+}
+
+.message-body.md-body blockquote {
+  margin: 0.5em 0;
+  padding-left: 12px;
+  border-left: 3px solid rgba(211, 47, 47, 0.35);
+  color: rgba(31, 41, 51, 0.85);
+}
+
+.message--user .message-body.md-body code {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.message--user .message-body.md-body pre {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.message--user .message-body.md-body blockquote {
+  border-left-color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.message--user .message-body.md-body a {
+  color: #fff;
 }
 
 .message--assistant {
@@ -330,21 +415,6 @@ h1 {
 
 .message--assistant .message-meta {
   color: var(--primary);
-}
-
-.message-sources-title {
-  margin-top: 10px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--primary-dark);
-}
-
-.message-sources-list {
-  margin: 6px 0 0;
-  padding-left: 20px;
-  color: var(--muted);
-  font-size: 0.86rem;
-  line-height: 1.45;
 }
 
 .message--user .message-meta {

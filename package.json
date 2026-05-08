@@ -9,13 +9,15 @@
   "scripts": {
     "start": "node server.js",
     "ingest:knowledge": "node scripts/ingest-knowledge.js",
-    "eval:rag": "node scripts/eval-rag.js"
+    "eval:rag": "node scripts/eval-rag.js",
+    "debug:rag": "node scripts/debug-rag-pipeline.js"
   },
   "dependencies": {
     "express": "^5.1.0",
     "mammoth": "^1.12.0",
     "pdf-parse": "^1.1.1",
     "pg": "^8.16.3",
+    "undici": "^7.5.0",
     "word-extractor": "^1.0.4"
   }
 }

@@ -29,7 +29,7 @@ function normalizeAssistantText(text) {
     return "";
   }
 
-  return text
+  let t = text
     .replace(/\$\\Rightarrow\$/g, "⇒")
     .replace(/\$\\Leftarrow\$/g, "⇐")
     .replace(/\$\\leftrightarrow\$/g, "↔")
@@ -67,15 +67,44 @@ function normalizeAssistantText(text) {
     .replace(/\\text\{\>=\}/g, ">=")
     .replace(/\\text\{\<=\}/g, "<=")
     .replace(/\$/g, "");
+
+  t = t.replace(
+    /^\s*\*{0,2}\s*(fact|interpretation|факт|интерпретация)\s*(?:\([^)]*\))?\s*\*{0,2}\s*:\s*/gim,
+    ""
+  );
+
+  const sourcesIdx = t.search(/\n\s*(?:Источники|Sources)\s*:/i);
+  if (sourcesIdx !== -1) {
+    t = t.slice(0, sourcesIdx).trimEnd();
+  }
+
+  return t;
 }
 
-function appendMessage(author, text, sources = []) {
+function renderMarkdownToSafeHtml(markdown) {
+  const raw = typeof markdown === "string" ? markdown : "";
+  try {
+    if (typeof marked !== "undefined" && typeof DOMPurify !== "undefined") {
+      const html = marked.parse(raw, { breaks: true });
+      return DOMPurify.sanitize(html);
+    }
+  } catch (e) {
+    console.warn("Markdown render failed:", e);
+  }
+  const fallback = document.createElement("div");
+  fallback.textContent = raw;
+  return fallback.innerHTML.replace(/\n/g, "<br>");
+}
+
+function appendMessage(author, text) {
   const message = document.createElement("article");
   message.className = `message message--${author}`;
 
   const content = document.createElement("div");
-  content.textContent =
+  content.className = "message-body md-body";
+  const normalized =
     author === "assistant" ? normalizeAssistantText(text) : text;
+  content.innerHTML = renderMarkdownToSafeHtml(normalized);
 
   if (author === "assistant") {
     const meta = document.createElement("div");
@@ -85,27 +114,6 @@ function appendMessage(author, text, sources = []) {
   }
 
   message.append(content);
-
-  if (author === "assistant" && Array.isArray(sources) && sources.length > 0) {
-    const sourcesTitle = document.createElement("div");
-    sourcesTitle.className = "message-sources-title";
-    sourcesTitle.textContent = "Источники:";
-    message.append(sourcesTitle);
-
-    const sourcesList = document.createElement("ul");
-    sourcesList.className = "message-sources-list";
-
-    sources.forEach((source) => {
-      const item = document.createElement("li");
-      const pageText =
-        Number.isInteger(source.page) && source.page > 0 ? `, стр. ${source.page}` : "";
-      const sectionText = source.section ? `, раздел: ${source.section}` : "";
-      item.textContent = `${source.sourceDoc}${sectionText}${pageText}`;
-      sourcesList.append(item);
-    });
-
-    message.append(sourcesList);
-  }
 
   chatMessages.append(message);
   chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -148,22 +156,34 @@ async function fetchEquipment(equipmentId) {
 }
 
 async function requestAssistantReply(question) {
-  const response = await fetch("/api/chat", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      equipmentId: window.equipmentId,
-      message: question,
-      history: conversationHistory,
-    }),
-  });
+  const chatUrl = new URL("/api/chat", window.location.origin).href;
+
+  let response;
+  try {
+    response = await fetch(chatUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        equipmentId: window.equipmentId,
+        message: question,
+        history: conversationHistory,
+      }),
+    });
+  } catch (networkError) {
+    const hint =
+      "Не удалось связаться с сервером приложения. Убедитесь, что он запущен (`npm start`), страница открыта по тому же адресу (не файлом с диска), и повторите запрос. Если ответ всё равно не приходит — запрос может выполняться слишком долго из‑за очереди вызовов к локальной модели.";
+    const original =
+      networkError instanceof Error ? networkError.message : String(networkError);
+    throw new Error(`${hint}\n\n(${original})`);
+  }
 
   const payload = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(payload.details || payload.error || "Ошибка запроса к чату.");
+    const combined = [payload.error, payload.details].filter(Boolean).join("\n\n");
+    throw new Error(combined || "Ошибка запроса к чату.");
   }
 
   return payload;
@@ -228,30 +248,27 @@ chatForm.addEventListener("submit", async (event) => {
     content: question,
   });
 
+  chatInput.value = "";
+  autoResizeChatInput();
+
   setFormState(true);
 
   try {
     const payload = await requestAssistantReply(question);
     const answer = payload.answer || "";
-    const sources = Array.isArray(payload.sources) ? payload.sources : [];
 
-    appendMessage("assistant", answer, sources);
+    appendMessage("assistant", answer);
     conversationHistory.push({
       role: "assistant",
       content: answer,
     });
-    chatInput.value = "";
-    autoResizeChatInput();
   } catch (error) {
     const errorMessage =
       error instanceof Error
         ? error.message
         : "Не удалось получить ответ от ассистента.";
 
-    appendMessage(
-      "assistant",
-      `Не удалось получить ответ от локальной модели.\n\n${errorMessage}`
-    );
+    appendMessage("assistant", errorMessage);
   } finally {
     setFormState(false);
     chatInput.focus();
@@ -259,6 +276,26 @@ chatForm.addEventListener("submit", async (event) => {
 });
 
 chatInput.addEventListener("input", autoResizeChatInput);
+
+chatInput.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.shiftKey) {
+    return;
+  }
+  if (event.isComposing) {
+    return;
+  }
+  if (chatInput.disabled || !currentEquipment) {
+    return;
+  }
+  event.preventDefault();
+  if (typeof chatForm.requestSubmit === "function") {
+    chatForm.requestSubmit();
+  } else {
+    chatForm.dispatchEvent(
+      new Event("submit", { cancelable: true, bubbles: true })
+    );
+  }
+});
 
 autoResizeChatInput();
 initChat();
