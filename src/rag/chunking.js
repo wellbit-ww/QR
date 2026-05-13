@@ -5,6 +5,8 @@
  * — в metadata: chunkKind, operatingModes для фильтрации/rerank при retrieval.
  */
 
+const { extractStructuredParameters } = require("./parameter-extraction");
+
 function normalizeText(text) {
   return String(text || "")
     .replace(/\r\n/g, "\n")
@@ -32,6 +34,15 @@ function detectOperatingModes(text) {
 
   return [...modes];
 }
+
+/** Семантический тип блока для retrieval/rerank (параллельно legacy chunkKind). */
+const BLOCK_TYPES = Object.freeze({
+  TABLE_BLOCK: "TABLE_BLOCK",
+  SPEC_BLOCK: "SPEC_BLOCK",
+  PROCEDURE_BLOCK: "PROCEDURE_BLOCK",
+  WARNING_BLOCK: "WARNING_BLOCK",
+  GENERAL_BLOCK: "GENERAL_BLOCK",
+});
 
 function detectChunkKind(content) {
   const c = String(content || "");
@@ -64,10 +75,155 @@ function detectChunkKind(content) {
   return "general";
 }
 
+function chunkKindToBlockType(chunkKind) {
+  switch (chunkKind) {
+    case "table":
+      return BLOCK_TYPES.TABLE_BLOCK;
+    case "spec":
+      return BLOCK_TYPES.SPEC_BLOCK;
+    case "procedure":
+      return BLOCK_TYPES.PROCEDURE_BLOCK;
+    case "safety":
+      return BLOCK_TYPES.WARNING_BLOCK;
+    default:
+      return BLOCK_TYPES.GENERAL_BLOCK;
+  }
+}
+
+/** При множественных parameterTypes — один «ведущий» для скоринга (устранение multi-topic dominance). */
+const PARAMETER_DOMINANCE_ORDER = [
+  "grounding_resistance",
+  "protection",
+  "voltage",
+  "frequency",
+  "humidity",
+  "temperature",
+  "pressure",
+  "load",
+  "dimensions",
+  "grounding",
+  "nitrogen",
+  "antistatic_resistor",
+];
+
+function inferPrimarySecondaryParameters(parameterTypes) {
+  const pts = Array.isArray(parameterTypes)
+    ? [...new Set(parameterTypes)].filter((p) => typeof p === "string")
+    : [];
+  pts.sort(
+    (a, b) =>
+      PARAMETER_DOMINANCE_ORDER.indexOf(a) - PARAMETER_DOMINANCE_ORDER.indexOf(b) ||
+      a.localeCompare(b)
+  );
+  return {
+    primaryParameter: pts[0] || null,
+    secondaryParameter: pts[1] || null,
+  };
+}
+
+function detectChunkSeverity(text) {
+  const c = String(text || "");
+  if (/аварийн|опасно|электроудар|смерт|угроз[аы]\s+жизни/i.test(c)) {
+    return "high";
+  }
+  if (/неисправност|ошибк[аи]|поврежден|не\s+включается/i.test(c)) {
+    return "medium";
+  }
+  return "low";
+}
+
+function detectNormativeSpec(text) {
+  const c = String(text || "");
+  return /(?:ГОСТ|ТУ\s*\d|должен\s|не\s+допускается|запрещено|обязательно\s|требовани[яе])/i.test(c);
+}
+
+/** Типы параметров для фильтрации retrieval/rerank (совпадают с focusParameter в query-intent). */
+function detectParameterTypes(text) {
+  const sample = String(text || "");
+  const rules = [
+    ["humidity", /\bRH%\w*|влажност|осушител|диапазон\s+(?:влажност|\(.*влаж)/i],
+    ["voltage", /напряжен(?:ие|ия)|питающ(?:ее|ая)\s+сеть|\d+\s*(?:±)?\s*В\b/i],
+    ["frequency", /\bГц\b|\bгерц|\bгц\b|частот[ауеы]/i],
+    ["pressure", /\bкПа\b|\bПа\b|мм\s*рт|давлен/i],
+    ["load", /нагрузк|полк|макс\.\s*нагрузк|\d+\s*кг\b/i],
+    ["protection", /\bIP\s*\d+|степень\s+защиты|класс\s+защиты/i],
+    ["dimensions", /габарит|размер(?:ы)?|ширин|высот|глубин|\d+\s*(?:×|x)\s*\d+/i],
+    [
+      "grounding_resistance",
+      /сопротивлен(?:ие|ия)\s+заземляющего\s+контура|заземляющ(?:ий|его)\s+контур|сопротивлен(?:ие|ия)\s+заземления\b/i,
+    ],
+    [
+      "antistatic_resistor",
+      /1\s*МОм|антистатическ(?:ий|ого|ая|ое)\s+браслет|функциональное\s+заземление|(?:антистат|МОм|мегом|браслет).{0,48}резистор|резистор.{0,48}(?:антистат|МОм|мегом|браслет)/i,
+    ],
+    ["grounding", /заземлен/i],
+    ["nitrogen", /\bазот/i],
+    ["temperature", /температур|°\s*[СC]|град\.?\s*цельс/i],
+  ];
+  const found = new Set();
+  for (const [key, re] of rules) {
+    if (re.test(sample)) {
+      found.add(key);
+    }
+  }
+  return [...found];
+}
+
+function enforceGroundingParameterPriority(parameterTypes, text) {
+  const pts = new Set(Array.isArray(parameterTypes) ? parameterTypes : []);
+  const sample = String(text || "");
+  const groundingSignals =
+    /(?:не\s+более\s*)?4\s*ом|заземляющ(?:его|ий)\s+контур|сопротивлен(?:ие|ия)\s+заземлен/i.test(sample);
+  if (groundingSignals) {
+    pts.add("grounding_resistance");
+    pts.delete("antistatic_resistor");
+  }
+  return [...pts];
+}
+
+/** Доп. тема фрагмента для штрафов при onboarding-запросах. */
+function detectSecondaryTopic(text) {
+  const c = String(text || "");
+  if (/аварийн|действия\s+при\s+авари|экстремальн(?:ых\s+услов|\s+ситуац)/i.test(c)) {
+    return "emergency";
+  }
+  if (
+    /типов(?:ые|ых)\s+неисправност|устранени[ея]\s+неисправност|не\s+включается|не\s+работает|диагностик/i.test(
+      c
+    )
+  ) {
+    return "troubleshooting";
+  }
+  if (/текущий\s+ремонт|ремонт\s+шкафа|замен(?:ить|а)\s+(?:блок|уплотнитель)/i.test(c)) {
+    return "repair";
+  }
+  if (/техническ(?:ое|ого)\s+обслуживани|\bТО\b.*интервал|ежегодно\s+техобслуживани/i.test(c)) {
+    return "maintenance";
+  }
+  return null;
+}
+
 function buildChunkMeta(content, extra = {}) {
+  const chunkKind = detectChunkKind(content);
+  const parameterTypes = enforceGroundingParameterPriority(detectParameterTypes(content), content);
+  const { primaryParameter, secondaryParameter } = inferPrimarySecondaryParameters(parameterTypes);
+  const structuredParameters = extractStructuredParameters(content);
+  const secondaryTopic = detectSecondaryTopic(content);
+  const blockType = chunkKindToBlockType(chunkKind);
+  const severity = detectChunkSeverity(content);
+  const isNormativeSpec = chunkKind === "spec" || chunkKind === "table" ? detectNormativeSpec(content) : false;
+
   return {
     operatingModes: detectOperatingModes(content),
-    chunkKind: detectChunkKind(content),
+    chunkKind,
+    blockType,
+    ...(parameterTypes.length ? { parameterTypes } : {}),
+    ...(primaryParameter ? { primaryParameter } : {}),
+    ...(secondaryParameter ? { secondaryParameter } : {}),
+    ...(structuredParameters.length ? { structuredParameters } : {}),
+    severity,
+    isNormativeSpec,
+    ...(secondaryTopic ? { secondaryTopic } : {}),
     ...extra,
   };
 }
@@ -288,6 +444,7 @@ function splitDocumentIntoChunks(text, chunkSize, overlap) {
         specSheetMerged: true,
       });
       meta.chunkKind = "spec";
+      meta.blockType = BLOCK_TYPES.SPEC_BLOCK;
       out.push({
         content: seg.content.trim(),
         metadata: meta,
@@ -324,11 +481,17 @@ function splitIntoChunks(text, chunkSize, overlap) {
 }
 
 module.exports = {
+  BLOCK_TYPES,
   splitIntoChunks,
   splitDocumentIntoChunks,
   segmentMarkdownRegions,
   mergeSpecsAroundDimensionTable,
   detectOperatingModes,
   detectChunkKind,
+  chunkKindToBlockType,
+  inferPrimarySecondaryParameters,
+  detectParameterTypes,
+  enforceGroundingParameterPriority,
+  detectSecondaryTopic,
   normalizeText,
 };

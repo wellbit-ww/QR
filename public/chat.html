@@ -2,7 +2,10 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>Чат поддержки оборудования</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="stylesheet" href="/styles.css" />
@@ -18,7 +21,7 @@
           <p class="chat-subtitle" id="chatSubtitle"></p>
         </header>
 
-        <section class="chat-shell" aria-label="Диалог с ассистентом">
+        <section class="chat-shell" aria-label="Диалог с SOVA">
           <div class="chat-messages" id="chatMessages"></div>
 
           <form class="chat-form" id="chatForm">
@@ -68,14 +71,8 @@
 
     <footer class="footer">Система поддержки оборудования</footer>
 
-    <script
-      src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"
-      crossorigin="anonymous"
-    ></script>
-    <script src="/chat.js"></script>
+    <script src="/vendor/marked.min.js" defer></script>
+    <script src="/vendor/purify.min.js" defer></script>
+    <script src="/chat.js" defer></script>
   </body>
 </html>

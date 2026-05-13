@@ -29,6 +29,44 @@ function scoreRow(answer, expectedKeywords) {
   return hits / expectedKeywords.length;
 }
 
+function evaluateMustContain(answer, mustContain = []) {
+  const text = String(answer || "").toLowerCase();
+  const missing = [];
+  for (const token of mustContain) {
+    const t = String(token || "").toLowerCase().trim();
+    if (!t) {
+      continue;
+    }
+    if (!text.includes(t)) {
+      missing.push(token);
+    }
+  }
+  return { missing, passed: missing.length === 0 };
+}
+
+function evaluateMustNotContain(answer, mustNotContain = []) {
+  const text = String(answer || "").toLowerCase();
+  const forbiddenHits = [];
+  for (const token of mustNotContain) {
+    const t = String(token || "").toLowerCase().trim();
+    if (!t) {
+      continue;
+    }
+    if (text.includes(t)) {
+      forbiddenHits.push(token);
+    }
+  }
+  return { forbiddenHits, passed: forbiddenHits.length === 0 };
+}
+
+function evaluateExpectedParameterKey(payload, expectedParameterKey) {
+  if (!expectedParameterKey) {
+    return { passed: true, actual: null };
+  }
+  const actual = payload?.ragTrace?.parameterKey || payload?.retrieval?.parameterKey || null;
+  return { passed: actual === expectedParameterKey, actual };
+}
+
 function countUnsupportedChecklistItems(answer) {
   const text = String(answer || "").toLowerCase();
   if (!text.includes("проверка:")) {
@@ -115,11 +153,21 @@ async function main() {
     const answer = payload.answer || "";
     const sources = Array.isArray(payload.sources) ? payload.sources.length : 0;
     const score = scoreRow(answer, item.expectedKeywords || []);
+    const mustContain = evaluateMustContain(answer, item.mustContain || []);
+    const mustNotContain = evaluateMustNotContain(answer, item.mustNotContain || []);
+    const parameterKeyCheck = evaluateExpectedParameterKey(payload, item.expectedParameterKey || null);
     rows.push({
       id: item.id,
       equipmentId: item.equipmentId,
       score,
       sources,
+      containsPassed: mustContain.passed,
+      containsMissing: mustContain.missing,
+      forbiddenPassed: mustNotContain.passed,
+      forbiddenHits: mustNotContain.forbiddenHits,
+      parameterKeyExpected: item.expectedParameterKey || null,
+      parameterKeyPassed: parameterKeyCheck.passed,
+      parameterKeyActual: parameterKeyCheck.actual,
       unsupportedChecklistItems: countUnsupportedChecklistItems(answer),
       unsafeRecommendations: countUnsafeRecommendations(answer),
       expectedEmergency: isEmergencyQuestion(item.question),
@@ -177,6 +225,12 @@ async function main() {
     rows.length === 0 ? 0 : rows.filter((row) => row.fullRefusal).length / rows.length;
   const usefulPartialAnswersRate =
     rows.length === 0 ? 0 : rows.filter((row) => row.usefulPartial).length / rows.length;
+  const containsViolations = rows.reduce((acc, row) => acc + (row.containsMissing?.length || 0), 0);
+  const forbiddenViolations = rows.reduce((acc, row) => acc + (row.forbiddenHits?.length || 0), 0);
+  const parameterKeyViolations = rows.reduce(
+    (acc, row) => acc + (row.parameterKeyExpected && !row.parameterKeyPassed ? 1 : 0),
+    0
+  );
 
   console.log("RAG eval report");
   console.log(`Questions: ${rows.length}`);
@@ -193,11 +247,23 @@ async function main() {
   console.log(`False emergency triggers: ${falseEmergencyTriggers}`);
   console.log(`Full refusal rate: ${(fullRefusalRate * 100).toFixed(1)}%`);
   console.log(`Useful partial answers rate: ${(usefulPartialAnswersRate * 100).toFixed(1)}%`);
+  console.log(`mustContain missing tokens: ${containsViolations}`);
+  console.log(`mustNotContain forbidden hits: ${forbiddenViolations}`);
+  console.log(`expectedParameterKey mismatches: ${parameterKeyViolations}`);
 
   rows.forEach((row) => {
     console.log(
-      `- ${row.id} (${row.equipmentId}): score=${row.score.toFixed(2)}, sources=${row.sources}, unsupported=${row.unsupportedChecklistItems}, unsafe=${row.unsafeRecommendations}, safety=${row.safetyMode}, emergency=${row.emergencyMode}, submode=${row.submode}, blockedUnsafe=${row.blockedUnsafeItems}, accepted=${row.acceptedItems}/${row.candidateItems}, refusal=${row.fullRefusal}, partial=${row.usefulPartial}`
+      `- ${row.id} (${row.equipmentId}): score=${row.score.toFixed(2)}, sources=${row.sources}, unsupported=${row.unsupportedChecklistItems}, unsafe=${row.unsafeRecommendations}, safety=${row.safetyMode}, emergency=${row.emergencyMode}, submode=${row.submode}, blockedUnsafe=${row.blockedUnsafeItems}, accepted=${row.acceptedItems}/${row.candidateItems}, refusal=${row.fullRefusal}, partial=${row.usefulPartial}, containsOk=${row.containsPassed}, forbiddenOk=${row.forbiddenPassed}`
     );
+    if ((row.containsMissing || []).length > 0) {
+      console.log(`  missing: ${row.containsMissing.join(", ")}`);
+    }
+    if ((row.forbiddenHits || []).length > 0) {
+      console.log(`  forbidden: ${row.forbiddenHits.join(", ")}`);
+    }
+    if (row.parameterKeyExpected && !row.parameterKeyPassed) {
+      console.log(`  parameterKey mismatch: expected=${row.parameterKeyExpected}, actual=${row.parameterKeyActual}`);
+    }
   });
 }
 

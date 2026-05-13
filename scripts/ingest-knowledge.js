@@ -166,8 +166,19 @@ async function embedTextsWithFallback(config, texts) {
   }
 }
 
-function enrichChunkRowMetadata(content, baseMeta) {
+function enrichChunkRowMetadata(content, baseMeta, sourceDoc, chunkIndex) {
   const meta = { ...baseMeta };
+  if (Array.isArray(meta.structuredParameters) && meta.structuredParameters.length > 0) {
+    meta.structuredParameters = meta.structuredParameters.map((entry) => ({
+      parameterKey: entry.parameterKey || null,
+      value: entry.value || null,
+      unit: entry.unit || null,
+      aliases: Array.isArray(entry.aliases) ? entry.aliases : [],
+      confidence: typeof entry.confidence === "number" ? entry.confidence : 0.7,
+      sourceDoc,
+      chunkIndex,
+    }));
+  }
   if (meta.chunkKind === "procedure") {
     const steps = [];
     for (const line of String(content || "").split("\n")) {
@@ -260,11 +271,16 @@ async function main() {
           const chunkIndex = start + i;
           const { content: chunkContent, metadata: splitMeta } = sliceObjs[i];
 
-          const metadata = enrichChunkRowMetadata(chunkContent, {
+          const metadata = enrichChunkRowMetadata(
+            chunkContent,
+            {
             ...doc.metadata,
             ...splitMeta,
             equipmentName: equipment.name,
-          });
+            },
+            doc.sourceDoc,
+            chunkIndex
+          );
 
           await upsertChunk(pool, {
             equipmentId: equipment.id,

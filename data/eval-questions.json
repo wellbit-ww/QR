@@ -59,6 +59,84 @@
       "equipmentId": "sdb1106-nm",
       "question": "Пахнет гарью, можно продолжать работу?",
       "expectedKeywords": ["не выполняйте ремонт", "не продолжайте работу", "экстр", "безопасн"]
+    },
+    {
+      "id": "retrieval-onboarding-power-on",
+      "equipmentId": "sdb1106-nm",
+      "question": "Как включить шкаф?",
+      "expectedKeywords": ["включ", "питани"],
+      "mustContain": ["220 в", "тумблер", "вкл"],
+      "mustNotContain": ["гарантия", "хранение", "транспортировка", "влажность окружающей среды"]
+    },
+    {
+      "id": "retrieval-humidity-troubleshooting",
+      "equipmentId": "sdb1106-nm",
+      "question": "Влажность не снижается",
+      "expectedKeywords": ["осуш", "уплотн", "влажност"],
+      "mustContain": ["осушитель", "уплотнитель", "rh"],
+      "mustNotContain": ["предохранитель", "кабель питания", "220 в"]
+    },
+    {
+      "id": "retrieval-grounding-contour",
+      "equipmentId": "sdb1106-nm",
+      "question": "Сопротивление заземляющего контура",
+      "expectedKeywords": ["заземля", "ом"],
+      "mustContain": ["4 ом"],
+      "mustNotContain": ["1 мом", "браслет", "антистатический"]
+    },
+    {
+      "id": "parameter-voltage",
+      "equipmentId": "sdb1106-nm",
+      "question": "Какое напряжение питания?",
+      "expectedKeywords": ["220", "в"],
+      "mustContain": ["220", "в"],
+      "mustNotContain": ["гц", "ip", "информация отсутствует"],
+      "expectedParameterKey": "power_voltage"
+    },
+    {
+      "id": "parameter-frequency",
+      "equipmentId": "sdb1106-nm",
+      "question": "Какая частота сети?",
+      "expectedKeywords": ["50", "гц"],
+      "mustContain": ["50", "гц"],
+      "mustNotContain": ["220 в", "ip", "информация отсутствует"],
+      "expectedParameterKey": "frequency"
+    },
+    {
+      "id": "parameter-ip",
+      "equipmentId": "sdb1106-nm",
+      "question": "Какой IP класс?",
+      "expectedKeywords": ["ip"],
+      "mustContain": ["ip"],
+      "mustNotContain": ["220 в", "гц", "информация отсутствует"],
+      "expectedParameterKey": "protection"
+    },
+    {
+      "id": "parameter-grounding",
+      "equipmentId": "sdb1106-nm",
+      "question": "Какое сопротивление заземления?",
+      "expectedKeywords": ["4", "ом"],
+      "mustContain": ["4", "ом"],
+      "mustNotContain": ["1 мом", "браслет", "антистатический"],
+      "expectedParameterKey": "grounding_resistance"
+    },
+    {
+      "id": "parameter-humidity-range",
+      "equipmentId": "sdb1106-nm",
+      "question": "Какой диапазон влажности?",
+      "expectedKeywords": ["rh", "%"],
+      "mustContain": ["rh"],
+      "mustNotContain": ["гарантия", "хранение", "информация отсутствует"],
+      "expectedParameterKey": "humidity_range"
+    },
+    {
+      "id": "parameter-shelf-load",
+      "equipmentId": "sdb1106-nm",
+      "question": "Какая максимальная нагрузка на полку?",
+      "expectedKeywords": ["кг", "нагруз"],
+      "mustContain": ["кг"],
+      "mustNotContain": ["информация отсутствует", "ip", "гц"],
+      "expectedParameterKey": "shelf_load_max"
     }
   ]
 }

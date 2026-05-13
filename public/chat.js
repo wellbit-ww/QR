@@ -19,7 +19,7 @@ function setEquipmentUi(equipment) {
   currentEquipment = equipment;
   equipmentBadge.textContent = `Оборудование: ${equipment.name}`;
   if (chatSubtitle) {
-    chatSubtitle.textContent = `Ассистент отвечает только по оборудованию: ${equipment.name}.`;
+    chatSubtitle.textContent = `SOVA отвечает только по оборудованию: ${equipment.name}.`;
   }
   backToEquipmentLink.href = `/equipment/${equipment.id}`;
 }
@@ -109,7 +109,7 @@ function appendMessage(author, text) {
   if (author === "assistant") {
     const meta = document.createElement("div");
     meta.className = "message-meta";
-    meta.textContent = "Ассистент";
+    meta.textContent = "SOVA";
     message.append(meta);
   }
 

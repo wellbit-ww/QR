@@ -17,6 +17,27 @@ const QUERY =
   process.argv[2] ||
   "Какой диапазон поддержания влажности внутри шкафа?";
 
+/** Без побочных эффектов для регресса классификатора (печатается в отчёте всегда). */
+const INTENT_REGRESSION_SAMPLES = [
+  "Какая частота?",
+  "Какое напряжение?",
+  "Какой IP?",
+  "Какой шаг установки влажности?",
+  "Почему шкаф не выходит на влажность?",
+  "Шкаф не включается",
+  "Почему пищит шкаф?",
+  "Влажность не падает",
+  "Как пользоваться шкафом?",
+  "Как начать работу?",
+  "Первый запуск шкафа",
+  "Как включить шкаф?",
+  "Какие условия эксплуатации?",
+  "Какой диапазон влажности?",
+  "Какое атмосферное давление?",
+  "Какое сопротивление заземления допускается?",
+  "Какое питание?",
+];
+
 async function main() {
   const config = getRagConfig();
   const equipment = equipmentCatalog[EQUIPMENT_ID];
@@ -29,8 +50,17 @@ async function main() {
     "Руководство SDB_2017 [22] 1106NM.md"
   );
 
-  const mdText = fs.readFileSync(mdPath, "utf8");
-  const chunks = splitDocumentIntoChunks(mdText, config.chunkSize, config.chunkOverlap);
+  let mdText = "";
+  let step1SkipReason = null;
+  if (fs.existsSync(mdPath)) {
+    mdText = fs.readFileSync(mdPath, "utf8");
+  } else {
+    step1SkipReason = `Файл не найден (${mdPath}) — offline chunking пропущен; это не ошибка сборки.`;
+  }
+
+  const chunks = mdText
+    ? splitDocumentIntoChunks(mdText, config.chunkSize, config.chunkOverlap)
+    : [];
 
   /** Шаг 1 */
   const foundChunks = chunks
@@ -131,11 +161,21 @@ async function main() {
 
   const report = {
     rootCauseHint:
-      foundChunks.length === 0
-        ? "Чанк с 0…80 RH не найден в offline — проверить chunking (FIX_CHUNKING)."
-        : foundChunks.some((f) => f.specSheetMerged)
-          ? "Спецификации склеены (spec_sheet merge); если раньше RH и IP были в разных чанках — это была основная потеря контекста."
-          : "Чанки содержат маркеры; при симптомах в проде проверить embeddings/rerank.",
+      step1SkipReason
+        ? step1SkipReason
+        : foundChunks.length === 0
+          ? "Чанк с 0…80 RH не найден в offline — проверить chunking (FIX_CHUNKING)."
+          : foundChunks.some((f) => f.specSheetMerged)
+            ? "Спецификации склеены (spec_sheet merge); если раньше RH и IP были в разных чанках — это была основная потеря контекста."
+            : "Чанки содержат маркеры; при симптомах в проде проверить embeddings/rerank.",
+    intentRegressionSamples: INTENT_REGRESSION_SAMPLES.map((q) => {
+      const ci = classifyQueryIntent(q, equipment, { forceSafety: false });
+      return {
+        query: q,
+        intentType: ci.intentType,
+        focusParameter: ci.focusParameter,
+      };
+    }),
     step1_chunkSearch: step1,
     step2_retrievalNoRerank: step2,
     step3_rerankInspect: step3,

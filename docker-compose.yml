@@ -1,0 +1,24 @@
+# PostgreSQL с расширением pgvector (нужно для RAG / таблицы knowledge_chunks).
+# Запуск: docker compose up -d
+# Строка подключения для приложения (пример):
+#   POSTGRES_URL=postgresql://rag:rag_secret_change_me@127.0.0.1:5432/equipment_rag
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: equipment-rag-postgres
+    environment:
+      POSTGRES_USER: rag
+      POSTGRES_PASSWORD: rag_secret_change_me
+      POSTGRES_DB: equipment_rag
+    ports:
+      - "5432:5432"
+    volumes:
+      - equipment_rag_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rag -d equipment_rag"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  equipment_rag_pgdata:

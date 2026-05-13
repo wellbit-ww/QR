@@ -8,13 +8,16 @@
   },
   "scripts": {
     "start": "node server.js",
+    "docker:db": "docker compose up -d",
     "ingest:knowledge": "node scripts/ingest-knowledge.js",
     "eval:rag": "node scripts/eval-rag.js",
     "debug:rag": "node scripts/debug-rag-pipeline.js"
   },
   "dependencies": {
+    "dompurify": "^3.2.4",
     "express": "^5.1.0",
     "mammoth": "^1.12.0",
+    "marked": "^12.0.2",
     "pdf-parse": "^1.1.1",
     "pg": "^8.16.3",
     "undici": "^7.5.0",
