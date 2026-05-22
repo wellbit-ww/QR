@@ -6,12 +6,13 @@ const fs = require("fs/promises");
 const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
-const DATASET = path.join(ROOT, "data", "eval-manual-docx-rag.json");
+const DEFAULT_DATASET = path.join(ROOT, "data", "eval-manual-docx-rag.json");
 const DEFAULT_OUT = path.join(ROOT, "data", "manual-docx-rag-results.json");
 
 function parseArgs(argv) {
   const opts = {
     baseUrl: process.env.EVAL_BASE_URL || "http://127.0.0.1:3000",
+    dataset: DEFAULT_DATASET,
     out: DEFAULT_OUT,
     delayMs: Number(process.env.EVAL_DELAY_MS) || 400,
     timeoutMs: Number(process.env.EVAL_TIMEOUT_MS) || 180000,
@@ -20,6 +21,9 @@ function parseArgs(argv) {
     if (argv[i] === "--base-url" && argv[i + 1]) {
       opts.baseUrl = argv[i + 1];
       i += 1;
+    } else if (argv[i] === "--dataset" && argv[i + 1]) {
+      opts.dataset = path.isAbsolute(argv[i + 1]) ? argv[i + 1] : path.join(ROOT, argv[i + 1]);
+      i += 1;
     } else if (argv[i] === "--out" && argv[i + 1]) {
       opts.out = path.isAbsolute(argv[i + 1]) ? argv[i + 1] : path.join(ROOT, argv[i + 1]);
       i += 1;
@@ -27,6 +31,10 @@ function parseArgs(argv) {
       opts.delayMs = Number(argv[i + 1]);
       i += 1;
     }
+  }
+  if (opts.out === DEFAULT_OUT && opts.dataset !== DEFAULT_DATASET) {
+    const base = path.basename(opts.dataset, path.extname(opts.dataset));
+    opts.out = path.join(ROOT, "data", `${base}-results.json`);
   }
   return opts;
 }
@@ -99,14 +107,14 @@ function sleep(ms) {
 
 async function main() {
   const opts = parseArgs(process.argv);
-  const dataset = JSON.parse(await fs.readFile(DATASET, "utf8"));
+  const dataset = JSON.parse(await fs.readFile(opts.dataset, "utf8"));
   const items = dataset.items || [];
   const results = [];
   let passed = 0;
   let failed = 0;
   let errors = 0;
 
-  console.log(`Manual docx RAG test — ${items.length} questions`);
+  console.log(`RAG eval — ${items.length} questions (${path.basename(opts.dataset)})`);
   console.log(`Base URL: ${opts.baseUrl}\n`);
 
   for (let i = 0; i < items.length; i += 1) {

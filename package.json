@@ -15,7 +15,12 @@
     "eval:parity": "node scripts/eval-sdb1106nm-parity.js",
     "validate:parity-json": "node scripts/validate-eval-parity-json.js",
     "test:golden-router": "node scripts/test-sdb1106nm-golden-router.js",
+    "test:golden-router-paraphrase": "node scripts/test-sdb1106nm-golden-router-paraphrase.js",
+    "test:sdb1106nm": "node scripts/run-sdb1106nm-eval-suite.js",
     "eval:manual-docx": "node scripts/run-manual-docx-rag-test.js",
+    "eval:adhoc": "node scripts/run-manual-docx-rag-test.js --dataset data/eval-adhoc-rag.json",
+    "eval:adhoc-paraphrase": "node scripts/run-manual-docx-rag-test.js --dataset data/eval-adhoc-paraphrase-rag.json",
+    "eval:sdb1106nm": "node scripts/run-sdb1106nm-eval-suite.js --live",
     "debug:rag": "node scripts/debug-rag-pipeline.js",
     "test:gate": "node scripts/test-sdb1106nm-gate.js --api http://127.0.0.1:3000"
   },

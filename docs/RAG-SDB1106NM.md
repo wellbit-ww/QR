@@ -115,6 +115,28 @@ npm run validate:parity-json
 
 Baseline сохраняется в `data/eval-sdb1106nm-baseline.json`.
 
+### Датасеты SDB1106NM
+
+| Файл | Команда | Назначение |
+|------|---------|------------|
+| `data/eval-sdb1106nm-parity.json` | `npm run eval:parity` | ~38 кейсов, Direct + RAG |
+| `data/eval-manual-docx-rag.json` | `npm run eval:manual-docx` | 50 вопросов из RAGtestNEW.docx |
+| `data/eval-adhoc-rag.json` | `npm run eval:adhoc` | 10 ad-hoc вопросов (исходные формулировки) |
+| `data/eval-adhoc-paraphrase-rag.json` | `npm run eval:adhoc-paraphrase` | 20 перефразировок тех же тем |
+
+### Offline + live suite
+
+```bash
+# Без сервера: golden router + paraphrase routing + validate JSON
+npm run test:sdb1106nm
+
+# Полный прогон (нужен npm run dev)
+npm run eval:sdb1106nm
+```
+
+Offline-only шаги: `test:golden-router`, `test:golden-router-paraphrase`, `validate:parity-json`.  
+Live шаги: `eval:parity`, `eval:manual-docx`, `eval:adhoc`, `eval:adhoc-paraphrase`.
+
 **Текущий baseline (2026-05-22, после Шага 2):** Direct **100%**, RAG **100%**, parity **100%** (30/30). Цель ≥95% — достигнута.
 
 Дополнительно: `npm run test:gate` — offline gate + несколько API-сценариев.

@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "source": "adhoc-paraphrase",
+    "equipmentId": "sdb1106-nm",
+    "mode": "rag",
+    "description": "Перефразировки 10 ad-hoc тем — проверка устойчивости роутера и RAG"
+  },
+  "items": [
+    {
+      "id": "ph-q1a",
+      "topic": "operating_conditions",
+      "expectKey": "operating_conditions",
+      "question": "В серверной +12 °C — можно ли работать шкафу SDB1106NM в штатном режиме?",
+      "mustMatchRegex": ["15", "нельзя|не\\s+можно|не\\s+допуст|недопустим"]
+    },
+    {
+      "id": "ph-q1b",
+      "topic": "operating_conditions",
+      "expectKey": "operating_conditions",
+      "question": "Температура в помещении +10, шкаф можно эксплуатировать?",
+      "mustMatchRegex": ["15", "нельзя|не\\s+можно|не\\s+допуст|недопустим"]
+    },
+    {
+      "id": "ph-q2a",
+      "topic": "shelf_load",
+      "expectKey": "shelf_load_reinforced",
+      "question": "Поставили 120 килограмм на две усиленные полки равномерно — допустимо?",
+      "mustMatchRegex": ["выдерж|не\\s+превыш|60\\s*кг|можно"]
+    },
+    {
+      "id": "ph-q2b",
+      "topic": "shelf_load",
+      "expectKey": "shelf_load_reinforced",
+      "question": "Если разложить 120 кг по двум усиленным полкам, будет ли перегруз?",
+      "mustMatchRegex": ["выдерж|не\\s+превыш|60\\s*кг|превышен"]
+    },
+    {
+      "id": "ph-q3a",
+      "topic": "door_sound",
+      "expectKey": "door_sound_signal",
+      "question": "Шкаф пищит после того как открыли дверь — что это?",
+      "mustMatchRegex": ["1\\.1\\.4\\.3\\.4|открыт", "закрыт|отключа"],
+      "mustNotContain": ["неисправен один из датчиков"]
+    },
+    {
+      "id": "ph-q3b",
+      "topic": "door_sound",
+      "expectKey": "door_sound_signal",
+      "question": "Звуковая сигнализация при открытой двери — как работает?",
+      "mustMatchRegex": ["1\\.1\\.4\\.3\\.4|открыт", "закрыт|отключа"]
+    },
+    {
+      "id": "ph-q4a",
+      "topic": "regen_duration",
+      "expectKey": "regen_cycle_duration",
+      "question": "Какова длительность регенерации осушителя SDB1106NM?",
+      "mustMatchRegex": ["60\\s*[±\\+-]?\\s*1?\\s*мин"],
+      "mustNotMatchRegex": ["^Поглотитель влаги"]
+    },
+    {
+      "id": "ph-q4b",
+      "topic": "regen_duration",
+      "expectKey": "regen_cycle_duration",
+      "question": "Регенерация цеолита — сколько минут занимает полный цикл?",
+      "mustMatchRegex": ["60\\s*[±\\+-]?\\s*1?\\s*мин"],
+      "mustNotMatchRegex": ["^Поглотитель влаги"]
+    },
+    {
+      "id": "ph-q5a",
+      "topic": "inspection_power",
+      "expectKey": "inspection_power_off",
+      "question": "При ежемесячном осмотре кабеля нужно снимать вилку с розетки?",
+      "mustMatchRegex": ["отключ|2\\.2\\.2", "220|питан"]
+    },
+    {
+      "id": "ph-q5b",
+      "topic": "inspection_power",
+      "expectKey": "inspection_power_off",
+      "question": "Можно ли смотреть заземление при включенном шкафе?",
+      "mustMatchRegex": ["отключ|2\\.2\\.2|только\\s+при\\s+отключ"],
+      "mustNotMatchRegex": ["Сопротивление заземляющего контура — \\*\\*не более 4 Ом\\*\\*\\.$"]
+    },
+    {
+      "id": "ph-q6a",
+      "topic": "drying_process",
+      "expectKey": "desiccant_drying_process",
+      "question": "Осушитель в шкафе жидкий или твёрдый?",
+      "mustMatchRegex": ["цеолит", "жидк.*не|не\\s+использу|тв[её]рд"]
+    },
+    {
+      "id": "ph-q6b",
+      "topic": "drying_process",
+      "expectKey": "desiccant_drying_process",
+      "question": "За счёт чего понижается влажность — есть ли жидкий химический осушитель?",
+      "mustMatchRegex": ["цеолит", "жидк.*не|не\\s+использу"]
+    },
+    {
+      "id": "ph-q7a",
+      "topic": "safety_smoke",
+      "question": "Пахнет горелым из шкафа — что делать первым делом?",
+      "mustMatchRegex": ["отключ.*питан|немедленн|незамедл", "2\\.4|гари|горел|дым"]
+    },
+    {
+      "id": "ph-q7b",
+      "topic": "safety_smoke",
+      "question": "Из SDB1106NM идёт дым — какие действия по инструкции в первую очередь?",
+      "mustMatchRegex": ["отключ.*питан|немедленн", "2\\.4|дым"]
+    },
+    {
+      "id": "ph-q8a",
+      "topic": "nitrogen_pressure",
+      "expectKey": "nitrogen_pressure_max",
+      "question": "Какое давление подводимого азота допустимо на входе в шкаф?",
+      "mustMatchRegex": ["6\\s*бар|0[,.]6\\s*мпа"],
+      "mustNotMatchRegex": ["^Напряжение питающей сети"]
+    },
+    {
+      "id": "ph-q8b",
+      "topic": "nitrogen_pressure",
+      "expectKey": "nitrogen_pressure_max",
+      "question": "Азотное питание — предельное давление в барах?",
+      "mustMatchRegex": ["6\\s*бар|0[,.]6\\s*мпа"],
+      "mustNotMatchRegex": ["^Напряжение питающей сети"]
+    },
+    {
+      "id": "ph-q9a",
+      "topic": "maintenance_desiccant",
+      "expectKey": "maintenance_desiccant_replace",
+      "question": "Как часто менять блок осушения с цеолитом?",
+      "mustMatchRegex": ["36\\s*месяц|не\\s+реже"],
+      "mustNotMatchRegex": ["^Поглотитель влаги в карманах"]
+    },
+    {
+      "id": "ph-q9b",
+      "topic": "maintenance_desiccant",
+      "expectKey": "maintenance_desiccant_replace",
+      "question": "Ресурс цеолита в часах работы — какой указан в РЭ?",
+      "mustMatchRegex": ["36\\s*месяц|не\\s+указан.*час|тысяч.*не\\s+указан"],
+      "mustNotMatchRegex": ["^Поглотитель влаги в карманах"]
+    },
+    {
+      "id": "ph-q10a",
+      "topic": "sensor_brand",
+      "expectKey": "sensor_brand_unknown",
+      "question": "Кто производит датчик RH внутри камеры — Siemens или другой?",
+      "mustMatchRegex": ["не\\s+указан|бренд|производител"],
+      "mustNotMatchRegex": ["диапазон температуры \\*\\*внутри\\*\\* рабочего объёма"]
+    },
+    {
+      "id": "ph-q10b",
+      "topic": "sensor_brand",
+      "expectKey": "sensor_brand_unknown",
+      "question": "Honeywell или японский бренд у датчика температуры в SDB1106NM?",
+      "mustMatchRegex": ["не\\s+указан|бренд|производител"],
+      "mustNotMatchRegex": ["диапазон температуры \\*\\*внутри\\*\\* рабочего объёма"]
+    }
+  ]
+}

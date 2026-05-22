@@ -247,7 +247,7 @@ function tryDeterministicSdb1106nmAnswer(message, options = {}) {
 
   const match = resolveGoldenFactMatch(m, history);
   if (match && match.key !== "volume_liters" && isHighConfidenceDeterministic(match)) {
-    const goldenAnswer = formatGoldenFactAnswer(match.key);
+    const goldenAnswer = formatGoldenFactAnswer(match.key, m);
     if (goldenAnswer) {
       return goldenAnswer;
     }

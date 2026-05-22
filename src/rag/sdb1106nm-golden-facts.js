@@ -63,6 +63,13 @@ const HIGH_CONFIDENCE_KEYS = new Set([
   "desiccant_zeolite",
   "esd_gost",
   "explosive_storage",
+  "inspection_power_off",
+  "regen_cycle_duration",
+  "maintenance_desiccant_replace",
+  "nitrogen_pressure_max",
+  "door_sound_signal",
+  "desiccant_drying_process",
+  "sensor_brand_unknown",
 ]);
 
 const FOLLOWUP_POWER_RE =
@@ -96,7 +103,7 @@ function isFollowUpPowerQuery(message, history = []) {
 
 function isShelfLoadQuery(message) {
   const m = String(message || "");
-  return /полк|нагрузк/i.test(m) && /масс|вес|кг|выдерж|лимит|грузопод/i.test(m);
+  return /полк|нагрузк/i.test(m) && /масс|вес|кг|килограм|выдерж|лимит|грузопод|перегруз|допустим/i.test(m);
 }
 
 function isCabinetDimensionQuery(message) {
@@ -126,6 +133,92 @@ function hasPowerOptionsInText(text) {
     return false;
   }
   return /опци|азот|подогрев/i.test(t);
+}
+
+function isNitrogenSupplyContext(message) {
+  const m = String(message || "");
+  return /азот/i.test(m) && /питан|подач|давлен|бар|мпа|магистрал|опци/i.test(m);
+}
+
+function isPowerVoltageQuery(message) {
+  const m = String(message || "");
+  if (isNitrogenSupplyContext(m)) {
+    return false;
+  }
+  return (
+    /напряжен|питани|\b220\b.*в/i.test(m) &&
+    !/мощност|вт\b/i.test(m) &&
+    !isLocationQuery(m) &&
+    !isVoltageSurgeQuery(m)
+  );
+}
+
+function isDesiccantIdentityQuery(message) {
+  const m = String(message || "");
+  if (/цикл|длит|сколько\s+времен|часов|минут|месяц|замен|меня|ресурс|тысяч|частот|регламент|интервал|как\s+часто/i.test(m)) {
+    return false;
+  }
+  if (/регенерац/i.test(m) && /длит|сколько|цикл|минут/i.test(m)) {
+    return false;
+  }
+  if (/жидк|как\s+(?:именно\s+)?осуш|метод\s+осуш|происходит\s+осуш/i.test(m)) {
+    return false;
+  }
+  return /поглотител|цеолит|химическ.*вещ.*влаг|влаго.*погло/i.test(m);
+}
+
+function isChamberTemperatureRangeQuery(message) {
+  const m = String(message || "");
+  if (/производител|бренд|комpan|siemens|honeywell|немецк|японск/i.test(m)) {
+    return false;
+  }
+  if (/датчик/i.test(m) && !/диапазон|рабоч.*темп/i.test(m)) {
+    return false;
+  }
+  return (
+    /диапазон.*температур|рабоч.*температур|температур.*(?:внутр|рабоч|камер)/i.test(m) ||
+    (/температур/i.test(m) && /внутр.*рабоч|рабоч.*объ[её]м/i.test(m))
+  );
+}
+
+function parseDistributedShelfLoad(message, factKey) {
+  const m = String(message || "");
+  const totalMatch = m.match(/(\d+)\s*(?:кг|килограм)/i);
+  if (!totalMatch) {
+    return null;
+  }
+  const total = Number(totalMatch[1]);
+  let shelfCount = null;
+  if (/по\s+двум|на\s+двух|дв(?:ух|ум|е)\s+(?:усилен|стандарт|выдвиж|укороч|полк)|\b2\s+(?:усилен|стандарт|выдвиж|укороч|полк)/i.test(m)) {
+    shelfCount = 2;
+  } else if (/по\s+тр[её]м|на\s+тр[её]х|тр[её](?:х|м|и)\s+(?:усилен|стандарт|выдвиж|укороч|полк)|\b3\s+(?:усилен|стандарт|выдвиж|укороч|полк)/i.test(m)) {
+    shelfCount = 3;
+  } else {
+    const countMatch = m.match(
+      /(?:по|на)\s+(\d+)\s+(?:усиленн|стандартн|выдвижн|укороченн)?\s*полк/i
+    );
+    if (countMatch) {
+      shelfCount = Number(countMatch[1]);
+    }
+  }
+  if (!shelfCount || shelfCount < 1) {
+    return null;
+  }
+  const limits = {
+    shelf_load_reinforced: GOLDEN_SHELF_LOAD_KG.reinforced,
+    shelf_load_standard: GOLDEN_SHELF_LOAD_KG.standard,
+    shelf_load_drawer: GOLDEN_SHELF_LOAD_KG.drawer,
+    shelf_load_cutout: GOLDEN_SHELF_LOAD_KG.cutoutHeating,
+  };
+  const limit = limits[factKey];
+  if (!limit) {
+    return null;
+  }
+  const perShelf = total / shelfCount;
+  if (perShelf <= limit) {
+    return `При равномерной загрузке **${total} кг** на **${shelfCount}** полки — **${perShelf} кг** на каждую; лимит **${limit} кг** **не превышен** — **нагрузку шкаф выдержит**.`;
+  }
+  return `При **${perShelf} кг** на полку (из **${total} кг** на **${shelfCount}** полки) лимит **${limit} кг** **превышен** — такую загрузку **нельзя** допускать.`;
 }
 
 function isPeakOrDualOptionsPowerQuery(message) {
@@ -199,11 +292,53 @@ function resolveGoldenFactMatch(message, history = []) {
     return { key: "power_on_procedure", confidence: "high" };
   }
 
+  if (
+    (/осмотр|визуальн/i.test(m) &&
+      /(?:отключ|220|кабел|электропитан|заземл|вилк|розетк)/i.test(m) &&
+      /нужно|надо|должен|следует|можно|требу|снимать|смотр|провер/i.test(m)) ||
+    (/заземл|кабел.*питан|кабель\s+пит/i.test(m) &&
+      /осмотр|визуальн|смотр|провер/i.test(m) &&
+      /можно|нужно|должен|при\s+включ|включен|под\s+напряжен/i.test(m))
+  ) {
+    return { key: "inspection_power_off", confidence: "high" };
+  }
+
+  if (/датчик/i.test(m) && /производител|бренд|комpan|siemens|honeywell|немецк|японск/i.test(m)) {
+    return { key: "sensor_brand_unknown", confidence: "high" };
+  }
+
+  if (/регенерац/i.test(m) && /цикл|длит|сколько\s+времен|минут|полн/i.test(m)) {
+    return { key: "regen_cycle_duration", confidence: "high" };
+  }
+
+  if (
+    (/замен|меня|ресурс|обслужив|частот|регламент|интервал|\bто\b/i.test(m) ||
+      /часов|тысяч\s+час|как\s+часто/i.test(m)) &&
+    /цеолит|осушител|блок.*осуш/i.test(m)
+  ) {
+    return { key: "maintenance_desiccant_replace", confidence: "high" };
+  }
+
+  if (/азот/i.test(m) && /давлен/i.test(m)) {
+    return { key: "nitrogen_pressure_max", confidence: "high" };
+  }
+
+  if ((/звук|сигнализац|пищит|писк/i.test(m) && /двер|откры/i.test(m)) || (/пищит|писк/i.test(m) && /шкаф/i.test(m))) {
+    return { key: "door_sound_signal", confidence: "high" };
+  }
+
+  if (
+    /жидк|как\s+(?:именно\s+)?осуш|метод\s+осуш|происходит\s+осуш|химическ.*осуш/i.test(m) &&
+    /осуш|влаж/i.test(m)
+  ) {
+    return { key: "desiccant_drying_process", confidence: "high" };
+  }
+
   if (/сопротивлен.*заземл|заземляющ.*контур/i.test(m)) {
     return { key: "grounding_resistance", confidence: "high" };
   }
 
-  if (/защитн.*заземл|требу.*заземл|нужн.*заземл|функциональн.*заземл/i.test(m)) {
+  if (/защитн.*заземл|требу.*заземл|нужн.*заземл|функциональн.*заземл/i.test(m) && !/осмотр|визуальн/i.test(m)) {
     return { key: "grounding_required", confidence: "high" };
   }
 
@@ -215,7 +350,8 @@ function resolveGoldenFactMatch(message, history = []) {
     /напряжен|питани|\b220\b.*в/i.test(m) &&
     !/мощност|вт\b/i.test(m) &&
     !isLocationQuery(m) &&
-    !isVoltageSurgeQuery(m)
+    !isVoltageSurgeQuery(m) &&
+    !isNitrogenSupplyContext(m)
   ) {
     return { key: "power_voltage", confidence: "high" };
   }
@@ -258,11 +394,11 @@ function resolveGoldenFactMatch(message, history = []) {
     return { key: "door_glass", confidence: "high" };
   }
 
-  if (/температур/i.test(m) && /внутр|рабоч.*объ|камер/i.test(m) && !/окружающ|помещен/i.test(m)) {
+  if (isChamberTemperatureRangeQuery(m)) {
     return { key: "chamber_temperature", confidence: "high" };
   }
 
-  if (/поглотител|цеолит|химическ.*вещ.*влаг|влаго.*погло/i.test(m)) {
+  if (isDesiccantIdentityQuery(m)) {
     return { key: "desiccant_zeolite", confidence: "high" };
   }
 
@@ -278,8 +414,12 @@ function resolveGoldenFactMatch(message, history = []) {
   }
 
   if (
-    /условия\s+эксплуатац|температур.*окружающ|влажност.*помещен|эксплуатац.*при.*%|90\s*%/i.test(m) &&
-    !/внутр.*рабоч|рабоч.*объем/i.test(m)
+    (/условия\s+эксплуатац|температур.*окружающ|влажност.*помещен|эксплуатац.*при.*%|90\s*%/i.test(m) ||
+      (/температур/i.test(m) &&
+        /(?:\+\s*)?(?:1[0-4]|\d)\s*(?:°|,|\b)|опустил|ниже.*15|минимально\s+допустим/i.test(m) &&
+        /эксплуатац|штатн|можно|продолж/i.test(m)) ||
+      (/(?:\+\s*)?(?:1[0-4])\s*°/i.test(m) && /можно|штатн|эксплуат|работ/i.test(m))) &&
+    !/внутр.*рабоч|рабоч.*объ[её]m/i.test(m)
   ) {
     return { key: "operating_conditions", confidence: "high" };
   }
@@ -338,7 +478,7 @@ function rowByKey(key) {
   return GOLDEN_TABLE_11.find((r) => r.key === key) || null;
 }
 
-function formatGoldenFactAnswer(factKey) {
+function formatGoldenFactAnswer(factKey, message = "") {
   switch (factKey) {
     case "mass": {
       const row = rowByKey("mass");
@@ -386,7 +526,24 @@ function formatGoldenFactAnswer(factKey) {
       return `Диапазон поддержания относительной влажности внутри рабочего объёма (п. 1.1.2.1–1.1.2.4): **0–80 %RH**, точность **±1 %RH**.`;
     case "coat_color":
       return `Цвет порошкового покрытия корпуса **${GOLDEN_MODEL}** (п. 1.1.2.10): **${GOLDEN_COAT_COLOR.value}**.`;
-    case "operating_conditions":
+    case "operating_conditions": {
+      const msg = String(message || "");
+      if (
+        ((/(?:\+\s*)?(?:1[0-4])\s*(?:°|°c|,|\b)|опустил|ниже\s*\+?\s*15/i.test(msg) &&
+          !/влажност|%rh|\brh\b|90\s*%/i.test(msg)) ||
+          (/температур/i.test(msg) &&
+            /(?:\+\s*)?(?:1[0-4])\s*(?:°|°c|,|\b)/i.test(msg) &&
+            !/влажност|%rh|\brh\b|90\s*%/i.test(msg))) &&
+        /эксплуатац|штатн|можно|продолж|работ/i.test(msg)
+      ) {
+        const tMatch = msg.match(/\+\s*(1[0-4]|\d{1,2})\s*(?:°|°C|,|\b)/i);
+        const tVal = tMatch ? tMatch[1] : "10";
+        return [
+          `При температуре **+${tVal} °C** (ниже **+15 °C**) штатная эксплуатация **${GOLDEN_MODEL}** **недопустима** (п. **1.1.2.12**).`,
+          "Допустимый диапазон температуры **окружающего** воздуха: **от +15 °C до +35 °C**.",
+          "Продолжать эксплуатацию в штатном режиме **нельзя** до возвращения температуры в допустимый диапазон.",
+        ].join("\n");
+      }
       return [
         `Условия эксплуатации **${GOLDEN_MODEL}** (п. 1.1.2.12):`,
         "• температура окружающего воздуха: **от +15 °C до +35 °C**;",
@@ -395,14 +552,27 @@ function formatGoldenFactAnswer(factKey) {
         "",
         "Эксплуатация при **90 % RH** в помещении **не соответствует** п. 1.1.2.12.",
       ].join("\n");
-    case "shelf_load_standard":
+    }
+    case "shelf_load_standard": {
+      const distributed = parseDistributedShelfLoad(message, factKey);
+      if (distributed) return distributed;
       return `Суммарная распределённая нагрузка на каждую **стандартную полку** **${GOLDEN_MODEL}** (п. 1.1.2.8): **не более ${GOLDEN_SHELF_LOAD_KG.standard} кг**.`;
-    case "shelf_load_reinforced":
+    }
+    case "shelf_load_reinforced": {
+      const distributed = parseDistributedShelfLoad(message, factKey);
+      if (distributed) return distributed;
       return `Суммарная распределённая нагрузка на каждую **усиленную полку** **${GOLDEN_MODEL}** (п. 1.1.2.8): **не более ${GOLDEN_SHELF_LOAD_KG.reinforced} кг**.`;
-    case "shelf_load_cutout":
+    }
+    case "shelf_load_cutout": {
+      const distributed = parseDistributedShelfLoad(message, factKey);
+      if (distributed) return distributed;
       return `Нагрузка на **укороченную полку с вырезом** (опция подогрева) **${GOLDEN_MODEL}** (п. 1.1.2.8): **не более ${GOLDEN_SHELF_LOAD_KG.cutoutHeating} кг**.`;
-    case "shelf_load_drawer":
+    }
+    case "shelf_load_drawer": {
+      const distributed = parseDistributedShelfLoad(message, factKey);
+      if (distributed) return distributed;
       return `Суммарная распределённая нагрузка на каждую **выдвижную полку** **${GOLDEN_MODEL}** (п. 1.1.2.8): **не более ${GOLDEN_SHELF_LOAD_KG.drawer} кг**.`;
+    }
     case "power_on_procedure":
       return [
         "Включение шкафа **SDB1106NM** (п. 2.2.4–2.2.5):",
@@ -429,6 +599,38 @@ function formatGoldenFactAnswer(factKey) {
         `Шкаф **${GOLDEN_MODEL}** **не предназначен** для хранения взрывоопасных, легковоспламеняющихся и иных опасных веществ.`,
         "Изделие предназначено для сухого хранения радиотехнических компонентов в контролируемой влажности (п. 1.1.1).",
         "Использовать шкаф для таких целей **запрещено** — в РЭ нет режима или комплектации для этого.",
+      ].join("\n");
+    case "inspection_power_off":
+      return [
+        `Визуальный осмотр шкафа **${GOLDEN_MODEL}** (п. **2.2.2**) выполняется **только при отключённом электропитании**.`,
+        "Перед осмотром заземления и кабеля питания **отключите шкаф от сети 220 В** (снимите вилку или переведите тумблер «ВЫКЛ» на кожухе осушителя).",
+      ].join("\n");
+    case "regen_cycle_duration":
+      return `Полный цикл регенерации осушителя **${GOLDEN_MODEL}** (п. **1.1.4.4.3**): **60 ± 1 мин**.`;
+    case "maintenance_desiccant_replace":
+      return [
+        `Замена блока осушения (цеолита) в **${GOLDEN_MODEL}** выполняется по регламенту ТО (п. **2.5**): **не реже 1 раза в 36 месяцев**.`,
+        "В РЭ **не указан** ресурс в **тысячах часов** непрерывной работы — ориентируйтесь на период **36 месяцев**.",
+      ].join("\n");
+    case "nitrogen_pressure_max":
+      return [
+        `Максимальное избыточное давление азота на входе шкафа **${GOLDEN_MODEL}** с опцией азотного питания (п. **1.1.2.6**): **не более 6 бар** (≈ **0,6 МПа**).`,
+        "Это давление **азота**, не напряжение электросети **220 В**.",
+      ].join("\n");
+    case "door_sound_signal":
+      return [
+        `Звуковая сигнализация **${GOLDEN_MODEL}** (п. **1.1.4.3.4**): при **открытии** двери включается **прерывистый звуковой сигнал**, при **закрытии** — **отключается**.`,
+        "Отдельная задержка срабатывания в секундах/минутах в РЭ **не указана** — сигнал связан с фактом открытия двери.",
+      ].join("\n");
+    case "desiccant_drying_process":
+      return [
+        `Осушение воздуха в **${GOLDEN_MODEL}** выполняется **адсорбционным модулем** с **цеолитом** в карманах осушителя (п. **1.1.4.2**).`,
+        "**Жидкий химический осушитель не используется** — это твёрдый поглотитель влаги (цеолит).",
+      ].join("\n");
+    case "sensor_brand_unknown":
+      return [
+        `Производитель / бренд цифрового датчика влажности и температуры в **${GOLDEN_MODEL}** в РЭ **не указан**.`,
+        "В документе описаны функции датчиков и индикация, но без привязки к Siemens, Honeywell и т.п.",
       ].join("\n");
     default:
       return null;

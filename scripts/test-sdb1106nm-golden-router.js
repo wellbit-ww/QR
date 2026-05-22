@@ -14,7 +14,7 @@ function expectKey(question, history, key, high = true) {
   assert.ok(match, `expected match for: ${question}`);
   assert.strictEqual(match.key, key, `question: ${question}`);
   assert.strictEqual(isHighConfidenceDeterministic(match), high, `confidence: ${question}`);
-  return formatGoldenFactAnswer(match.key);
+  return formatGoldenFactAnswer(match.key, question);
 }
 
 function expectNoDeterministic(question, history = []) {
@@ -101,6 +101,72 @@ assert.match(
 assert.match(
   expectKey("Можно ли использовать шкаф для хранения взрывоопасных веществ?", [], "explosive_storage"),
   /не\s+предназнач|запрещ/i
+);
+
+// P1.5 ad-hoc disambiguation
+assert.match(
+  expectKey(
+    "Сколько времени длится полный цикл регенерации осушающего вещества (цеолита) в модулях шкафа?",
+    [],
+    "regen_cycle_duration"
+  ),
+  /60\s*[±+-]?\s*1?\s*мин/i
+);
+assert.match(
+  expectKey(
+    "Нужно ли отключать шкаф от электрической сети 220В при проведении ежемесячного визуального осмотра заземления и кабеля питания?",
+    [],
+    "inspection_power_off"
+  ),
+  /отключ.*2\.2\.2|2\.2\.2.*отключ/i
+);
+assert.match(
+  expectKey(
+    "Какое максимальное избыточное давление азота в МПа разрешено подавать в шкаф, если на нем установлена опция азотного питания?",
+    [],
+    "nitrogen_pressure_max"
+  ),
+  /6\s*бар|0[,.]6/i
+);
+assert.match(
+  expectKey(
+    "Через сколько тысяч часов непрерывной работы требуется полностью заменить цеолит в осушающих модулях шкафа SDB1106NM на новый?",
+    [],
+    "maintenance_desiccant_replace"
+  ),
+  /36\s*месяц/i
+);
+assert.match(
+  expectKey(
+    "Какая известная немецкая или японская компания является производителем цифрового датчика влажности и температуры, установленного внутри этого шкафа?",
+    [],
+    "sensor_brand_unknown"
+  ),
+  /не\s+указан/i
+);
+assert.match(
+  expectKey(
+    "Оператор услышал прерывистый звуковой сигнал шкафа. Что это означает и через какое время после открытия двери он обычно срабатывает?",
+    [],
+    "door_sound_signal"
+  ),
+  /1\.1\.4\.3\.4|открыт/i
+);
+assert.match(
+  expectKey(
+    "Каким образом и с помощью какого вещества происходит осушение воздуха внутри шкафа — используется ли там химический жидкий осушитель?",
+    [],
+    "desiccant_drying_process"
+  ),
+  /цеолит/i
+);
+assert.match(
+  expectKey(
+    "В шкаф загрузили партию печатных плат общим весом 120 кг, равномерно распределив их по двум усиленным полкам. Выдержит ли шкаф такую нагрузку?",
+    [],
+    "shelf_load_reinforced"
+  ),
+  /выдерж|не\s+превыш/i
 );
 
 console.log("OK: golden router P0 tests passed");
