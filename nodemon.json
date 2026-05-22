@@ -1,0 +1,15 @@
+{
+  "watch": [
+    "server.js",
+    "src",
+    "scripts/knowledge-content-loader.js",
+    "data/equipment.json"
+  ],
+  "ext": "js,json",
+  "delay": 400,
+  "signal": "SIGTERM",
+  "env": {
+    "NODE_ENV": "development",
+    "SOVA_CONSOLE_LOG": "1"
+  }
+}

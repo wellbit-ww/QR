@@ -1,12 +1,24 @@
 const fs = require("fs/promises");
+const fsSync = require("fs");
 const path = require("path");
+const os = require("os");
+const { spawnSync } = require("child_process");
 const mammoth = require("mammoth");
 const pdfParse = require("pdf-parse");
 const WordExtractor = require("word-extractor");
 const equipmentCatalog = require("../data/equipment.json");
 const { getRagConfig } = require("../src/rag/config");
 const { getPool, ensureRagSchema } = require("../src/rag/pg-client");
-const { splitDocumentIntoChunks } = require("../src/rag/chunking");
+const {
+  splitDocumentIntoChunks,
+  splitDocumentIntoParentChildChunkRecords,
+  applySdb1106nmModelPrefixToChunk,
+  extractAtomicForbiddenChunks,
+  extractFaultTableTextChunks,
+  extractPossibleFaultsListChunks,
+  extractSpecTableFlattenedChunks,
+  extractEquipmentModelIdentifiers,
+} = require("../src/rag/chunking");
 const { embedText, embedTextsBatch, vectorToSqlLiteral } = require("../src/rag/embeddings");
 
 const ROOT_DIR = path.join(__dirname, "..");
@@ -15,8 +27,44 @@ const KNOWLEDGE_DIR = path.join(ROOT_DIR, "knowledge");
 const WORD_DOC_EXTRACTOR = new WordExtractor();
 const SUPPORTED_FILE_EXT = new Set([".md", ".txt", ".pdf", ".doc", ".docx"]);
 
+function tryConvertPdfToMarkdownViaPython(pdfPath) {
+  const python = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
+  const scriptPath = path.join(ROOT_DIR, "scripts", "pdf_to_markdown.py");
+  if (!fsSync.existsSync(scriptPath)) {
+    return null;
+  }
+  const outPath = path.join(os.tmpdir(), `rag-pdf-md-${Date.now()}-${Math.random().toString(36).slice(2)}.md`);
+  const res = spawnSync(python, [scriptPath, pdfPath, outPath], {
+    encoding: "utf8",
+    maxBuffer: 50 * 1024 * 1024,
+    timeout: 900_000,
+  });
+  if (res.status !== 0 || res.error) {
+    try {
+      fsSync.unlinkSync(outPath);
+    } catch (_e) {
+      /* ignore */
+    }
+    return null;
+  }
+  try {
+    const md = fsSync.readFileSync(outPath, "utf8");
+    return md && md.trim().length > 40 ? md : null;
+  } finally {
+    try {
+      fsSync.unlinkSync(outPath);
+    } catch (_e) {
+      /* ignore */
+    }
+  }
+}
+
 async function loadFileContent(absolutePath, ext) {
   if (ext === ".pdf") {
+    const md = tryConvertPdfToMarkdownViaPython(absolutePath);
+    if (md) {
+      return md;
+    }
     const raw = await fs.readFile(absolutePath);
     const pdf = await pdfParse(raw);
     return pdf.text || "";
@@ -126,6 +174,7 @@ async function loadEquipmentDocuments(equipment) {
       metadata: {
         sourceType: ext.slice(1),
         path: absolutePath.replace(/\\/g, "/"),
+        equipmentModels: extractEquipmentModelIdentifiers(content, equipment),
       },
     };
     docs.push(doc);
@@ -206,9 +255,10 @@ async function upsertChunk(pool, chunkRow) {
         chunk_index,
         content,
         metadata,
-        embedding
+        embedding,
+        content_tsv
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::vector)
+      VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::vector, to_tsvector('simple', COALESCE($6::text, '')))
       ON CONFLICT (equipment_id, source_doc, chunk_index)
       DO UPDATE SET
         section = EXCLUDED.section,
@@ -216,6 +266,7 @@ async function upsertChunk(pool, chunkRow) {
         content = EXCLUDED.content,
         metadata = EXCLUDED.metadata,
         embedding = EXCLUDED.embedding,
+        content_tsv = to_tsvector('simple', COALESCE(EXCLUDED.content, '')),
         updated_at = NOW()
     `,
     [
@@ -231,7 +282,13 @@ async function upsertChunk(pool, chunkRow) {
   );
 }
 
+async function deleteEquipmentChunks(pool, equipmentId) {
+  const r = await pool.query(`DELETE FROM knowledge_chunks WHERE equipment_id = $1`, [equipmentId]);
+  return r.rowCount || 0;
+}
+
 async function main() {
+  const forceReindex = process.argv.includes("--force");
   const config = getRagConfig();
   const pool = getPool(config.postgresUrl);
 
@@ -250,13 +307,56 @@ async function main() {
     console.log(`[INGEST] Equipment ${equipment.id}: docs=${docs.length}`);
 
     for (const doc of docs) {
-      const chunkObjs = splitDocumentIntoChunks(
-        doc.content,
-        config.chunkSize,
-        config.chunkOverlap
-      );
+      const usePc = Boolean(config.useParentChildChunking);
+      let chunkObjs = usePc
+        ? splitDocumentIntoParentChildChunkRecords(doc.content, equipment, {
+            parentChunkChars: config.parentChunkChars,
+            childChunkChars: config.childChunkChars,
+            childOverlapChars: config.childOverlapChars,
+            parentOverlapChars: config.parentOverlapChars || config.chunkOverlap,
+          })
+        : splitDocumentIntoChunks(doc.content, config.chunkSize, config.chunkOverlap);
+      const atomicSafety = extractAtomicForbiddenChunks(doc.content, {
+        equipmentName: equipment.name,
+      });
+      if (atomicSafety.length) {
+        chunkObjs = [...chunkObjs, ...atomicSafety];
+        console.log(
+          `[INGEST] ${equipment.id}/${doc.sourceDoc}: +${atomicSafety.length} atomic safety (ЗАПРЕЩАЕТСЯ) chunks`
+        );
+      }
+      const faultTableChunks = extractFaultTableTextChunks(doc.content, {
+        equipmentName: equipment.name,
+      });
+      if (faultTableChunks.length) {
+        chunkObjs = [...chunkObjs, ...faultTableChunks];
+        console.log(
+          `[INGEST] ${equipment.id}/${doc.sourceDoc}: +${faultTableChunks.length} fault table (3.1.4 / табл. 3.2) chunks`
+        );
+      }
+      const possibleFaultsChunks = extractPossibleFaultsListChunks(doc.content, {
+        equipmentName: equipment.name,
+      });
+      if (possibleFaultsChunks.length) {
+        chunkObjs = [...chunkObjs, ...possibleFaultsChunks];
+        console.log(
+          `[INGEST] ${equipment.id}/${doc.sourceDoc}: +${possibleFaultsChunks.length} possible-faults list (2.2.2 / humidity checks) chunks`
+        );
+      }
+      const specFlatChunks = extractSpecTableFlattenedChunks(doc.content, {
+        equipmentName: equipment.name,
+      });
+      if (specFlatChunks.length) {
+        chunkObjs = [...chunkObjs, ...specFlatChunks];
+        console.log(
+          `[INGEST] ${equipment.id}/${doc.sourceDoc}: +${specFlatChunks.length} table-1.1 flattened (model/param/value) chunks`
+        );
+      }
       console.log(
-        `[INGEST] ${equipment.id}/${doc.sourceDoc}: chunks=${chunkObjs.length}, chunkSize=${config.chunkSize}, overlap=${config.chunkOverlap}`
+        `[INGEST] ${equipment.id}/${doc.sourceDoc}: chunks=${chunkObjs.length}, mode=${usePc ? "parent_child" : "legacy"}, ` +
+          (usePc
+            ? `parent≈${config.parentChunkChars} child≈${config.childChunkChars}`
+            : `chunkSize=${config.chunkSize}, overlap=${config.chunkOverlap}`)
       );
 
       const batchSize = Math.max(1, Math.floor(config.ingestEmbedBatchSize) || 16);
@@ -264,23 +364,35 @@ async function main() {
       for (let start = 0; start < chunkObjs.length; start += batchSize) {
         const end = Math.min(start + batchSize, chunkObjs.length);
         const sliceObjs = chunkObjs.slice(start, end);
-        const sliceTexts = sliceObjs.map((c) => c.content);
-        const vectors = await embedTextsWithFallback(config, sliceTexts);
-
-        for (let i = 0; i < sliceObjs.length; i += 1) {
+        const prepared = sliceObjs.map((obj, i) => {
           const chunkIndex = start + i;
-          const { content: chunkContent, metadata: splitMeta } = sliceObjs[i];
-
+          const { content: chunkContent, metadata: splitMeta } = obj;
           const metadata = enrichChunkRowMetadata(
             chunkContent,
             {
-            ...doc.metadata,
-            ...splitMeta,
-            equipmentName: equipment.name,
+              ...doc.metadata,
+              ...splitMeta,
+              equipmentName: equipment.name,
             },
             doc.sourceDoc,
             chunkIndex
           );
+          let contentForStore = applySdb1106nmModelPrefixToChunk(chunkContent, metadata);
+          if (metadata.parentLlmContext) {
+            metadata.parentLlmContext = applySdb1106nmModelPrefixToChunk(
+              metadata.parentLlmContext,
+              metadata
+            );
+          }
+          return { chunkIndex, contentForStore, metadata };
+        });
+        const vectors = await embedTextsWithFallback(
+          config,
+          prepared.map((p) => p.contentForStore)
+        );
+
+        for (let i = 0; i < prepared.length; i += 1) {
+          const { chunkIndex, contentForStore, metadata } = prepared[i];
 
           await upsertChunk(pool, {
             equipmentId: equipment.id,
@@ -288,7 +400,7 @@ async function main() {
             section: doc.section,
             page: doc.page,
             chunkIndex,
-            content: chunkContent,
+            content: contentForStore,
             metadata,
             embedding: vectorToSqlLiteral(vectors[i]),
           });

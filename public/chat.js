@@ -1,8 +1,48 @@
 const params = new URLSearchParams(window.location.search);
 window.equipmentId = params.get("equipment");
 
+const testSessionParams = {
+  block: Number(params.get("testBlock")) || null,
+  question: Number(params.get("testQ")) || null,
+  sessionLabel: params.get("testSession") || null,
+};
+
+function buildTestMetaPayload() {
+  const meta = {};
+  if (Number.isFinite(testSessionParams.block) && testSessionParams.block > 0) {
+    meta.block = testSessionParams.block;
+  }
+  if (Number.isFinite(testSessionParams.question) && testSessionParams.question > 0) {
+    meta.question = testSessionParams.question;
+  }
+  if (testSessionParams.sessionLabel) {
+    meta.sessionLabel = testSessionParams.sessionLabel;
+  }
+  return Object.keys(meta).length ? meta : null;
+}
+
+function showTestSessionHint() {
+  const meta = buildTestMetaPayload();
+  if (!meta || !chatModeHint) {
+    return;
+  }
+  const parts = [];
+  if (meta.block) {
+    parts.push(`блок ${meta.block}`);
+  }
+  if (meta.question) {
+    parts.push(`вопрос ${meta.question}`);
+  }
+  if (meta.sessionLabel) {
+    parts.push(meta.sessionLabel);
+  }
+  chatModeHint.textContent = `Ручной тест: ${parts.join(", ")} — метка попадёт в logs/*.jsonl`;
+}
+
 const equipmentBadge = document.getElementById("equipmentBadge");
 const chatSubtitle = document.getElementById("chatSubtitle");
+const chatModeBadge = document.getElementById("chatModeBadge");
+const chatModeHint = document.getElementById("chatModeHint");
 const backToEquipmentLink = document.getElementById("backToEquipmentLink");
 const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
@@ -22,6 +62,60 @@ function setEquipmentUi(equipment) {
     chatSubtitle.textContent = `SOVA отвечает только по оборудованию: ${equipment.name}.`;
   }
   backToEquipmentLink.href = `/equipment/${equipment.id}`;
+  updateExpectedChatMode();
+}
+
+function formatExpectedModeHint(capabilities, directChecked) {
+  if (!capabilities) {
+    return "";
+  }
+  if (directChecked) {
+    return "Запросы пойдут в Direct Context (полный PDF в промпт).";
+  }
+  if (!capabilities.ragAvailable) {
+    if (capabilities.autoDirectForEquipment) {
+      return "Postgres не настроен — для этой модели автоматически используется Direct Context.";
+    }
+    return "RAG недоступен (нет POSTGRES_URL) — ответы из полного документа.";
+  }
+  return "RAG активен: поиск по чанкам руководства в Postgres.";
+}
+
+function updateExpectedChatMode() {
+  if (!chatModeBadge || !currentEquipment) {
+    return;
+  }
+  const caps = currentEquipment.chatCapabilities;
+  const directCheckbox = document.getElementById("directContextMode");
+  const directChecked = directCheckbox ? directCheckbox.checked : false;
+  const useDirect =
+    directChecked || (caps && caps.autoDirectForEquipment && !caps.ragAvailable);
+  const path = useDirect ? "direct" : "rag";
+  chatModeBadge.hidden = false;
+  chatModeBadge.dataset.path = path;
+  chatModeBadge.textContent = useDirect
+    ? "Ожидается: Direct Context"
+    : "Ожидается: RAG";
+  if (chatModeHint) {
+    chatModeHint.textContent = formatExpectedModeHint(caps, directChecked);
+  }
+}
+
+function applyResponseChatMode(payload) {
+  if (!chatModeBadge) {
+    return;
+  }
+  const mode = payload?.chatMode;
+  if (!mode) {
+    return;
+  }
+  chatModeBadge.hidden = false;
+  chatModeBadge.dataset.path = mode.path || "";
+  chatModeBadge.textContent = `Ответ: ${mode.label || mode.mode || "—"}`;
+  if (chatModeHint && mode.ragAvailable === false && mode.autoDirect) {
+    chatModeHint.textContent =
+      "Postgres не настроен — Direct Context включён автоматически для SDB1106NM.";
+  }
 }
 
 function normalizeAssistantText(text) {
@@ -157,9 +251,13 @@ async function fetchEquipment(equipmentId) {
 
 async function requestAssistantReply(question) {
   const chatUrl = new URL("/api/chat", window.location.origin).href;
+  const directContextCheckbox = document.getElementById("directContextMode");
+  const directContextMode = directContextCheckbox ? directContextCheckbox.checked : false;
+  const testMeta = buildTestMetaPayload();
 
   let response;
   try {
+    // No AbortSignal / client timeout — RAG + Ollama can take 60s+; server timeouts are in server.js.
     response = await fetch(chatUrl, {
       method: "POST",
       headers: {
@@ -169,6 +267,8 @@ async function requestAssistantReply(question) {
         equipmentId: window.equipmentId,
         message: question,
         history: conversationHistory,
+        directContextMode: directContextMode,
+        ...(testMeta ? { testMeta } : {}),
       }),
     });
   } catch (networkError) {
@@ -190,6 +290,18 @@ async function requestAssistantReply(question) {
 }
 
 async function initChat() {
+  const directContextCheckbox = document.getElementById("directContextMode");
+  if (directContextCheckbox) {
+    const saved = localStorage.getItem("sova_direct_context_mode");
+    if (saved !== null) {
+      directContextCheckbox.checked = saved === "true";
+    }
+    directContextCheckbox.addEventListener("change", () => {
+      localStorage.setItem("sova_direct_context_mode", directContextCheckbox.checked);
+      updateExpectedChatMode();
+    });
+  }
+
   if (!window.equipmentId) {
     equipmentBadge.textContent = "Оборудование: не выбрано";
     if (chatSubtitle) {
@@ -208,6 +320,7 @@ async function initChat() {
   try {
     const equipment = await fetchEquipment(window.equipmentId);
     setEquipmentUi(equipment);
+    showTestSessionHint();
     appendMessage(
       "assistant",
       `Здравствуйте. Я работаю только с оборудованием ${equipment.name}. Задайте вопрос по этой модели.`
@@ -257,6 +370,7 @@ chatForm.addEventListener("submit", async (event) => {
     const payload = await requestAssistantReply(question);
     const answer = payload.answer || "";
 
+    applyResponseChatMode(payload);
     appendMessage("assistant", answer);
     conversationHistory.push({
       role: "assistant",

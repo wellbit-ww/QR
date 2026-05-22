@@ -3,6 +3,17 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const equipmentCatalog = require("./data/equipment.json");
+const { resolveEquipmentProfile } = require("./src/equipment/equipment-runtime");
+const {
+  isChatFileLogEnabled,
+  normalizeTestMeta,
+  summarizeRagTrace,
+  recordChatExchange,
+  recordChatError,
+  getChatSessionLogPath,
+  closeChatSessionLog,
+  initChatSessionLog,
+} = require("./src/chat-session-log");
 const { getRagConfig, getMaxRetrievalTopK } = require("./src/rag/config");
 const { getPool, ensureRagSchema } = require("./src/rag/pg-client");
 const {
@@ -10,13 +21,42 @@ const {
   formatContextForPrompt,
   extractSources,
 } = require("./src/rag/retrieval");
-const { classifyQueryIntent } = require("./src/rag/query-intent");
+const {
+  classifyQueryIntent,
+  llmGenerationOptionsForIntent,
+  isTechnicalNumericQuery,
+} = require("./src/rag/query-intent");
+const { loadAllKnowledgeText } = require("./scripts/knowledge-content-loader");
+const {
+  buildSdb1106nmDirectPreamble,
+  directContextHintsForMessage,
+  tryDeterministicSdb1106nmAnswer,
+  buildSdb1106nmDirectSystemContent,
+  extractSafetyDocExcerpt,
+} = require("./src/rag/sdb1106nm-direct-facts");
 const { validateAnswerAgainstContext } = require("./src/rag/answer-validation");
 const {
   createRagTrace,
   finalizeRagTrace,
 } = require("./src/rag/telemetry/rag-trace");
 const { fetchOllama } = require("./src/rag/ollama-fetch");
+const { analyzeQuery, QUERY_TYPES } = require("./src/rag/query-analysis");
+const { applySpecializedRetrievalStrategy } = require("./src/rag/retrieval-strategies");
+const { buildProceduralMessages } = require("./src/rag/synthesis/procedural-synthesis");
+const {
+  buildTroubleshootingMessages,
+  buildDiagnosticClarification,
+} = require("./src/rag/synthesis/troubleshooting-synthesis");
+const { buildReasoningMessages } = require("./src/rag/synthesis/reasoning-synthesis");
+const { validateGrounding } = require("./src/rag/synthesis/grounding-validation");
+const { routeQuery } = require("./src/rag/router/query-router");
+const { runPipeline } = require("./src/rag/pipeline/run-pipeline");
+const { classifySdb1106nmMessage, buildSafetyDeterministicOrPrompt } = require("./src/rag/sdb1106nm-chat-gate");
+const {
+  applySdb1106nmPostGate,
+  resolveDeliveryMethodFromLlmTrace,
+} = require("./src/rag/sdb1106nm-post-gate");
+const { STRICT_ABSTAIN, buildSdb1106nmDirectSystemPrompt, buildSafetyGroundedSystemPrompt } = require("./src/rag/prompts");
 
 const app = express();
 
@@ -54,6 +94,34 @@ function listLanIPv4Addresses() {
 
 const HOST = resolveListenHost();
 const PORT = resolveListenPort();
+
+/**
+ * HTTP server socket limits for long RAG + Ollama (often 8–120s+ per request).
+ * - HTTP_SERVER_TIMEOUT_MS: incoming connection idle/socket timeout (ms). Default 180000 (3 min), minimum 60000.
+ *   Set to "0" to disable server.timeout (Node: no socket idle cap).
+ * - CHAT_REQUEST_SOCKET_MS: per-request req/res/socket timeout for POST /api/chat only. Same default; "0" = clear.
+ */
+function resolveHttpServerTimeouts() {
+  const raw = process.env.HTTP_SERVER_TIMEOUT_MS;
+  if (raw === "0") {
+    return { socketMs: 0, keepAliveMs: 125_000, headersMs: 130_000 };
+  }
+  const socketMs = Math.max(60_000, Number(raw || 180_000));
+  return {
+    socketMs,
+    keepAliveMs: socketMs + 5_000,
+    headersMs: socketMs + 10_000,
+  };
+}
+
+function resolveChatRequestSocketMs() {
+  const raw = process.env.CHAT_REQUEST_SOCKET_MS;
+  if (raw === "0") {
+    return 0;
+  }
+  return Math.max(60_000, Number(raw || 180_000));
+}
+
 const publicDir = path.join(__dirname, "public");
 /** Локальная раздача Markdown-санитайзера без CDN (телефон в LAN без интернета / блокировка CDN). */
 const vendorMarkedPath = path.join(__dirname, "node_modules", "marked", "marked.min.js");
@@ -65,7 +133,7 @@ const vendorPurifyPath = path.join(
   "purify.min.js"
 );
 const OLLAMA_URL = "http://127.0.0.1:11434/api/chat";
-const OLLAMA_MODEL = "gemma4:e2b";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:32b-instruct";
 const ragConfig = getRagConfig();
 
 /** PDF руководства SDB1106 NM: env SDB1106_MANUAL_PDF или файл в public/manuals/SDB1106NM.pdf */
@@ -87,17 +155,24 @@ function resolveSdb1106ManualFilePath() {
 /** Лимит контекста для /api/chat (см. WARN Ollama: num_ctx не больше обученного у модели). Переопределение: OLLAMA_NUM_CTX */
 function resolveOllamaChatNumCtx() {
   const trainedCap = 131072;
-  const fallback = 32768;
+  const fallback = 16384; // Reduced from 32768 to prevent GPU/CPU thrashing and high RAM (70GB+) swap freezes on local devices
   const n = Number(process.env.OLLAMA_NUM_CTX);
   let v = Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback;
   v = Math.min(v, trainedCap);
   return Math.max(2048, v);
 }
 
-function getOllamaChatOptions() {
-  return {
-    num_ctx: resolveOllamaChatNumCtx(),
-  };
+function getOllamaChatOptions({ directContext = false } = {}) {
+  let numCtx = resolveOllamaChatNumCtx();
+  if (directContext) {
+    const directCtx = Number(process.env.OLLAMA_DIRECT_NUM_CTX);
+    if (Number.isFinite(directCtx) && directCtx > 0) {
+      numCtx = Math.min(Math.floor(directCtx), 131072);
+    } else {
+      numCtx = Math.max(numCtx, 32768);
+    }
+  }
+  return { num_ctx: numCtx };
 }
 
 const WB = String.raw`(?<![\p{L}\p{N}])(?:`;
@@ -285,7 +360,21 @@ function getTimestamp() {
   return new Date().toISOString();
 }
 
+function isConsoleLogEnabled() {
+  return process.env.SOVA_CONSOLE_LOG !== "0";
+}
+
+function shouldLogHttpRequest(url) {
+  if (process.env.LOG_HTTP_ALL === "1") {
+    return true;
+  }
+  return String(url || "").startsWith("/api");
+}
+
 function logInfo(message, details) {
+  if (!isConsoleLogEnabled()) {
+    return;
+  }
   if (details) {
     console.log(`[${getTimestamp()}] INFO ${message}`, details);
     return;
@@ -301,6 +390,67 @@ function logError(message, details) {
   }
 
   console.error(`[${getTimestamp()}] ERROR ${message}`);
+}
+
+function logChatOutcome(details) {
+  if (!isConsoleLogEnabled()) {
+    return;
+  }
+  console.log(`[${getTimestamp()}] CHAT ${JSON.stringify(details)}`);
+}
+
+function emitChatSessionRecord({
+  equipment,
+  question,
+  answer,
+  chatStartedAt,
+  testMeta,
+  directContextRequested,
+  chatMode,
+  chatCapabilities,
+  ragTrace,
+  retrieval,
+  gateAction,
+  httpStatus = 200,
+  error = null,
+}) {
+  const durationMs = Date.now() - chatStartedAt;
+  const mode = chatMode?.mode || ragTrace?.mode || null;
+
+  logChatOutcome({
+    equipmentId: equipment?.id ?? null,
+    mode,
+    gateAction: gateAction ?? null,
+    durationMs,
+    answerPreview: String(answer || error || "").slice(0, 240),
+    ...(testMeta ? { testMeta } : {}),
+  });
+
+  if (!isChatFileLogEnabled()) {
+    return;
+  }
+
+  const record = {
+    equipmentId: equipment?.id ?? null,
+    equipmentName: equipment?.name ?? null,
+    question,
+    answer: answer ?? null,
+    httpStatus,
+    durationMs,
+    directContextRequested: Boolean(directContextRequested),
+    testMeta,
+    chatMode: chatMode ?? null,
+    chatCapabilities: chatCapabilities ?? null,
+    ragTrace: summarizeRagTrace(ragTrace),
+    retrieval: retrieval ?? null,
+    gateAction: gateAction ?? null,
+  };
+
+  if (error) {
+    recordChatError({ ...record, error });
+    return;
+  }
+  recordChatExchange(record);
 }
 
 function getEquipment(equipmentId) {
@@ -322,6 +472,76 @@ function toEquipmentSummary(equipment) {
     manualUrl: equipment.manualUrl,
     guideUrl: equipment.guideUrl,
     summary: equipment.summary,
+  };
+}
+
+function getChatCapabilities(equipment) {
+  const ragAvailable = Boolean(ragConfig.postgresUrl);
+  const autoDirectForEquipment =
+    Boolean(resolveEquipmentProfile(equipment?.id)?.autoDirectWhenNoPostgres) && !ragAvailable;
+  let defaultPath = "direct";
+  if (ragAvailable && !autoDirectForEquipment) {
+    defaultPath = "rag";
+  }
+  return {
+    ragAvailable,
+    postgresConfigured: ragAvailable,
+    autoDirectForEquipment,
+    defaultPath,
+  };
+}
+
+const CHAT_MODE_LABELS = Object.freeze({
+  DIRECT_CONTEXT: "Direct Context (полный PDF)",
+  DIRECT_CONTEXT_DETERMINISTIC: "Direct · deterministic",
+  DIRECT_CONTEXT_RETRY: "Direct Context (повтор)",
+  RAG: "RAG (поиск по чанкам)",
+  RAG_DETERMINISTIC: "RAG · deterministic",
+  RAG_DETERMINISTIC_RECOVERY: "RAG · recovery",
+  SAFETY_DETERMINISTIC: "Safety · deterministic",
+  SCOPE_GATE: "Scope gate",
+});
+
+function buildChatModeInfo({ useDirectContext, ragTrace, capabilities }) {
+  const mode = ragTrace?.mode || (useDirectContext ? "DIRECT_CONTEXT" : "RAG");
+  const path = useDirectContext ? "direct" : "rag";
+  return {
+    path,
+    mode,
+    label: CHAT_MODE_LABELS[mode] || mode,
+    ragAvailable: Boolean(capabilities?.ragAvailable),
+    requestedDirect: Boolean(useDirectContext),
+    autoDirect: Boolean(capabilities?.autoDirectForEquipment),
+  };
+}
+
+function buildPostgresAutoDirectWarning(capabilities) {
+  if (!capabilities?.autoDirectForEquipment) {
+    return null;
+  }
+  return "POSTGRES_URL не задан — RAG недоступен, для SDB1106NM автоматически используется Direct Context.";
+}
+
+function attachRagTraceWarnings(ragTrace, capabilities) {
+  const warning = buildPostgresAutoDirectWarning(capabilities);
+  if (!warning) {
+    return ragTrace;
+  }
+  return {
+    ...ragTrace,
+    warnings: [...(Array.isArray(ragTrace?.warnings) ? ragTrace.warnings : []), warning],
+    postgresConfigured: false,
+    autoDirectFallback: true,
+  };
+}
+
+function enrichEquipmentForChat(equipment) {
+  if (!equipment) {
+    return equipment;
+  }
+  return {
+    ...equipment,
+    chatCapabilities: getChatCapabilities(equipment),
   };
 }
 
@@ -1140,8 +1360,17 @@ function buildSystemPrompt(equipment, retrievalContext, options = {}) {
   ].join("\n");
 }
 
-async function callOllamaChat({ model, messages, format }) {
-  const chatOptions = getOllamaChatOptions();
+async function callOllamaChat({
+  model,
+  messages,
+  format,
+  options: ollamaOptions = null,
+  directContext = false,
+}) {
+  const chatOptions = {
+    ...getOllamaChatOptions({ directContext }),
+    ...(ollamaOptions && typeof ollamaOptions === "object" ? ollamaOptions : {}),
+  };
   const buildBody = (fmt) =>
     JSON.stringify({
       model,
@@ -1488,6 +1717,9 @@ app.use((req, res, next) => {
   const startedAt = Date.now();
 
   res.on("finish", () => {
+    if (!shouldLogHttpRequest(req.originalUrl)) {
+      return;
+    }
     logInfo(`${req.method} ${req.originalUrl} -> ${res.statusCode}`, {
       durationMs: Date.now() - startedAt,
       ip: req.ip,
@@ -1556,7 +1788,7 @@ app.get("/api/equipment/:equipmentId", (req, res) => {
     });
   }
 
-  return res.json(equipment);
+  return res.json(enrichEquipmentForChat(equipment));
 });
 
 app.get("/equipment/:equipmentId", (req, res) => {
@@ -1572,15 +1804,85 @@ app.get("/equipment/:equipmentId", (req, res) => {
   return res.sendFile(path.join(publicDir, "index.html"));
 });
 
-app.post("/api/chat", async (req, res) => {
-  req.setTimeout(0);
-  res.setTimeout(0);
-  if (req.socket) {
-    req.socket.setTimeout(0);
+async function getDirectContextForEquipment(equipment) {
+  let docText = "";
+  let sourcePath = "";
+  let sourceType = "catalog";
+  let manualLoaded = false;
+
+  try {
+    const primaryText = await loadAllKnowledgeText(equipment.id);
+    if (primaryText && primaryText.text && primaryText.text.trim()) {
+      docText = primaryText.text.trim();
+      sourcePath = primaryText.sourcePath;
+      sourceType = primaryText.sourceType;
+      manualLoaded = sourceType !== "json";
+    }
+  } catch (err) {
+    logError("Failed to load combined knowledge text for direct context.", {
+      equipmentId: equipment.id,
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 
-  const { equipmentId, message, history } = req.body || {};
+  if (!docText) {
+    if (equipment.id === "sdb1106-nm") {
+      docText = buildSdb1106nmDirectPreamble("");
+      sourcePath = "src/rag/sdb1106nm-direct-facts.js";
+      sourceType = "preamble_only";
+      manualLoaded = false;
+    } else {
+      const specsStr = Array.isArray(equipment.specs) ? equipment.specs.join("\n") : "";
+      const detailsStr = Array.isArray(equipment.details) ? equipment.details.join("\n") : "";
+      docText = `Название: ${equipment.name}\nТип: ${equipment.type}\nОписание: ${equipment.description}\nКраткая информация: ${equipment.summary}\n\nХарактеристики:\n${specsStr}\n\nДетали:\n${detailsStr}`;
+      sourcePath = "data/equipment.json";
+      sourceType = "json";
+    }
+  }
+
+  let systemPrompt = "";
+  if (equipment.id === "sdb1106-nm") {
+    systemPrompt = buildSdb1106nmDirectSystemPrompt(equipment, { manualLoaded });
+    if (sourceType !== "preamble_only") {
+      const preamble = buildSdb1106nmDirectPreamble(docText);
+      docText = `${preamble}\n\n---\n\n${docText}`;
+    }
+  } else if (equipment.id === "wattsan-1313a") {
+    systemPrompt = `Ты — сервисный инженер по лазерному станку по металлу Wattsan 1313A.
+Твоя задача — отвечать на вопросы пользователя по этому станку на основе предоставленной технической информации.
+Будь точен, профессионален и давай ответы строго по делу.`;
+  } else if (equipment.id === "w-700") {
+    systemPrompt = `Ты — технический специалист по горизонтальному токарному станку с ЧПУ W 700.
+Твоя задача — отвечать на вопросы пользователя по этому станку на основе предоставленной информации.
+Будь вежлив, точен и давай технически грамотные ответы.`;
+  } else {
+    systemPrompt = `Ты — квалифицированный технический специалист по оборудованию ${equipment.name}.
+Твоя задача — отвечать на вопросы пользователя на основе предоставленного документа.
+Будь профессионален, точен и опирайся строго на предоставленную информацию.`;
+  }
+
+  return { docText, sourcePath, sourceType, systemPrompt, manualLoaded };
+}
+
+app.post("/api/chat", async (req, res) => {
+  const chatSocketMs = resolveChatRequestSocketMs();
+  if (chatSocketMs > 0) {
+    req.setTimeout(chatSocketMs);
+    res.setTimeout(chatSocketMs);
+    if (req.socket) {
+      req.socket.setTimeout(chatSocketMs);
+    }
+  } else {
+    req.setTimeout(0);
+    res.setTimeout(0);
+    if (req.socket) {
+      req.socket.setTimeout(0);
+    }
+  }
+
+  const { equipmentId, message, history, directContextMode, testMeta: rawTestMeta } = req.body || {};
   const trimmedMessage = typeof message === "string" ? message.trim() : "";
+  const testMeta = normalizeTestMeta({ testMeta: rawTestMeta });
 
   if (!trimmedMessage) {
     logError("Chat request rejected: empty message.", { equipmentId });
@@ -1612,735 +1914,390 @@ app.post("/api/chat", async (req, res) => {
         }))
     : [];
 
+  const chatStartedAt = Date.now();
+  const chatCapabilities = getChatCapabilities(equipment);
+  const equipmentProfile = resolveEquipmentProfile(equipment.id);
+  const useDirectContext =
+    Boolean(directContextMode) ||
+    (Boolean(equipmentProfile?.autoDirectWhenNoPostgres) && !ragConfig.postgresUrl);
+
   logInfo("Chat request received.", {
     equipmentId: equipment?.id || equipmentId || null,
     equipmentName: equipment?.name || null,
     historyItems: normalizedHistory.length,
-    questionPreview: trimmedMessage.slice(0, 120),
+    question: trimmedMessage,
   });
 
-  try {
-    const keywordSafety = isSafetyChecklistQuestion(trimmedMessage);
-    const keywordEmergency = isEmergencyQuestion(trimmedMessage);
-    const keywordSynthesis = isSynthesisQuestion(trimmedMessage);
-    const procedureMode = PROCEDURE_PATTERN.test(trimmedMessage);
-    const preparationSectionFilter =
-      PREPARATION_SECTION_PATTERN.test(trimmedMessage);
+  let sdb1106Gate = null;
 
-    const classifierDecision = await detectSafetyModeWithClassifier(
-      trimmedMessage,
-      ragConfig.safetyClassifierModel,
-      OLLAMA_MODEL
-    );
-
-    const forceSafetyIntent =
-      keywordEmergency ||
-      keywordSafety ||
-      classifierDecision.emergencyMode ||
-      classifierDecision.safetyMode;
-
-    const queryIntent = classifyQueryIntent(trimmedMessage, equipment, {
-      forceSafety: forceSafetyIntent,
-    });
-
-    let ragTrace = createRagTrace({
-      equipmentId: equipment.id,
-      query: trimmedMessage,
-      intent: queryIntent.intentType,
-      focusParameter: queryIntent.focusParameter,
-      symptomDomain: queryIntent.symptomDomain || null,
-      queryScope: queryIntent.queryScope,
-      queryRisk: queryIntent.queryRisk,
-    });
-
-    const retrievalTopCap = getMaxRetrievalTopK(ragConfig);
-    const retrievalWide = await retrieveEquipmentContext({
-      equipmentId: equipment.id,
-      query: trimmedMessage,
-      topK: retrievalTopCap,
-      sectionHints: preparationSectionFilter ? ["2.2", "2.3"] : undefined,
-      intent: queryIntent,
-    });
-    const safetyMode =
-      keywordEmergency ||
-      classifierDecision.emergencyMode ||
-      ((keywordSafety || classifierDecision.safetyMode) &&
-        !(keywordSynthesis || classifierDecision.synthesisMode));
-    const emergencyMode = keywordEmergency || classifierDecision.emergencyMode;
-    const synthesisMode =
-      !emergencyMode &&
-      queryIntent.intentType !== "FACT_QUERY" &&
-      (keywordSynthesis || classifierDecision.synthesisMode);
-    const safetySubmode = emergencyMode
-      ? "safety_extract"
-      : safetyMode
-        ? "safety_synthesize"
-        : "normal";
-    const triggerTerms = [
-      ...(keywordSafety ? ["keyword:safety"] : []),
-      ...(keywordEmergency ? ["keyword:emergency"] : []),
-      ...(keywordSynthesis ? ["keyword:synthesis"] : []),
-      ...(procedureMode ? ["keyword:procedure"] : []),
-      ...classifierDecision.triggerTerms.map((term) => `classifier:${term}`),
-    ];
-    const requestedTopK = emergencyMode
-      ? ragConfig.emergencyRetrievalTopK
-      : safetyMode
-        ? synthesisMode
-          ? ragConfig.synthesisRetrievalTopK
-          : ragConfig.safetyRetrievalTopK
-        : synthesisMode
-          ? ragConfig.synthesisRetrievalTopK
-          : ragConfig.retrievalTopK;
-
-    const slicedChunks = retrievalWide.chunks.slice(0, requestedTopK);
-    const retrieval = {
-      ...retrievalWide,
-      chunks: slicedChunks,
-      topScore: slicedChunks.length
-        ? slicedChunks[0].rerankScore ?? slicedChunks[0].score
-        : 0,
-      selectedTopK: requestedTopK,
-    };
-
-    const useSinglePromptChunk =
-      queryIntent.intentType === "SINGLE_FIELD_QUERY" ||
-      queryIntent.intentType === "QUICK_FACT_QUERY" ||
-      (queryIntent.intentType === "FACT_QUERY" && queryIntent.queryScope === "narrow");
-    const promptChunks = useSinglePromptChunk
-      ? retrieval.chunks.slice(0, 1)
-      : retrieval.chunks;
-
-    ragTrace.retrievedChunks = retrievalWide.telemetryCandidates || [];
-    ragTrace.rerankTop = (retrievalWide.telemetryCandidates || []).slice(0, 5);
-    ragTrace.retrievalFilterReason = retrievalWide.retrievalFilterReason || "none";
-    ragTrace.rejectedByParameterMismatch = retrievalWide.rejectedByParameterMismatch || 0;
-    ragTrace.rejectedByBlockType = retrievalWide.rejectedByBlockType || 0;
-    ragTrace.rerankApplied = Boolean(retrievalWide.rerankApplied);
-    ragTrace.embeddingAugmented = Boolean(retrievalWide.embeddingAugmented);
-    ragTrace.parameterResolved = Boolean(retrievalWide.parameterResolved);
-    ragTrace.parameterKey = retrievalWide.parameterKey || null;
-    ragTrace.parameterSource = retrievalWide.parameterSource || null;
-    ragTrace.parameterConfidence = Number(retrievalWide.parameterConfidence || 0);
-    ragTrace.lexicalScore = Number(retrievalWide.lexicalScore || 0);
-    ragTrace.fusionScore = Number(retrievalWide.fusionScore || 0);
-    ragTrace.finalChunksUsed = promptChunks.map((ch, idx) => ({
-      rank: idx + 1,
-      sourceDoc: ch.sourceDoc,
-      chunkKind: ch.metadata?.chunkKind ?? null,
-      blockType: ch.metadata?.blockType ?? null,
-      primaryParameter: ch.metadata?.primaryParameter ?? null,
-      rerankScore: ch.rerankScore ?? ch.score ?? null,
-      snippet: String(ch.content || "").slice(0, 220),
-    }));
-
-    const sources = extractSources(promptChunks);
-    const retrievalContext = formatContextForPrompt(promptChunks);
-    const retrievalHasSpecOrTable = retrievalHasSpecOrTableChunks(promptChunks);
-
-    if (
-      queryIntent.intentType === "SINGLE_FIELD_QUERY" &&
-      retrieval.parameterLookupAttempted &&
-      !retrieval.parameterResolved
-    ) {
-      const answer = "Информация не найдена в документации.";
-      ragTrace.finalGenerationMode = "parameter_lookup_not_found";
-      ragTrace.validationFailures = [];
-      ragTrace.validationFlags = [];
-      const ragTraceFinal = finalizeRagTrace(ragTrace);
+  if (equipmentProfile?.classifyPreGate) {
+    const gate = equipmentProfile.classifyPreGate(trimmedMessage, { history: normalizedHistory });
+    sdb1106Gate = gate;
+    if (gate.action === "OFF_TOPIC" || gate.action === "FOREIGN_MODEL" || gate.action === "CHATTER") {
+      logInfo("SDB1106NM pre-gate: scope reject (no LLM).", {
+        gateAction: gate.action,
+        gateReason: gate.reason,
+        question: trimmedMessage,
+      });
+      emitChatSessionRecord({
+        equipment,
+        question: trimmedMessage,
+        answer: gate.reply,
+        chatStartedAt,
+        testMeta,
+        directContextRequested: useDirectContext,
+        chatMode: buildChatModeInfo({
+          useDirectContext,
+          ragTrace: { mode: "SCOPE_GATE" },
+          capabilities: chatCapabilities,
+        }),
+        chatCapabilities,
+        ragTrace: {
+          used: false,
+          mode: "SCOPE_GATE",
+          gateAction: gate.action,
+          gateReason: gate.reason,
+        },
+        retrieval: {
+          route: null,
+          retrievalStrategy: "scope_gate",
+          topScore: 0,
+          chunks: 0,
+        },
+        gateAction: gate.action,
+      });
       return res.json({
         equipmentId: equipment.id,
         equipmentName: equipment.name,
-        answer,
+        answer: gate.reply,
         items: [],
-        sources,
+        sources: [],
         retrieval: {
-          topScore: retrieval.topScore,
-          chunks: retrieval.chunks.length,
-          promptChunksUsed: promptChunks.length,
-          queryScope: queryIntent.queryScope,
-          queryRisk: queryIntent.queryRisk,
-          retrievalLatencyMs: retrieval.retrievalLatencyMs,
+          route: null,
+          retrievalStrategy: "scope_gate",
+          topScore: 0,
+          chunks: 0,
           fallback: false,
-          retrievalFilterReason: retrieval.retrievalFilterReason || "none",
-          rejectedByParameterMismatch: retrieval.rejectedByParameterMismatch || 0,
-          rejectedByBlockType: retrieval.rejectedByBlockType || 0,
-          sectionHints: retrieval.sectionHints || [],
-          sectionHintFiltered: Boolean(retrieval.sectionHintFiltered),
-          rerankApplied: Boolean(retrieval.rerankApplied),
-          fetchLimit: retrieval.fetchLimit,
-          intentType: queryIntent.intentType,
-          queryOperatingModes: queryIntent.queryOperatingModes,
-          symptomDomain: queryIntent.symptomDomain || null,
-          parameterResolved: false,
-          parameterKey: retrieval.parameterKey || null,
-          parameterSource: null,
-          parameterConfidence: Number(retrieval.parameterConfidence || 0),
-          lexicalScore: 0,
-          fusionScore: 0,
+          llmUsed: false,
+          deterministicUsed: false,
+          groundingPassed: true,
+          abstained: false,
         },
-        safety: {
-          safetyMode: false,
-          emergencyMode: false,
-          synthesisMode: false,
-          procedureMode,
-          preparationSectionFilter,
-          submode: "normal",
-          triggerTerms: [],
+        ragTrace: {
+          used: false,
+          mode: "SCOPE_GATE",
+          gateAction: gate.action,
+          gateReason: gate.reason,
         },
-        verification: { enabled: false },
-        hallucinationCheck: { flagged: false, suspiciousTokens: [], ratio: 0 },
-        ragGroundingCheck: { ok: true, warnings: [], failures: [] },
-        ragTrace: ragTraceFinal,
+        chatMode: buildChatModeInfo({
+          useDirectContext,
+          ragTrace: { mode: "SCOPE_GATE" },
+          capabilities: chatCapabilities,
+        }),
+        chatCapabilities,
       });
     }
+  }
 
-    if (queryIntent.intentType === "SINGLE_FIELD_QUERY" && retrieval.parameterResolved) {
-      const topEntry = retrieval.chunks[0]?.parameterEntry || {};
-      const answer = buildDeterministicParameterAnswer(retrieval.parameterKey, topEntry);
-      const ragGroundingCheck = ragConfig.ragAnswerValidation
-        ? validateAnswerAgainstContext(answer, retrievalContext, {
-            queryOperatingModes: queryIntent.queryOperatingModes,
-            intentType: queryIntent.intentType,
-            focusParameter: queryIntent.focusParameter,
-            queryScope: queryIntent.queryScope,
-            originalQuery: queryIntent.originalQuery,
-            contextHasSpecOrTableChunks: retrievalHasSpecOrTable,
-          })
-        : { ok: true, warnings: [], failures: [], skipped: true };
-
-      ragTrace.validationFlags = [
-        ...(ragGroundingCheck.warnings || []).map((w) => w.code),
-        ...(ragGroundingCheck.failures || []).map((f) => `FAIL:${f.code}`),
-      ];
-      ragTrace.validationFailures = ragGroundingCheck.failures || [];
-      ragTrace.finalGenerationMode = "deterministic_parameter_answer";
-      const ragTraceFinal = finalizeRagTrace(ragTrace);
-
-      return res.json({
-        equipmentId: equipment.id,
-        equipmentName: equipment.name,
-        answer,
-        items: [],
-        sources,
-        retrieval: {
-          topScore: retrieval.topScore,
-          chunks: retrieval.chunks.length,
-          promptChunksUsed: promptChunks.length,
-          queryScope: queryIntent.queryScope,
-          queryRisk: queryIntent.queryRisk,
-          retrievalLatencyMs: retrieval.retrievalLatencyMs,
-          fallback: false,
-          retrievalFilterReason: retrieval.retrievalFilterReason || "none",
-          rejectedByParameterMismatch: retrieval.rejectedByParameterMismatch || 0,
-          rejectedByBlockType: retrieval.rejectedByBlockType || 0,
-          sectionHints: retrieval.sectionHints || [],
-          sectionHintFiltered: Boolean(retrieval.sectionHintFiltered),
-          rerankApplied: Boolean(retrieval.rerankApplied),
-          fetchLimit: retrieval.fetchLimit,
-          intentType: queryIntent.intentType,
-          queryOperatingModes: queryIntent.queryOperatingModes,
-          symptomDomain: queryIntent.symptomDomain || null,
-          parameterResolved: true,
-          parameterKey: retrieval.parameterKey || null,
-          parameterSource: retrieval.parameterSource || "structured_index",
-          parameterConfidence: Number(retrieval.parameterConfidence || 0),
-          lexicalScore: Number(retrieval.lexicalScore || 0),
-          fusionScore: Number(retrieval.fusionScore || 0),
-        },
-        safety: {
-          safetyMode: false,
-          emergencyMode: false,
-          synthesisMode: false,
-          procedureMode,
-          preparationSectionFilter,
-          submode: "normal",
-          triggerTerms: [],
-        },
-        verification: { enabled: false },
-        hallucinationCheck: { flagged: false, suspiciousTokens: [], ratio: 0 },
-        ragGroundingCheck,
-        ragTrace: ragTraceFinal,
-      });
-    }
-
-    logInfo("Retrieval completed.", {
+  if (useDirectContext) {
+    logInfo("Running chat in Direct Context Mode (Bypassing RAG).", {
       equipmentId: equipment.id,
-      queryIntentType: queryIntent.intentType,
-      queryOperatingModes: queryIntent.queryOperatingModes,
-      mode: safetyMode ? "safety" : "normal",
-      safetyMode,
-      emergencyMode,
-      synthesisMode,
-      procedureMode,
-      preparationSectionFilter,
-      safetySubmode,
-      triggerTerms,
-      triggerType:
-        keywordSafety || keywordEmergency
-          ? "keyword"
-          : classifierDecision.safetyMode || classifierDecision.emergencyMode
-            ? "classifier"
-            : "none",
-      classifierReason: classifierDecision.reason,
-      selectedTopK: retrieval.selectedTopK,
-      chunks: retrieval.chunks.length,
-      topScore: retrieval.topScore,
-      retrievalLatencyMs: retrieval.retrievalLatencyMs,
-      topSources: retrieval.chunks.slice(0, 3).map((chunk) => ({
-        sourceDoc: chunk.sourceDoc,
-        section: chunk.section,
-        score: chunk.rerankScore ?? chunk.score,
-        vectorScore: chunk.vectorScore,
-      })),
-      sectionHints: retrieval.sectionHints || [],
-      sectionHintFiltered: Boolean(retrieval.sectionHintFiltered),
-      rerankApplied: Boolean(retrieval.rerankApplied),
-      retrievalFetchLimit: retrieval.fetchLimit,
-      embeddingAugmented: Boolean(retrieval.embeddingAugmented),
+      directContextRequested: Boolean(directContextMode),
+      ragPostgresConfigured: Boolean(ragConfig.postgresUrl),
+      autoDirectFallback: chatCapabilities.autoDirectForEquipment,
+      question: trimmedMessage.slice(0, 100),
     });
 
-    const ragEnabled = Boolean(ragConfig.postgresUrl);
-    const allowGettingStartedProceed =
-      queryIntent.intentType === "GETTING_STARTED_QUERY" && retrieval.chunks.length >= 2;
-    if (
-      ragEnabled &&
-      (retrieval.chunks.length === 0 ||
-        (retrieval.topScore < ragConfig.minSimilarityScore && !allowGettingStartedProceed))
-    ) {
-      const fallbackAnswer =
-        "Информация отсутствует в документации. Уточните вопрос или проверьте инструкцию.";
+    try {
+      const { docText, sourcePath, sourceType, systemPrompt, manualLoaded } =
+        await getDirectContextForEquipment(equipment);
 
-      logInfo("Low-relevance retrieval fallback used.", {
-        equipmentId: equipment.id,
-        topScore: retrieval.topScore,
-        minRequiredScore: ragConfig.minSimilarityScore,
-        chunks: retrieval.chunks.length,
-        retrievalLatencyMs: retrieval.retrievalLatencyMs,
-      });
-      ragTrace.finalGenerationMode = "retrieval_low_relevance_fallback";
-      const ragTraceFinal = finalizeRagTrace(ragTrace);
+      let deterministicAnswer =
+        equipment.id === "sdb1106-nm"
+          ? tryDeterministicSdb1106nmAnswer(trimmedMessage, { history: normalizedHistory })
+          : null;
 
-      return res.json({
-        equipmentId: equipment.id,
-        equipmentName: equipment.name,
-        answer: fallbackAnswer,
-        sources,
-        retrieval: {
-          topScore: retrieval.topScore,
-          chunks: retrieval.chunks.length,
-          retrievalLatencyMs: retrieval.retrievalLatencyMs,
-          fallback: true,
-          retrievalFilterReason: retrieval.retrievalFilterReason || "none",
-          rejectedByParameterMismatch: retrieval.rejectedByParameterMismatch || 0,
-          rejectedByBlockType: retrieval.rejectedByBlockType || 0,
-          rerankApplied: Boolean(retrieval.rerankApplied),
-          fetchLimit: retrieval.fetchLimit,
-          intentType: queryIntent.intentType,
-          queryOperatingModes: queryIntent.queryOperatingModes,
-          symptomDomain: queryIntent.symptomDomain || null,
-          parameterResolved: Boolean(retrieval.parameterResolved),
-          parameterKey: retrieval.parameterKey || null,
-          parameterSource: retrieval.parameterSource || null,
-          parameterConfidence: Number(retrieval.parameterConfidence || 0),
-          lexicalScore: Number(retrieval.lexicalScore || 0),
-          fusionScore: Number(retrieval.fusionScore || 0),
-        },
-        ragTrace: ragTraceFinal,
-      });
-    }
-
-    const ollamaStartedAt = Date.now();
-    let answer = "";
-    let finalGenerationMode = "normal_prose";
-    let skipAnswerSelfCorrection = false;
-    let responseItems = [];
-    let verification = {
-      enabled: safetyMode || synthesisMode,
-      emergencyMode,
-      synthesisMode,
-      safetySubmode,
-      candidateItems: 0,
-      acceptedItems: 0,
-      droppedItems: 0,
-      blockedUnsafeItems: 0,
-      jsonRetryUsed: false,
-    };
-
-    if (safetyMode || synthesisMode) {
-      const checklistPrompt = [
-        trimmedMessage,
-        "",
-        "Верни строго JSON формата:",
-        '{"items":[{"check":"...","criticalReason":"...","type":"fact","confidence":"high","composed":true,"evidence":[{"quote":"...","source":"..."}]}]}',
-        "Требования:",
-        "- Укажи проверки и шаги из контекста; для режима эксплуатации включай подготовку и осмотр, если они есть в тексте.",
-        "- Каждый пункт обязан содержать подтверждение из контекста.",
-        "- type: fact или interpretation. interpretation обязательно помечай как вывод.",
-        "- confidence: high/medium/low.",
-        synthesisMode
-          ? "- РАЗРЕШЕНО только упорядочивать шаги, явно присутствующие в тексте. ЗАПРЕЩЕНО добавлять новые шаги, даже если они логически ожидаемы. Каждый шаг должен иметь прямое подтверждение в тексте."
-          : "- Новая структура не обязательна; используй прямые пункты контекста.",
-        synthesisMode
-          ? "- Для composed=true указывай минимум два подтверждения evidence[] из разных источников."
-          : "- Можно указывать одно подтверждение evidence[].",
-        emergencyMode
-          ? "- Аварийный сценарий: не предлагай ремонт/диагностику/продолжение работы."
-          : "- Избегай небезопасных действий и недоказанных рекомендаций.",
-        "- Если подтвержденных пунктов нет, верни {\"items\":[]}.",
-        "",
-        "Общая политика документирования — каждый пункт JSON и evidence должны ей соответствовать:",
-        sharedDocumentationRulesAsBullets(),
-      ].join("\n");
-
-      const checklistMessages = [
-        {
-          role: "system",
-          content: buildSystemPrompt(equipment, retrievalContext, {
-            safetyMode,
-            emergencyMode,
-            synthesisMode,
-            procedureMode,
-            queryIntent,
-            retrievalHasSpecOrTable,
-          }),
-        },
-        ...normalizedHistory,
-        {
-          role: "user",
-          content: checklistPrompt,
-        },
-      ];
-
-      let generatedContent = await callOllamaChat({
-        model: OLLAMA_MODEL,
-        format: "json",
-        messages: checklistMessages,
-      });
-
-      let parsed = tryParseJson(generatedContent);
-      let candidateItems = normalizeChecklistItems(parsed?.items);
-      let synthesisEvidenceCheck = enforceSynthesisEvidence(candidateItems, synthesisMode);
-      candidateItems = synthesisEvidenceCheck.validItems;
-      if (!candidateItems.length) {
-        verification.jsonRetryUsed = true;
-        const retryPrompt = [
-          checklistPrompt,
-          "",
-          "Повтори ответ СТРОГО JSON без markdown.",
-          '{"items":[{"check":"...","criticalReason":"...","type":"fact","confidence":"high","composed":true,"evidence":[{"quote":"...","source":"..."}]}]}',
-          "Если нет подтверждений, верни {\"items\":[]}.",
-        ].join("\n");
-        generatedContent = await callOllamaChat({
-          model: OLLAMA_MODEL,
-          format: "json",
-          messages: [
-            ...checklistMessages.slice(0, -1),
-            { role: "user", content: retryPrompt },
-          ],
-        });
-        parsed = tryParseJson(generatedContent);
-        candidateItems = normalizeChecklistItems(parsed?.items);
-        synthesisEvidenceCheck = enforceSynthesisEvidence(candidateItems, synthesisMode);
-        candidateItems = synthesisEvidenceCheck.validItems;
+      if (!deterministicAnswer && equipment.id === "sdb1106-nm" && sdb1106Gate?.action === "SAFETY") {
+        const safetyPath = buildSafetyDeterministicOrPrompt(trimmedMessage, docText);
+        if (safetyPath.mode === "deterministic") {
+          deterministicAnswer = safetyPath.answer;
+        }
       }
 
-      verification.candidateItems = candidateItems.length;
+      let answer = deterministicAnswer;
+      let ragTraceMode = deterministicAnswer
+        ? sdb1106Gate?.action === "SAFETY"
+          ? "SAFETY_DETERMINISTIC"
+          : "DIRECT_CONTEXT_DETERMINISTIC"
+        : "DIRECT_CONTEXT";
+      let modelOptions = null;
+      let llmMessages = null;
 
-      const verified = await verifyChecklistItems({
-        checklistItems: candidateItems,
-        retrievalContext,
-        model: ragConfig.verifierModel,
-        fallbackModel: OLLAMA_MODEL,
-        emergencyMode,
-        synthesisMode,
-      });
-      verification.acceptedItems = verified.verifiedItems.length;
-      verification.droppedItems = verified.droppedItems;
-      verification.blockedUnsafeItems = verified.blockedUnsafeItems;
-      const notConfirmed = [
-        ...verified.unverifiedItems,
-        ...synthesisEvidenceCheck.weakItems,
-      ];
+      if (!answer) {
+        const hints =
+          equipment.id === "sdb1106-nm" ? directContextHintsForMessage(trimmedMessage) : "";
+        const userContent = hints ? `${trimmedMessage}\n\n[Служебная подсказка: ${hints}]` : trimmedMessage;
 
-      if (!verified.verifiedItems.length) {
-        if (emergencyMode) {
-          answer = buildSafeEmergencyFallback();
-          finalGenerationMode = "emergency_fallback";
-          skipAnswerSelfCorrection = true;
-        } else {
-          logInfo("Safety verifier accepted no items; falling back to prose RAG answer.", {
-            equipmentId: equipment.id,
-            candidateItems: candidateItems.length,
+        let effectiveSystemPrompt = systemPrompt;
+        if (equipment.id === "sdb1106-nm" && sdb1106Gate?.action === "SAFETY") {
+          const safetyExcerpt = extractSafetyDocExcerpt(docText, trimmedMessage);
+          const equipmentForPrompt = manualLoaded
+            ? { id: equipment.id, name: equipment.name }
+            : equipment;
+          effectiveSystemPrompt = buildSafetyGroundedSystemPrompt(equipmentForPrompt, safetyExcerpt);
+        }
+
+        const systemContent =
+          equipment.id === "sdb1106-nm"
+            ? buildSdb1106nmDirectSystemContent(effectiveSystemPrompt, docText)
+            : `${systemPrompt}\n\nПолный текст руководства (единственный источник):\n\n${docText}`;
+
+        llmMessages = [
+          { role: "system", content: systemContent },
+          ...normalizedHistory,
+          { role: "user", content: userContent },
+        ];
+
+        modelOptions = {
+          temperature: 0,
+          top_p: 0.85,
+          ...(llmGenerationOptionsForIntent(null, trimmedMessage) || {}),
+        };
+
+        answer = await callOllamaChat({
+          model: OLLAMA_MODEL,
+          messages: llmMessages,
+          options: modelOptions,
+          directContext: true,
+        });
+      }
+
+      let postGate = null;
+      if (equipment.id === "sdb1106-nm") {
+        const deliveryMethod = deterministicAnswer ? "direct_deterministic" : "direct_context";
+        postGate = applySdb1106nmPostGate({
+          answer,
+          context: docText,
+          message: trimmedMessage,
+          equipment,
+          deliveryMethod,
+          semanticSimilarity: 1,
+          gateAction: sdb1106Gate?.action,
+          history: normalizedHistory,
+        });
+
+        const needsRetry =
+          postGate.guardrails.action === "ABSTAIN" &&
+          !deterministicAnswer &&
+          llmMessages &&
+          answer !== STRICT_ABSTAIN;
+
+        if (needsRetry) {
+          logInfo("SDB1106NM post-gate: retrying Direct Context LLM after guardrail abstain.", {
+            guardrailReason: postGate.guardrails.reason,
+            questionPreview: trimmedMessage.slice(0, 120),
           });
+          const retryOptions = { ...modelOptions, temperature: 0 };
           answer = await callOllamaChat({
             model: OLLAMA_MODEL,
-            messages: [
-              {
-                role: "system",
-                content: buildSystemPrompt(equipment, retrievalContext, {
-                  safetyMode: false,
-                  emergencyMode: false,
-                  synthesisMode,
-                  procedureMode,
-                  queryIntent,
-                  retrievalHasSpecOrTable,
-                }),
-              },
-              ...normalizedHistory,
-              {
-                role: "user",
-                content: trimmedMessage,
-              },
-            ],
+            messages: llmMessages,
+            options: retryOptions,
+            directContext: true,
           });
-          finalGenerationMode = "fallback_prose";
+          modelOptions = retryOptions;
+          ragTraceMode = "DIRECT_CONTEXT_RETRY";
+          postGate = applySdb1106nmPostGate({
+            answer,
+            context: docText,
+            message: trimmedMessage,
+            equipment,
+            deliveryMethod: "direct_context_retry",
+            semanticSimilarity: 1,
+            gateAction: sdb1106Gate?.action,
+            history: normalizedHistory,
+          });
         }
-      } else {
-        responseItems = verified.verifiedItems;
-        skipAnswerSelfCorrection = true;
-        answer = synthesisMode
-          ? buildUserFacingProcedureAnswer(verified.verifiedItems)
-          : buildChecklistAnswer(verified.verifiedItems);
-        finalGenerationMode = synthesisMode ? "verified_procedure" : "verified_checklist";
-        if (!emergencyMode && notConfirmed.length > 0) {
-          if (synthesisMode) {
-            answer = [
-              answer,
-              "",
-              "Отдельные возможные шаги не включены: их нельзя было надёжно подтвердить по тексту документа.",
-            ].join("\n");
-          } else {
-            answer = answer.trim();
-          }
-        }
+
+        answer = postGate.answer;
       }
-    } else {
-      answer = await callOllamaChat({
-        model: OLLAMA_MODEL,
-        messages: [
-          {
-            role: "system",
-            content: buildSystemPrompt(equipment, retrievalContext, {
-              safetyMode,
-              emergencyMode,
-              synthesisMode,
-              procedureMode,
-              queryIntent,
-              retrievalHasSpecOrTable,
-            }),
-          },
-          ...normalizedHistory,
-          {
-            role: "user",
-            content: trimmedMessage,
-          },
-        ],
-      });
-      finalGenerationMode = "normal_prose";
-    }
 
-    if (!answer) {
-      if (
-        queryIntent.intentType === "TROUBLESHOOTING_QUERY" &&
-        queryIntent.symptomDomain === "humidity"
-      ) {
-        const humidityFallback = buildHumidityTroubleshootingFallback(
-          promptChunks.length ? promptChunks : retrieval.chunks
-        );
-        if (humidityFallback) {
-          answer = humidityFallback;
-          finalGenerationMode = "troubleshooting_humidity_deterministic_fallback";
-          skipAnswerSelfCorrection = true;
-        }
-      }
-    }
+      const sources = [
+        {
+          sourceDoc: sourcePath,
+          score: 1.0,
+          content: docText.slice(0, 1000) + (docText.length > 1000 ? "..." : ""),
+        },
+      ];
 
-    if (!answer) {
-      logError("Ollama returned empty answer.", {
-        equipmentId: equipment?.id || equipmentId || null,
-      });
-      return res.status(502).json({
-        error: "Ollama returned an empty response.",
-      });
-    }
+      const retrieval = {
+        topScore: 1.0,
+        selectedTopK: 1,
+        reason: "Direct context mode (No RAG)",
+        ...(equipment.id === "sdb1106-nm" && postGate
+          ? {
+              groundingPassed: postGate.guardrails.passed,
+              abstained: postGate.guardrails.action === "ABSTAIN",
+            }
+          : {}),
+      };
 
-    if (
-      ragConfig.chatSelfCorrect &&
-      answer &&
-      !skipAnswerSelfCorrection &&
-      !["FACT_QUERY", "SINGLE_FIELD_QUERY", "QUICK_FACT_QUERY"].includes(queryIntent.intentType)
-    ) {
-      try {
-        answer = await runAnswerSelfCorrection({
-          draftAnswer: answer,
-          retrievalContext,
-          userQuestion: trimmedMessage,
-          equipment,
-          model: OLLAMA_MODEL,
-          maxContextChars: ragConfig.selfCorrectionMaxContextChars,
-        });
-      } catch (scError) {
-        logInfo("Answer self-correction failed; using draft.", {
-          equipmentId: equipment.id,
-          details: scError instanceof Error ? scError.message : String(scError),
-        });
-      }
-    }
-
-    answer = polishAssistantAnswer(answer);
-    answer = hardSanitizeUserFacingAnswer(answer, queryIntent);
-    answer = enforceSingleFieldFocusAnswer(answer, queryIntent);
-    if (
-      queryIntent.intentType === "TROUBLESHOOTING_QUERY" &&
-      queryIntent.symptomDomain === "humidity"
-    ) {
-      const humidityFallback = buildHumidityTroubleshootingFallback(
-        promptChunks.length ? promptChunks : retrieval.chunks
+      const ragTrace = attachRagTraceWarnings(
+        {
+          used: true,
+          model: deterministicAnswer ? null : OLLAMA_MODEL,
+          mode: ragTraceMode,
+          directContextMode: true,
+          documentPath: sourcePath,
+          documentLength: docText.length,
+          manualLoaded: equipment.id === "sdb1106-nm" ? manualLoaded : undefined,
+          systemPromptUsed: systemPrompt,
+          modelOptions,
+          ...(postGate ? postGate.postGateTrace : {}),
+        },
+        chatCapabilities,
       );
-      if (humidityFallback) {
-        answer = humidityFallback;
-        finalGenerationMode = "troubleshooting_humidity_deterministic";
-      }
-    }
-    if (queryIntent.intentType === "GETTING_STARTED_QUERY") {
-      const onboardingChunks = promptChunks.length ? promptChunks : retrieval.chunks;
-      if (hasOnboardingChunk(onboardingChunks)) {
-        const deterministicProcedureAnswer = buildDeterministicGettingStartedAnswer(
-          trimmedMessage,
-          onboardingChunks
-        );
-        if (deterministicProcedureAnswer) {
-          answer = deterministicProcedureAnswer;
-          finalGenerationMode = "getting_started_deterministic_procedure";
-        } else {
-          answer = finalizeGettingStartedAnswer(answer, onboardingChunks);
-          finalGenerationMode = "getting_started_strict_formatter";
-        }
-      }
-    }
-    if (
-      queryIntent.intentType === "GETTING_STARTED_QUERY" &&
-      /информац(?:ия|ии)\s+.*отсутств|не\s+содержится\s+в\s+предоставленной\s+документации/i.test(answer) &&
-      retrieval.topScore >= ragConfig.minSimilarityScore
-    ) {
-      const onboardingChunks = promptChunks.length ? promptChunks : retrieval.chunks;
-      const derivedSteps =
-        buildDeterministicGettingStartedAnswer(trimmedMessage, onboardingChunks) ||
-        extractGettingStartedStepsFromChunks(onboardingChunks);
-      if (derivedSteps) {
-        answer = derivedSteps;
-        finalGenerationMode = "getting_started_context_fallback";
-      }
-    }
-
-    if (!answer) {
-      if (
-        queryIntent.intentType === "TROUBLESHOOTING_QUERY" &&
-        queryIntent.symptomDomain === "humidity"
-      ) {
-        const humidityFallback = buildHumidityTroubleshootingFallback(
-          promptChunks.length ? promptChunks : retrieval.chunks
-        );
-        if (humidityFallback) {
-          answer = humidityFallback;
-          finalGenerationMode = "troubleshooting_humidity_deterministic_fallback";
-        }
-      }
-    }
-
-    if (!answer) {
-      logError("Ollama returned empty answer after sanitization.", {
-        equipmentId: equipment?.id || equipmentId || null,
+      const chatMode = buildChatModeInfo({
+        useDirectContext: true,
+        ragTrace,
+        capabilities: chatCapabilities,
       });
-      return res.status(502).json({
-        error: "Ollama returned an empty response.",
+
+      logInfo("Direct Context Mode finished.", {
+        equipmentId: equipment.id,
+        mode: ragTraceMode,
+        gateAction: sdb1106Gate?.action || null,
+        answerPreview: answer.slice(0, 240),
+      });
+      emitChatSessionRecord({
+        equipment,
+        question: trimmedMessage,
+        answer,
+        chatStartedAt,
+        testMeta,
+        directContextRequested: useDirectContext,
+        chatMode,
+        chatCapabilities,
+        ragTrace,
+        retrieval,
+        gateAction: sdb1106Gate?.action || null,
+      });
+
+      return res.json({
+        equipmentId: equipment.id,
+        equipmentName: equipment.name,
+        answer,
+        items: [],
+        sources,
+        retrieval,
+        ragTrace,
+        chatMode,
+        chatCapabilities,
+      });
+    } catch (directError) {
+      logError("Direct Context Mode failed, falling back to RAG pipeline.", {
+        equipmentId: equipment.id,
+        error: directError instanceof Error ? directError.message : String(directError),
+      });
+      // Fall back to RAG pipeline (this ensures that if Ollama or something fails under Direct Mode, RAG is tried!)
+    }
+  }
+
+  try {
+    const routerDecision = await routeQuery({
+      query: trimmedMessage,
+      history: normalizedHistory,
+      equipmentId: equipment.id,
+      equipment,
+    });
+
+    const result = await runPipeline({
+      equipment,
+      message: trimmedMessage,
+      history: normalizedHistory,
+      routerDecision,
+    });
+
+    logInfo("RAG trace.", result.ragTrace);
+
+    let finalAnswer = result.answer;
+    let finalRetrieval = result.retrieval;
+    let finalRagTrace = result.ragTrace;
+
+    if (equipment.id === "sdb1106-nm") {
+      const semanticHint = Math.max(
+        Number(result.retrieval?.topScore) || 0,
+        Number(result.retrieval?.fusionScore) || 0,
+        Number(result.retrieval?.lexicalScore) || 0,
+      );
+      const postGate = applySdb1106nmPostGate({
+        answer: result.answer,
+        context: result.retrievalContext || "",
+        message: trimmedMessage,
+        equipment,
+        deliveryMethod:
+          result.ragTrace?.mode === "RAG_DETERMINISTIC" ||
+          result.ragTrace?.mode === "SAFETY_DETERMINISTIC"
+            ? "rag_deterministic"
+            : resolveDeliveryMethodFromLlmTrace(result.ragTrace?.llm),
+        semanticSimilarity: semanticHint,
+        gateAction: sdb1106Gate?.action,
+        routerDecision: result.ragTrace?.router,
+        retrieval: result.retrieval,
+        history: normalizedHistory,
+      });
+      finalAnswer = postGate.answer;
+      finalRetrieval = {
+        ...result.retrieval,
+        groundingPassed: postGate.guardrails.passed,
+        abstained:
+          postGate.guardrails.action === "ABSTAIN" || Boolean(result.retrieval?.abstained),
+      };
+      finalRagTrace = attachRagTraceWarnings(
+        {
+          ...result.ragTrace,
+          ...postGate.postGateTrace,
+          mode: postGate.postGateTrace?.mode || result.ragTrace?.mode,
+          serverPostGate: true,
+        },
+        chatCapabilities,
+      );
+      logInfo("SDB1106NM post-gate applied to RAG answer.", {
+        guardrailAction: postGate.guardrails.action,
+        guardrailReason: postGate.guardrails.reason,
+        validationOk: postGate.validation.ok,
       });
     }
 
-    const hallucinationCheck = detectHallucinations(answer, retrievalContext);
-    verification.hallucinationFlagged = hallucinationCheck.flagged;
+    const ragChatMode = buildChatModeInfo({
+      useDirectContext: false,
+      ragTrace: finalRagTrace,
+      capabilities: chatCapabilities,
+    });
 
-    const ragGroundingCheck = ragConfig.ragAnswerValidation
-      ? validateAnswerAgainstContext(answer, retrievalContext, {
-          queryOperatingModes: queryIntent.queryOperatingModes,
-          intentType: queryIntent.intentType,
-          focusParameter: queryIntent.focusParameter,
-          queryScope: queryIntent.queryScope,
-          originalQuery: queryIntent.originalQuery,
-          contextHasSpecOrTableChunks: retrievalHasSpecOrTable,
-        })
-      : { ok: true, warnings: [], failures: [], skipped: true };
-
-    ragTrace.validationFlags = [
-      ...(ragGroundingCheck.warnings || []).map((w) => w.code),
-      ...(ragGroundingCheck.failures || []).map((f) => `FAIL:${f.code}`),
-    ];
-    ragTrace.validationFailures = ragGroundingCheck.failures || [];
-    ragTrace.finalGenerationMode = finalGenerationMode;
-    const ragTraceFinal = finalizeRagTrace(ragTrace);
-    logInfo("RAG trace.", ragTraceFinal);
-    logInfo("Ollama answer generated.", {
-      equipmentId: equipment?.id || equipmentId || null,
-      mode: safetyMode ? "safety" : "normal",
-      safetyMode,
-      emergencyMode,
-      synthesisMode,
-      procedureMode,
-      preparationSectionFilter,
-      safetySubmode,
-      triggerTerms,
-      durationMs: Date.now() - ollamaStartedAt,
-      verification,
-      hallucinationFlagged: hallucinationCheck.flagged,
-      ragGroundingCheck,
-      answerPreview: answer.slice(0, 160),
+    emitChatSessionRecord({
+      equipment,
+      question: trimmedMessage,
+      answer: finalAnswer,
+      chatStartedAt,
+      testMeta,
+      directContextRequested: false,
+      chatMode: ragChatMode,
+      chatCapabilities,
+      ragTrace: finalRagTrace,
+      retrieval: finalRetrieval,
+      gateAction: sdb1106Gate?.action || null,
     });
 
     return res.json({
       equipmentId: equipment.id,
       equipmentName: equipment.name,
-      answer,
-      items: responseItems,
-      sources,
-      retrieval: {
-        topScore: retrieval.topScore,
-        chunks: retrieval.chunks.length,
-        promptChunksUsed: promptChunks.length,
-        queryScope: queryIntent.queryScope,
-        queryRisk: queryIntent.queryRisk,
-        retrievalLatencyMs: retrieval.retrievalLatencyMs,
-        fallback: false,
-        retrievalFilterReason: retrieval.retrievalFilterReason || "none",
-        rejectedByParameterMismatch: retrieval.rejectedByParameterMismatch || 0,
-        rejectedByBlockType: retrieval.rejectedByBlockType || 0,
-        sectionHints: retrieval.sectionHints || [],
-        sectionHintFiltered: Boolean(retrieval.sectionHintFiltered),
-        rerankApplied: Boolean(retrieval.rerankApplied),
-        fetchLimit: retrieval.fetchLimit,
-        intentType: queryIntent.intentType,
-        queryOperatingModes: queryIntent.queryOperatingModes,
-        symptomDomain: queryIntent.symptomDomain || null,
-        parameterResolved: Boolean(retrieval.parameterResolved),
-        parameterKey: retrieval.parameterKey || null,
-        parameterSource: retrieval.parameterSource || null,
-        parameterConfidence: Number(retrieval.parameterConfidence || 0),
-        lexicalScore: Number(retrieval.lexicalScore || 0),
-        fusionScore: Number(retrieval.fusionScore || 0),
-      },
-      safety: {
-        safetyMode,
-        emergencyMode,
-        synthesisMode,
-        procedureMode,
-        preparationSectionFilter,
-        submode: safetySubmode,
-        triggerTerms,
-      },
-      verification,
-      hallucinationCheck,
-      ragGroundingCheck,
-      ragTrace: ragTraceFinal,
+      answer: finalAnswer,
+      items: [],
+      sources: result.sources,
+      retrieval: finalRetrieval,
+      ragTrace: finalRagTrace,
+      chatMode: ragChatMode,
+      chatCapabilities,
     });
   } catch (error) {
     const raw = error instanceof Error ? error.message : String(error);
@@ -2349,12 +2306,34 @@ app.post("/api/chat", async (req, res) => {
         equipmentId: equipment?.id,
         details: raw,
       });
+      emitChatSessionRecord({
+        equipment,
+        question: trimmedMessage,
+        answer: null,
+        chatStartedAt,
+        testMeta,
+        directContextRequested: useDirectContext,
+        chatCapabilities,
+        httpStatus: 503,
+        error: raw,
+      });
       const payload = formatPostgresFailureForClient(error);
       return res.status(503).json(payload);
     }
     logError("Chat pipeline failed (Ollama or internal).", {
       equipmentId: equipment?.id,
       details: raw,
+    });
+    emitChatSessionRecord({
+      equipment,
+      question: trimmedMessage,
+      answer: null,
+      chatStartedAt,
+      testMeta,
+      directContextRequested: useDirectContext,
+      chatCapabilities,
+      httpStatus: 502,
+      error: raw,
     });
     const payload = formatOllamaFailureForClient(error);
     return res.status(502).json(payload);
@@ -2395,8 +2374,64 @@ app.use((err, req, res, next) => {
   });
 });
 
-const server = app.listen(PORT, HOST, () => {
-  logInfo(`Equipment support server is listening on ${HOST}:${PORT}`);
+const httpServerTimeouts = resolveHttpServerTimeouts();
+let isShuttingDown = false;
+
+function shutdownServer(signal) {
+  if (isShuttingDown) {
+    return;
+  }
+  isShuttingDown = true;
+  closeChatSessionLog(signal);
+  logInfo(`Получен ${signal}, останавливаем сервер…`);
+  server.close((closeErr) => {
+    if (closeErr) {
+      logError("Ошибка при закрытии HTTP-сервера.", {
+        error: closeErr instanceof Error ? closeErr.message : String(closeErr),
+      });
+    } else {
+      logInfo("HTTP-сервер остановлен.");
+    }
+    const pool = getPool(ragConfig.postgresUrl);
+    if (pool) {
+      pool.end().catch(() => {});
+    }
+    process.exit(closeErr ? 1 : 0);
+  });
+  setTimeout(() => {
+    logError("Принудительное завершение (таймаут shutdown).");
+    process.exit(1);
+  }, 8000).unref();
+}
+
+process.on("SIGINT", () => shutdownServer("SIGINT"));
+process.on("SIGTERM", () => shutdownServer("SIGTERM"));
+
+const server = app.listen(PORT, HOST);
+
+server.on("error", (err) => {
+  if (err && err.code === "EADDRINUSE") {
+    logError(
+      `Порт ${PORT} уже занят — сервер НЕ запущен. Остановите другой процесс (например старый node server.js) или задайте другой PORT.`,
+      { host: HOST, port: PORT, code: err.code },
+    );
+    logError("Windows: netstat -ano | findstr :" + PORT + "  →  taskkill /PID <pid> /F");
+  } else {
+    logError("Не удалось запустить HTTP-сервер.", {
+      host: HOST,
+      port: PORT,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  }
+  process.exit(1);
+});
+
+server.on("listening", () => {
+  logInfo(`Equipment support server is listening on ${HOST}:${PORT}`, {
+    nodeEnv: process.env.NODE_ENV || "production",
+    consoleLog: isConsoleLogEnabled(),
+    pid: process.pid,
+  });
   if (/^(127\.0\.0\.1|localhost)$/i.test(HOST)) {
     logError(
       "Сервер слушает только localhost — чат с телефона по Wi‑Fi не откроется. Уберите переменную HOST или задайте HOST=0.0.0.0 и перезапустите.",
@@ -2420,13 +2455,27 @@ const server = app.listen(PORT, HOST, () => {
     ollamaNumCtx: resolveOllamaChatNumCtx(),
     embeddingModel: ragConfig.embeddingModel,
   });
+  logInfo("Сервер работает. Логи чата — в консоли (CHAT) и в файле logs/*.jsonl. Остановка: Ctrl+C.");
+  if (isChatFileLogEnabled()) {
+    initChatSessionLog();
+    const logPath = getChatSessionLogPath();
+    if (logPath) {
+      logInfo(`Лог чата для эксперта: ${logPath}`);
+    }
+  }
 });
 
-// Входящий запрос: не обрывать длинную генерацию; исходящий к Ollama — см. fetchOllama (Undici bodyTimeout).
+// HTTP server: long RAG + Ollama (defaults ≥60s; see resolveHttpServerTimeouts / HTTP_SERVER_TIMEOUT_MS).
 server.requestTimeout = 0;
-server.timeout = 0;
-server.headersTimeout = 600_000;
-server.keepAliveTimeout = 120_000;
+server.timeout = httpServerTimeouts.socketMs;
+server.keepAliveTimeout = httpServerTimeouts.keepAliveMs;
+server.headersTimeout = httpServerTimeouts.headersMs;
+logInfo("HTTP server socket timeouts (ms).", {
+  socket: server.timeout,
+  keepAlive: server.keepAliveTimeout,
+  headers: server.headersTimeout,
+  chatRouteSocketMsDefault: resolveChatRequestSocketMs(),
+});
 
 const ragPool = getPool(ragConfig.postgresUrl);
 if (ragPool) {

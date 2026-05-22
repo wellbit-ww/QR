@@ -27,11 +27,18 @@ function chunkMatchesSectionHints(chunk, hints) {
 
 /**
  * Эмбеддинг только из текста запроса — без intent/modes (шум и недетерминизм в vector space).
+ * Лёгкое расширение для вопросов про осушитель/абсорбент без явного имени материала в запросе.
  */
 function mergeEmbeddingQuery(originalQuery, intent, config) {
   void intent;
   void config;
-  return String(originalQuery || "").trim();
+  const q = String(originalQuery || "").trim();
+  const materialDesiccantHint =
+    /абсорбент|адсорбент|химическ(?:ое|ий)\s+веществ|сорбент|наполнител|поглощен(?:ие|ия|ию)\s+влаг|влаг.*поглощ|осушител.*карман|карман.*осушител|осушительн/i;
+  if (materialDesiccantHint.test(q)) {
+    return `${q}\nцеолит силикагель адсорбент осушение влага карман осушителя`;
+  }
+  return q;
 }
 
 function sanitizeChunk(row) {
@@ -44,6 +51,250 @@ function sanitizeChunk(row) {
     metadata: row.metadata || {},
     score: Number(row.score) || 0,
   };
+}
+
+/** Max similarity across score fields (avoids `a ?? b` treating 0 as valid when vector score is higher). */
+function chunkBestSimilarity(ch) {
+  if (!ch) {
+    return 0;
+  }
+  const nums = [ch.rerankScore, ch.routedScore, ch.score, ch.vectorScore, ch.rrfScore, ch.fusionScore, ch.lexicalScore]
+    .map((v) => (typeof v === "number" && Number.isFinite(v) ? v : NaN))
+    .filter((v) => !Number.isNaN(v));
+  return nums.length ? Math.max(...nums) : 0;
+}
+
+function chunkRowDedupeKey(sourceDoc, chunkIndex) {
+  return `${String(sourceDoc || "")}\u0000${Number(chunkIndex)}`;
+}
+
+/** AND-style phrase for plainto_tsquery (legacy path). */
+function buildSimpleTsQueryString(query) {
+  const words = String(query || "")
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/[^\p{L}\p{N}\s]+/gu, " ")
+    .split(/\s+/)
+    .filter((w) => w.length >= 2)
+    .filter((w) => !/^(и|в|на|по|для|как|что|или|а|не|из|за|от|до|ли|бы)$/iu.test(w))
+    .slice(0, 16);
+  if (!words.length) {
+    return null;
+  }
+  return words.join(" ");
+}
+
+/** OR-joined operands for to_tsquery('simple', …) — better recall on natural questions. */
+function buildSimpleOrTsqueryOperands(query) {
+  const words = String(query || "")
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/[^\p{L}\p{N}\s]+/gu, " ")
+    .split(/\s+/)
+    .map((w) => w.replace(/[^\p{L}\p{N}]+/gu, ""))
+    .filter((w) => w.length >= 2)
+    .filter((w) => !/^(и|в|на|по|для|как|что|или|а|не|из|за|от|до|ли|бы)$/iu.test(w))
+    .slice(0, 14);
+  const uniq = [...new Set(words)];
+  if (!uniq.length) {
+    return null;
+  }
+  return uniq.join(" | ");
+}
+
+/** True if hybrid lexical pass is worth attempting (even when token filter is empty). */
+function shouldAttemptLexicalHybrid(query) {
+  const t = String(query || "").trim();
+  return t.length >= 2 && /[\p{L}\p{N}]/u.test(t);
+}
+
+function tokensForIlikeFallback(queryText) {
+  const ors = buildSimpleOrTsqueryOperands(queryText);
+  if (ors) {
+    return ors
+      .split(/\s*\|\s*/)
+      .map((s) => s.trim())
+      .filter((w) => w.length >= 3)
+      .slice(0, 6);
+  }
+  const flat = buildSimpleTsQueryString(queryText);
+  if (flat) {
+    return flat.split(/\s+/).filter((w) => w.length >= 3).slice(0, 6);
+  }
+  const hits = String(queryText || "")
+    .toLowerCase()
+    .match(/[\p{L}\p{N}]{3,}/gu);
+  return hits ? [...new Set(hits)].slice(0, 6) : [];
+}
+
+async function fetchLexicalRankedChunks(pool, equipmentId, queryText, limit) {
+  const rawPhrase = String(queryText || "").trim().slice(0, 400);
+
+  if (rawPhrase.length >= 2) {
+    try {
+      const rWeb = await pool.query(
+        `
+        SELECT
+          source_doc,
+          section,
+          page,
+          chunk_index,
+          content,
+          metadata,
+          ts_rank_cd(content_tsv, websearch_to_tsquery('simple', $2)) AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND content_tsv @@ websearch_to_tsquery('simple', $2)
+        ORDER BY score DESC NULLS LAST
+        LIMIT $3
+      `,
+        [equipmentId, rawPhrase, limit]
+      );
+      if (rWeb.rows.length) {
+        return rWeb.rows;
+      }
+    } catch (_e) {
+      /* websearch_to_tsquery unsupported or bad input — fall through */
+    }
+  }
+
+  const orOperands = buildSimpleOrTsqueryOperands(queryText);
+  if (orOperands) {
+    try {
+      const rOr = await pool.query(
+        `
+        SELECT
+          source_doc,
+          section,
+          page,
+          chunk_index,
+          content,
+          metadata,
+          ts_rank_cd(content_tsv, to_tsquery('simple', $2)) AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND content_tsv @@ to_tsquery('simple', $2)
+        ORDER BY score DESC NULLS LAST
+        LIMIT $3
+      `,
+        [equipmentId, orOperands, limit]
+      );
+      if (rOr.rows.length) {
+        return rOr.rows;
+      }
+    } catch (_e) {
+      /* ignore */
+    }
+  }
+
+  const tsQ = buildSimpleTsQueryString(queryText);
+  if (tsQ) {
+    try {
+      const r = await pool.query(
+        `
+        SELECT
+          source_doc,
+          section,
+          page,
+          chunk_index,
+          content,
+          metadata,
+          ts_rank_cd(
+            content_tsv,
+            plainto_tsquery('simple', $2)
+          ) AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND content_tsv @@ plainto_tsquery('simple', $2)
+        ORDER BY score DESC NULLS LAST
+        LIMIT $3
+      `,
+        [equipmentId, tsQ, limit]
+      );
+      if (r.rows.length) {
+        return r.rows;
+      }
+    } catch (_e) {
+      /* ignore fts errors */
+    }
+  }
+  const uniq = tokensForIlikeFallback(queryText);
+  if (!uniq.length) {
+    return [];
+  }
+  const patterns = uniq.map((w) => `%${w.replace(/([%_\\])/g, "\\$1")}%`);
+  const cond = patterns.map((_, i) => `content ILIKE $${i + 3} ESCAPE '\\'`).join(" OR ");
+  const r2 = await pool.query(
+    `
+      SELECT source_doc, section, page, chunk_index, content, metadata, 0.02::float AS score
+      FROM knowledge_chunks
+      WHERE equipment_id = $1 AND (${cond})
+      LIMIT $2
+    `,
+    [equipmentId, limit, ...patterns]
+  );
+  return r2.rows;
+}
+
+/** Запросы с тех. аббревиатурами — усилить вклад FTS в RRF. */
+function queryHasTechnicalAbbreviations(query) {
+  return /(?:^|[\s(])(?:ГОСТ|GOST|IP\s*\d|IP\d|RH%?[тп]?|RH\b|Вт|кВт|Вт·|Бар|бар|кПа|SDB\d)/iu.test(
+    String(query || "")
+  );
+}
+
+function reciprocalRankFusionChunks(vectorRows, lexicalRows, sanitizeFn, k = 60, opts = {}) {
+  const lexicalMultiplier = Math.max(1, Number(opts.lexicalRankMultiplier) || 1);
+  const map = new Map();
+  const bump = (rows, fromVector) => {
+    if (!Array.isArray(rows)) {
+      return;
+    }
+    rows.forEach((row, idx) => {
+      const ch = sanitizeFn(row);
+      const key = chunkRowDedupeKey(ch.sourceDoc, ch.chunkIndex);
+      const rankWeight = fromVector ? 1 : lexicalMultiplier;
+      const add = (rankWeight / (k + idx + 1));
+      const cur = map.get(key);
+      if (!cur) {
+        map.set(key, {
+          chunk: {
+            ...ch,
+            _vectorHitRank: fromVector ? idx + 1 : null,
+            _lexicalHitRank: !fromVector ? idx + 1 : null,
+          },
+          rrf: add,
+        });
+      } else {
+        cur.rrf += add;
+        if (fromVector) {
+          cur.chunk._vectorHitRank = idx + 1;
+          cur.chunk.score = Math.max(Number(cur.chunk.score) || 0, Number(ch.score) || 0);
+        } else {
+          cur.chunk._lexicalHitRank = idx + 1;
+        }
+      }
+    });
+  };
+  bump(vectorRows, true);
+  bump(lexicalRows, false);
+  return [...map.values()]
+    .sort((a, b) => b.rrf - a.rrf)
+    .map(({ chunk, rrf }) => ({
+      ...chunk,
+      rrfScore: Number(rrf.toFixed(6)),
+      score: Math.min(0.995, Math.max(Number(chunk.score) || 0, rrf * 6)),
+      hybridFused: true,
+    }));
+}
+
+function getChunkBodyForPrompt(chunk) {
+  const m = (chunk && chunk.metadata) || {};
+  const parent = m.parentLlmContext;
+  if (typeof parent === "string" && parent.trim().length > String(chunk.content || "").trim().length + 80) {
+    return parent.trim();
+  }
+  return String((chunk && chunk.content) || "").trim();
 }
 
 function attachKeywordScores(chunks, query) {
@@ -84,12 +335,316 @@ function isOnboardingNoiseChunk(chunk) {
 
 function isHumidityTroubleshootingChunk(chunk) {
   const t = normalizeChunkText(chunk);
-  return /осушител|осушени|drying|rh|влажност|уплотнит|регенерац|desiccant|влагопоглот/i.test(t);
+  const m = chunk?.metadata || {};
+  if (m.humidityInspectionChecklist === true || m.possibleFaultsList === true) {
+    return true;
+  }
+  return /осушител|осушени|drying|rh|влажност|уплотнит|регенерац|desiccant|влагопоглот|2\.2\.2\.[123]|перечень\s+возможных|симптом:/i.test(
+    t
+  );
 }
 
 function isPowerTroubleshootingChunk(chunk) {
   const t = normalizeChunkText(chunk);
   return /предохран|кабель|no power|питани[ея]|напряжен|fuse|power|розетк|220\s*в/i.test(t);
+}
+
+function isSafetyEmergencyQuery(query) {
+  return /дым|гарь|задымлен|вспышк|нельзя|опасно/i.test(String(query || ""));
+}
+
+function isHighPrioritySafetyChunk(chunk) {
+  const m = (chunk && chunk.metadata) || {};
+  if (m.priority === "high") {
+    return true;
+  }
+  const hay = `${chunk?.content || ""}\n${chunk?.section || ""}\n${m.parentLlmContext || ""}`;
+  return /(?:^|[\s(])2\.2\.1\b|п\.?\s*2\.2\.1\b|мер[аы]\s+безопасност|(?:^|[\s(])2\.4\b|п\.?\s*2\.4\b|экстремальн(?:ых\s+услов|ные\s+услов)/i.test(
+    hay
+  );
+}
+
+async function fetchSection24EmergencyChunks(pool, equipmentId, cap = 6) {
+  const lim = Math.max(1, Math.min(10, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.92::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            content ~* '(^|[^0-9])2\\.4([^0-9]|$)|экстремальн|действия\\s+при\\s+экстремальн'
+          )
+        ORDER BY
+          CASE WHEN content ~* '2\\.4' THEN 0 ELSE 1 END,
+          chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim]
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      safetyPriorityInjected: true,
+      emergencySection24: true,
+      score: Math.max(Number(row.score) || 0, 0.92),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchRegenerationForbiddenChunks(pool, equipmentId, cap = 4) {
+  const lim = Math.max(1, Math.min(8, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.95::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            COALESCE(metadata->>'atomicSafety', '') = 'true'
+            OR content ~* 'ЗАПРЕЩАЕТСЯ[^\\n]{0,200}регенерац'
+            OR content ~* 'регенерац[^\\n]{0,200}ЗАПРЕЩАЕТСЯ'
+            OR content ~* '1\\.1\\.4\\.4'
+          )
+        ORDER BY
+          CASE WHEN content ~* 'ЗАПРЕЩАЕТСЯ' THEN 0 ELSE 1 END,
+          chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim]
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      safetyPriorityInjected: true,
+      regenerationForbidden: true,
+      score: Math.max(Number(row.score) || 0, 0.95),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchIndicatorSectionChunks(pool, equipmentId, cap = 4) {
+  const lim = Math.max(1, Math.min(6, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.91::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            content ~* '1\\.1\\.4\\.3\\.3|световых\\s+индикатор|режим\\s*[«"]?Хранен|режим\\s*[«"]?Осушен|режим\\s*[«"]?Регенерац'
+            OR content ~* 'желтый\\s+световой|зеленый\\s+световой\\s+сигнал\\s+и\\s+мигающий'
+          )
+        ORDER BY chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim]
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      indicatorSectionInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.91),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchP1GoldenFactsChunks(pool, equipmentId, cap = 10) {
+  const lim = Math.max(1, Math.min(16, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.91::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            source_doc ILIKE '%golden-facts-p1%'
+            OR content ~* 'Золотые факты P1'
+            OR content ~* 'Модель:\\s*SDB1106NM,\\s*Параметр:'
+          )
+        ORDER BY chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim]
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      p1GoldenFactsInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.91),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchTable11FlattenedChunks(pool, equipmentId, cap = 8) {
+  const lim = Math.max(1, Math.min(12, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.93::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            metadata @> '{"tableFlattened": true}'::jsonb
+            OR content ~* 'Модель:\\s*SDB1106NM,\\s*Параметр:'
+            OR content ~* 'табл\\.\\s*1\\.1'
+          )
+        ORDER BY chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim]
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      table11FlattenInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.93),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchMaintenanceSectionChunks(pool, equipmentId, cap = 6) {
+  const lim = Math.max(1, Math.min(10, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.9::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            content ~* '(^|[^0-9])1\\.1\\.2([^0-9]|$)|технич(?:еск)?(?:ие|\\.)?\\s+характеристик'
+            OR content ~* '(^|[^0-9])3\\.1([^0-9]|$)|техническ(?:ое|ого)\\s+обслуживани'
+            OR content ~* 'график\\s+техническ|замен(?:а|ить)\\s+блока\\s+осуш|36\\s+месяц'
+            OR content ~* 'запасн(?:ые|ых)\\s+част|ресурс\\s+осушител'
+          )
+        ORDER BY
+          CASE WHEN content ~* '3\\.1' THEN 0
+               WHEN content ~* '1\\.1\\.2' THEN 1
+               ELSE 2 END,
+          chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim]
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      maintenanceSectionInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.9),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchPossibleFaultsListChunks(pool, equipmentId, cap = 8) {
+  const lim = Math.max(1, Math.min(12, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.93::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            COALESCE(metadata->>'possibleFaultsList', '') = 'true'
+            OR COALESCE(metadata->>'tableToText', '') = 'true'
+            OR COALESCE(metadata->>'humidityInspectionChecklist', '') = 'true'
+            OR content ~* 'Перечень возможных|типов(?:ые|ых)\\s+неисправ|Симптом:\\s*'
+            OR content ~* '2\\.2\\.2\\.(?:1|2|3)|внешний\\s+осмотр'
+            OR content ~* 'уплотнител.{0,40}двер|плотность.{0,40}закрыт.{0,40}замк'
+            OR content ~* 'кожух.{0,40}осушител|осушающ'
+          )
+        ORDER BY
+          CASE WHEN COALESCE(metadata->>'humidityInspectionChecklist', '') = 'true' THEN 0
+               WHEN COALESCE(metadata->>'tableToText', '') = 'true' THEN 1
+               WHEN content ~* '2\\.2\\.2\\.2' THEN 2
+               ELSE 3 END,
+          chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim]
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      possibleFaultsInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.93),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchHumidityStepChunks(pool, equipmentId, cap = 4) {
+  const lim = Math.max(1, Math.min(6, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.86::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            content ~* '0[,.]1\\s*%\\s*RH|0[,.]1\\s*RH%|шаг[^\\n]{0,40}влажност|дискретност[^\\n]{0,30}влажност'
+          )
+        LIMIT $2
+      `,
+      [equipmentId, lim]
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      humidityStepInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.86),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchHighPrioritySafetyChunks(pool, equipmentId, cap = 6) {
+  const lim = Math.max(1, Math.min(12, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.88::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            COALESCE(metadata->>'priority', '') = 'high'
+            OR content ~* '(2\\.2\\.1|меры\\s+безопасност|2\\.4|экстремальн|ЗАПРЕЩАЕТСЯ|1\\.1\\.4\\.4)'
+          )
+        ORDER BY chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim]
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      safetyPriorityInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.88),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+function mergeSafetyPriorityChunks(ranked, safetyRows, limit) {
+  if (!safetyRows.length) {
+    return ranked;
+  }
+  const seen = new Set(ranked.map((ch) => chunkRowDedupeKey(ch.sourceDoc, ch.chunkIndex)));
+  const injected = [];
+  for (const ch of safetyRows) {
+    const key = chunkRowDedupeKey(ch.sourceDoc, ch.chunkIndex);
+    if (!seen.has(key)) {
+      seen.add(key);
+      injected.push(ch);
+    }
+  }
+  const merged = [...injected, ...ranked];
+  return merged.slice(0, Math.max(limit, injected.length));
 }
 
 function applyOversizedChunkPenalty(chunks, intent) {
@@ -100,14 +655,17 @@ function applyOversizedChunkPenalty(chunks, intent) {
   if (scope !== "narrow" && scope !== "medium") {
     return chunks;
   }
-  const maxChunkCharactersForFact = 1800;
-  const maxChunkCharactersForOnboarding = 2200;
+  const maxChunkCharactersForFact = 2800;
+  const maxChunkCharactersForOnboarding = 3200;
   const threshold =
     intent?.intentType === "GETTING_STARTED_QUERY"
       ? maxChunkCharactersForOnboarding
       : maxChunkCharactersForFact;
   return chunks.map((ch) => {
-    const len = String(ch.content || "").length;
+    const len = Math.max(
+      String(ch.content || "").length,
+      String(ch.metadata?.parentLlmContext || "").length
+    );
     if (len <= threshold) {
       return { ...ch, oversizedPenaltyScore: 0 };
     }
@@ -186,6 +744,12 @@ function scoreStructuredLexical(query, chunk, parameterKey, entry) {
   }
   if (/стандартн/.test(q)) {
     score += /стандартн/.test(hay) ? 0.25 : -0.08;
+  }
+  if (/максимальн|макс\b|не\s+более|до\s+(?:плюс\s*)?\d/.test(q)) {
+    score += entry?.qualifier === "max" ? 0.22 : 0;
+  }
+  if (/температур|окружающ|сред/.test(q)) {
+    score += /температур|окружающ|сред/.test(hay) ? 0.18 : -0.06;
   }
 
   return Math.max(0, Math.min(1, Number(score.toFixed(4))));
@@ -446,7 +1010,11 @@ async function retrieveEquipmentContext({
     retrievalOverrides && typeof retrievalOverrides === "object"
       ? { ...baseConfig, ...retrievalOverrides }
       : baseConfig;
-  const limit = Number.isFinite(topK) && topK > 0 ? Math.floor(topK) : config.retrievalTopK;
+  const defaultTopK = Math.max(
+    Math.floor(config.retrievalTopK || 15),
+    Math.floor(config.technicalRetrievalTopK || 15)
+  );
+  const limit = Number.isFinite(topK) && topK > 0 ? Math.floor(topK) : defaultTopK;
   const pool = getPool(config.postgresUrl);
 
   if (!pool) {
@@ -488,16 +1056,17 @@ async function retrieveEquipmentContext({
         chunkKind: ch.metadata?.chunkKind ?? null,
         blockType: ch.metadata?.blockType ?? null,
         primaryParameter: ch.metadata?.primaryParameter ?? null,
-        rerankScore: ch.fusionScore ?? ch.score,
+        rerankScore: chunkBestSimilarity(ch),
         lexicalScore: ch.lexicalScore ?? null,
         fusionScore: ch.fusionScore ?? null,
         rerankComponents: ch.rerankComponents ?? null,
         snippet: String(ch.content || "").slice(0, 280),
       }));
       const top = structured[0];
+      const structuredTopSim = chunkBestSimilarity(top) || Number(top.fusionScore) || Number(top.score) || 0;
       return {
         chunks: structured,
-        topScore: top.fusionScore ?? 0,
+        topScore: structuredTopSim,
         retrievalLatencyMs: Date.now() - startedAt,
         selectedTopK: limit,
         sectionHints: [],
@@ -519,7 +1088,10 @@ async function retrieveEquipmentContext({
         parameterSource: "structured_index",
         parameterConfidence: Number(resolvedParameter.confidence || top.parameterEntry?.confidence || 0.8),
         lexicalScore: Number(top.lexicalScore || 0),
-        fusionScore: Number(top.fusionScore || 0),
+        fusionScore: structuredTopSim,
+        vectorTopSimilarity: Number(top.score) || Number(top.fusionScore) || 0,
+        chunksBeforeSingleFieldNarrowing:
+          structured.length > 1 ? structured.slice(0, Math.min(12, structured.length)) : null,
       };
     }
   }
@@ -555,7 +1127,7 @@ async function retrieveEquipmentContext({
 
   const vectorLiteral = vectorToSqlLiteral(queryEmbedding);
 
-  const result = await pool.query(
+  const vecRes = await pool.query(
     `
       SELECT
         source_doc,
@@ -573,7 +1145,31 @@ async function retrieveEquipmentContext({
     [vectorLiteral, equipmentId, fetchLimit]
   );
 
-  let chunks = result.rows.map(sanitizeChunk);
+  const vectorSanitized = vecRes.rows.map(sanitizeChunk);
+  const vectorTopSimilarity = vectorSanitized.length ? Number(vectorSanitized[0].score) || 0 : 0;
+  let hybridLexicalMax = 0;
+  let chunks;
+  const hybridOn = Boolean(config.hybridSearchRrf) && shouldAttemptLexicalHybrid(originalQuery);
+  if (hybridOn) {
+    try {
+      const lexRows = await fetchLexicalRankedChunks(pool, equipmentId, originalQuery, fetchLimit);
+      hybridLexicalMax = lexRows.length ? Math.max(...lexRows.map((r) => Number(r.score) || 0)) : 0;
+      if (!lexRows.length) {
+        chunks = vectorSanitized.map((c) => ({ ...c, hybridVectorOnlyFallback: true }));
+      } else {
+        const lexicalBoost = queryHasTechnicalAbbreviations(originalQuery)
+          ? Math.max(1.5, Number(config.rrfLexicalBoostAbbrev) || 2)
+          : 1;
+        chunks = reciprocalRankFusionChunks(vecRes.rows, lexRows, sanitizeChunk, config.rrfK || 60, {
+          lexicalRankMultiplier: lexicalBoost,
+        });
+      }
+    } catch (_e) {
+      chunks = vectorSanitized.map((c) => ({ ...c, hybridVectorOnlyFallback: true }));
+    }
+  } else {
+    chunks = vectorSanitized;
+  }
 
   let sectionHintFiltered = false;
   if (hints.length > 0) {
@@ -583,6 +1179,10 @@ async function retrieveEquipmentContext({
   }
 
   chunks = attachKeywordScores(chunks, originalQuery);
+  const chunksBeforeSingleFieldNarrowing =
+    intent?.intentType === "SINGLE_FIELD_QUERY"
+      ? chunks.slice(0, Math.min(24, chunks.length)).map((ch) => ({ ...ch }))
+      : null;
   const singleFieldFiltered = filterChunksForSingleFieldIntent(chunks, intent);
   chunks = singleFieldFiltered.chunks;
   const gettingStartedFiltered = filterChunksForGettingStartedIntent(chunks, intent);
@@ -620,14 +1220,62 @@ async function retrieveEquipmentContext({
     chunkKind: ch.metadata?.chunkKind ?? null,
     blockType: ch.metadata?.blockType ?? null,
     primaryParameter: ch.metadata?.primaryParameter ?? null,
-    rerankScore: ch.rerankScore ?? ch.score,
+    rerankScore: chunkBestSimilarity(ch),
     rerankComponents: ch.rerankComponents ?? null,
     snippet: String(ch.content || "").slice(0, 280),
   }));
 
-  ranked = ranked.slice(0, limit);
+  const boosters = intent?.retrievalBoosters || {};
+  let injectedRows = [];
+  if (boosters.emergencySmoke || (isSafetyEmergencyQuery(originalQuery) && /дым|гарь|задымлен|вспышк/i.test(originalQuery))) {
+    injectedRows = await fetchSection24EmergencyChunks(pool, equipmentId, Math.max(limit, 6));
+  } else if (isSafetyEmergencyQuery(originalQuery)) {
+    injectedRows = await fetchHighPrioritySafetyChunks(pool, equipmentId, Math.max(limit, 6));
+  }
+  if (boosters.regenerationShutdown) {
+    const regRows = await fetchRegenerationForbiddenChunks(pool, equipmentId, 4);
+    injectedRows = [...regRows, ...injectedRows];
+  }
+  if (boosters.humidityStep || (intent?.focusParameter === "humidity" && /шаг/i.test(originalQuery))) {
+    const humRows = await fetchHumidityStepChunks(pool, equipmentId, 4);
+    injectedRows = [...humRows, ...injectedRows];
+  }
+  if (
+    boosters.troubleshootingPossibleFaults ||
+    intent?.intentType === "TROUBLESHOOTING_QUERY"
+  ) {
+    const faultRows = await fetchPossibleFaultsListChunks(pool, equipmentId, 8);
+    injectedRows = [...faultRows, ...injectedRows];
+  }
+  if (boosters.maintenanceSections || intent?.intentType === "MAINTENANCE_QUERY") {
+    const maintRows = await fetchMaintenanceSectionChunks(pool, equipmentId, 6);
+    injectedRows = [...maintRows, ...injectedRows];
+  }
+  if (boosters.indicatorNormalMode) {
+    const indRows = await fetchIndicatorSectionChunks(pool, equipmentId, 4);
+    injectedRows = [...indRows, ...injectedRows];
+  }
+  if (boosters.table11Flatten) {
+    const t11Rows = await fetchTable11FlattenedChunks(pool, equipmentId, 8);
+    injectedRows = [...t11Rows, ...injectedRows];
+  }
+  if (boosters.p1GoldenFacts) {
+    const p1Rows = await fetchP1GoldenFactsChunks(pool, equipmentId, 10);
+    injectedRows = [...p1Rows, ...injectedRows];
+  }
+  if (injectedRows.length) {
+    ranked = mergeSafetyPriorityChunks(ranked, injectedRows, limit);
+  } else {
+    ranked = ranked.slice(0, limit);
+  }
 
-  const topScore = ranked.length > 0 ? ranked[0].rerankScore ?? ranked[0].score : 0;
+  if (!ranked.length && vectorTopSimilarity >= 0.6) {
+    ranked = vectorSanitized.slice(0, limit);
+  }
+
+  const rankedTopSim = ranked.length ? chunkBestSimilarity(ranked[0]) : 0;
+  const topScore = Math.max(rankedTopSim, vectorTopSimilarity, hybridLexicalMax);
+  const fusionScore = Math.max(rankedTopSim, vectorTopSimilarity, hybridLexicalMax);
 
   return {
     chunks: ranked,
@@ -652,8 +1300,10 @@ async function retrieveEquipmentContext({
     parameterKey: resolvedParameter?.parameterKey || null,
     parameterSource: null,
     parameterConfidence: Number(resolvedParameter?.confidence || 0),
-    lexicalScore: 0,
-    fusionScore: 0,
+    lexicalScore: hybridLexicalMax,
+    fusionScore,
+    vectorTopSimilarity,
+    chunksBeforeSingleFieldNarrowing,
   };
 }
 
@@ -697,7 +1347,7 @@ function formatContextForPrompt(chunks) {
       if (metaLine) {
         lines.push(metaLine);
       }
-      lines.push(chunk.content);
+      lines.push(getChunkBodyForPrompt(chunk));
       return lines.join("\n");
     })
     .join("\n\n");
@@ -729,4 +1379,6 @@ module.exports = {
   retrieveEquipmentContext,
   formatContextForPrompt,
   extractSources,
+  getChunkBodyForPrompt,
+  chunkBestSimilarity,
 };

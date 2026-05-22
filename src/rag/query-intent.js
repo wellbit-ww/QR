@@ -11,6 +11,7 @@ const INTENT_TYPES = Object.freeze({
   GETTING_STARTED_QUERY: "GETTING_STARTED_QUERY",
   SINGLE_FIELD_QUERY: "SINGLE_FIELD_QUERY",
   TROUBLESHOOTING_QUERY: "TROUBLESHOOTING_QUERY",
+  MAINTENANCE_QUERY: "MAINTENANCE_QUERY",
   QUICK_FACT_QUERY: "QUICK_FACT_QUERY",
 });
 
@@ -77,10 +78,78 @@ const FOCUS_PARAMETER_LABELS = Object.freeze({
   temperature: "температура",
 });
 
+const { isMaintenanceQuery } = require("./maintenance-scope");
+const { isNormalIndicatorSymptomQuery } = require("./indicator-scope");
+const {
+  SDB1106NM_PRODUCT_MODEL,
+  contextHasCompetingSdbModels,
+} = require("./sdb1106nm-scope");
+
+/** Жёсткий фильтр модели — только колонка SDB1106NM в смешанных таблицах. */
+const SDB1106NM_CONTEXT_FILTER_RULES = Object.freeze([
+  "ФИЛЬТР МОДЕЛИ (обязательно для SDB1106NM):",
+  `Если в вопросе или контексте упоминается ${SDB1106NM_PRODUCT_MODEL} (или SDB1106 / SDB1106-NM), ИГНОРИРУЙ любые числовые данные других моделей (SDB151, SDB302, SDB702, SDB1560M и иные SDB####).`,
+  "В таблице с несколькими моделями бери цифру СТРОГО из колонки/строки «SDB1106NM» (или объединённой ячейки SDB1106/SDB1106NM).",
+  "ЗАПРЕЩЕНО подставлять габариты, массу, мощность, сроки обслуживания и прочие ТТХ соседних моделей (например 580 мм вместо 1204 мм).",
+]);
+
+const FOREIGN_SDB_MODEL_NAMES = "SDB151, SDB302, SDB702, SDB1560M";
+
+function equipmentIsSdb1106nm(equipment) {
+  const id = String(equipment?.id || "").toLowerCase();
+  const name = String(equipment?.name || "").toLowerCase();
+  return id.includes("sdb1106") || name.includes("sdb1106");
+}
+
+/**
+ * Нужен ли жёсткий фильтр «только SDB1106NM» для промпта/ответа.
+ */
+function shouldApplySdb1106nmModelContextFilter(query, retrievalContext, equipment = null) {
+  if (equipmentIsSdb1106nm(equipment)) {
+    return true;
+  }
+  const q = String(query || "");
+  const ctx = String(retrievalContext || "");
+  if (/\bSDB1106(?:\s*NM|NM|-NM)?\b/i.test(q) || /\bSDB1106NM\b/i.test(q)) {
+    return true;
+  }
+  if (/\bSDB1106(?:\s*NM|NM)?\b/i.test(ctx) || contextHasCompetingSdbModels(ctx)) {
+    return true;
+  }
+  return false;
+}
+
+function modelContextFilterPromptLines() {
+  return [...SDB1106NM_CONTEXT_FILTER_RULES];
+}
+
+/** Технический / числовой вопрос (ТТХ, габариты, сроки, мощность и т.д.) — temperature 0. */
+function isTechnicalNumericQuery(message) {
+  const m = String(message || "");
+  if (!m.trim()) {
+    return false;
+  }
+  if (detectFocusParameter(m)) {
+    return true;
+  }
+  if (
+    /(?:масс|габарит|размер|ширин|высот|глубин|полк|мощност|напряжен|частот|влажност|шаг|обслужив|ресурс|наработк|температур|подогрев|табл|ттх|техническ|характеристик)/iu.test(
+      m
+    )
+  ) {
+    return true;
+  }
+  return (
+    /\d/.test(m) &&
+    /(?:мм|см|м\b|кг|вт|ватт|гц|вольт|°\s*[сc]|ip\s*\d|месяц|год|rh)/iu.test(m)
+  );
+}
+
 const CLEAR_MODES_INTENTS = new Set([
   INTENT_TYPES.FACT_QUERY,
   INTENT_TYPES.SINGLE_FIELD_QUERY,
   INTENT_TYPES.QUICK_FACT_QUERY,
+  INTENT_TYPES.MAINTENANCE_QUERY,
 ]);
 
 function detectQueryOperatingModes(text) {
@@ -191,6 +260,10 @@ function isGettingStartedQuery(m) {
 function isTroubleshootingQuery(m) {
   const s = String(m || "").trim();
 
+  if (isNormalIndicatorSymptomQuery(s)) {
+    return false;
+  }
+
   if (
     /(?:не\s+выходит|не\s+набирает|не\s+достигает|не\s+держит|не\s+поддерживает|не\s+может\s+выйти|не\s+сушит|не\s+осушает)(?:\s+на\s+(?:режим|влажност|температур))?/iu.test(
       s
@@ -238,9 +311,28 @@ function isTroubleshootingQuery(m) {
 }
 
 /**
+ * Запрос о физическом расположении органов управления / деталей корпуса (не числовой SINGLE_FIELD).
+ */
+function isSpatialPhysicalControlsQuery(message) {
+  const s = String(message || "");
+  const spatial =
+    /(?:^|[\s,.;:])(?:где|куда)\b|физически|располага(?:ется|ются|юсь)|расположен(?:а|о|ы)?|находится|находятся|с\s+какой\s+стороны/i.test(
+      s
+    );
+  const physical =
+    /тумблер|кнопк(?:а|и|у)?|переключател|разъем|разъём|вилк[аи]?|кабел(?:[ья]|ем)?|ножк|колес|опор|ручк|рычаг|защелк|фиксатор|индикатор/i.test(
+      s
+    );
+  return spatial && physical;
+}
+
+/**
  * Один доминирующий параметр для SINGLE_FIELD / валидации ответа.
  */
 function detectFocusParameter(message) {
+  if (isSpatialPhysicalControlsQuery(message)) {
+    return null;
+  }
   const m = String(message || "").toLowerCase();
 
   if (
@@ -277,8 +369,11 @@ function detectFocusParameter(message) {
   if (/температур|градус|°\s*[сc]/i.test(m)) {
     return "temperature";
   }
-  if (/нагрузк|полк|кг\b/i.test(m)) {
+  if (/нагрузк|полк/i.test(m)) {
     return "load";
+  }
+  if (/масс|вес|сколько\s+весит|каков\s+вес|какая\s+масса/i.test(m)) {
+    return "dimensions";
   }
   if (/габарит|размер|ширин|высот|глубин/i.test(m)) {
     return "dimensions";
@@ -317,7 +412,7 @@ function classifyIntentType(message, opts = {}) {
   }
 
   if (
-    /что\s+проверить|чек-?лист|безопасн|риск|охран[ае]\s+труда|аварийн|ч\s*п\.|п\s*т\.|дым|огонь|пожар|искрен|гарь|коротк|замыкан|угроз[аы]\s+жизни|эвакуац/i.test(
+    /что\s+проверить|чек-?лист|безопасн|риск|охран[ае]\s+труда|аварийн|ч\s*п\.|п\s*т\.|дым|огонь|пожар|искрен|гарь|задымлен|вспышк|коротк|замыкан|угроз[аы]\s+жизни|эвакуац/i.test(
       m
     )
   ) {
@@ -325,6 +420,17 @@ function classifyIntentType(message, opts = {}) {
   }
 
   if (/сравни|разниц|чем\s+отлича|versus|\bvs\b/i.test(m)) {
+    return INTENT_TYPES.COMPARISON_QUERY;
+  }
+
+  if (isMaintenanceQuery(m)) {
+    return INTENT_TYPES.MAINTENANCE_QUERY;
+  }
+
+  if (
+    /\d/.test(m) &&
+    /условия\s+эксплуатации|1\.1\.3|допустим|входит\s+ли|соответствует|нарушен|можно\s+ли/i.test(m)
+  ) {
     return INTENT_TYPES.COMPARISON_QUERY;
   }
 
@@ -386,6 +492,8 @@ function preferredChunkKindsForIntent(intentType) {
       return new Set(["procedure", "general", "table"]);
     case INTENT_TYPES.COMPARISON_QUERY:
       return new Set(["table", "spec", "general"]);
+    case INTENT_TYPES.MAINTENANCE_QUERY:
+      return new Set(["spec", "table", "general"]);
     case INTENT_TYPES.CONFIGURATION_QUERY:
       return new Set(["general", "procedure", "spec", "table"]);
     case INTENT_TYPES.FACT_QUERY:
@@ -423,6 +531,27 @@ function equipmentModelAliases(equipment) {
 function detectRetrievalMode(intentType) {
   if (intentType === INTENT_TYPES.GETTING_STARTED_QUERY) {
     return "onboarding_focused";
+  }
+  if (intentType === INTENT_TYPES.MAINTENANCE_QUERY) {
+    return "maintenance_focused";
+  }
+  return null;
+}
+
+const ZERO_TEMP_LLM_OPTIONS = Object.freeze({ temperature: 0, top_p: 0.85 });
+
+/** Параметры генерации LLM: SAFETY и все технические/числовые запросы — temperature 0. */
+function llmGenerationOptionsForIntent(intentType, message = "") {
+  if (intentType === INTENT_TYPES.SAFETY_QUERY || isTechnicalNumericQuery(message)) {
+    return { ...ZERO_TEMP_LLM_OPTIONS };
+  }
+  if (
+    intentType === INTENT_TYPES.SINGLE_FIELD_QUERY ||
+    intentType === INTENT_TYPES.QUICK_FACT_QUERY ||
+    intentType === INTENT_TYPES.MAINTENANCE_QUERY ||
+    (intentType === INTENT_TYPES.FACT_QUERY && /\d/.test(String(message || "")))
+  ) {
+    return { ...ZERO_TEMP_LLM_OPTIONS };
   }
   return null;
 }
@@ -471,6 +600,8 @@ function classifyQueryIntent(message, equipment, options = {}) {
     configHints,
     originalQuery: String(message || "").trim(),
     embeddingAugmentation: "",
+    applyModelContextFilter: shouldApplySdb1106nmModelContextFilter(message, "", equipment),
+    strictNumericLlm: isTechnicalNumericQuery(message),
   };
 }
 
@@ -479,8 +610,11 @@ module.exports = {
   QUERY_SCOPE,
   QUERY_RISK,
   FOCUS_PARAMETER_LABELS,
+  SDB1106NM_CONTEXT_FILTER_RULES,
+  FOREIGN_SDB_MODEL_NAMES,
   classifyQueryIntent,
   detectQueryOperatingModes,
+  isSpatialPhysicalControlsQuery,
   detectFocusParameter,
   inferQueryScope,
   inferQueryRisk,
@@ -488,4 +622,10 @@ module.exports = {
   detectSymptomDomain,
   preferredChunkKindsForIntent,
   equipmentModelAliases,
+  shouldApplySdb1106nmModelContextFilter,
+  modelContextFilterPromptLines,
+  isTechnicalNumericQuery,
+  equipmentIsSdb1106nm,
+  llmGenerationOptionsForIntent,
+  ZERO_TEMP_LLM_OPTIONS,
 };

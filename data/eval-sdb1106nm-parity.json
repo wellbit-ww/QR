@@ -1,0 +1,258 @@
+{
+  "meta": {
+    "equipmentId": "sdb1106-nm",
+    "description": "Parity eval: Direct Context vs RAG для SDB1106NM. Pass = mustContain + mustNotContain + mustMatchRegex (+ optional expectMode).",
+    "version": "1.0.0"
+  },
+  "items": [
+    {
+      "id": "gate-off-topic-welding",
+      "question": "Как сварить алюминий?",
+      "expectMode": "SCOPE_GATE",
+      "mustMatchRegex": ["SDB1106NM|шкаф|сух\\w*\\s+хранен"],
+      "mustNotContain": ["свар"]
+    },
+    {
+      "id": "gate-off-topic-python",
+      "question": "Расскажи про Python",
+      "expectMode": "SCOPE_GATE",
+      "mustMatchRegex": ["SDB1106NM|шкаф"]
+    },
+    {
+      "id": "gate-foreign-sdb302",
+      "question": "Какая мощность SDB302?",
+      "expectMode": "SCOPE_GATE",
+      "mustMatchRegex": ["SDB1106NM"],
+      "mustNotContain": ["810"],
+      "mustNotMatchRegex": ["8\\s*вт"]
+    },
+    {
+      "id": "gate-foreign-sdb702",
+      "question": "Масса шкафа SDB702NM",
+      "expectMode": "SCOPE_GATE",
+      "mustNotContain": ["180"]
+    },
+    {
+      "id": "safety-smoke",
+      "question": "Внимание! Дым! Что делать?",
+      "expectModeDirect": "SAFETY_DETERMINISTIC",
+      "skipModeCheckRag": true,
+      "mustMatchRegex": ["отключ", "2\\.4|экстр"],
+      "mustNotContain": ["свар", "python"]
+    },
+    {
+      "id": "safety-regen-shutdown",
+      "question": "Можно выключить шкаф во время регенерации осушителя?",
+      "expectModeDirectOneOf": ["SAFETY_DETERMINISTIC", "DIRECT_CONTEXT_DETERMINISTIC"],
+      "skipModeCheckRag": true,
+      "mustMatchRegex": ["ЗАПРЕЩАЕТСЯ|запрещ"],
+      "mustNotContain": ["можно выключ"]
+    },
+    {
+      "id": "ttx-mass-cabinet",
+      "question": "Каков вес шкафа SDB1106NM?",
+      "mustContain": ["180"],
+      "mustMatchRegex": ["180\\s*кг"],
+      "mustNotContain": ["56", "1028", "SDB302"],
+      "expectedKeywords": ["масс", "табл"]
+    },
+    {
+      "id": "ttx-mass-synonym",
+      "question": "Какая масса шкафа?",
+      "mustContain": ["180"],
+      "mustMatchRegex": ["180\\s*кг"],
+      "mustNotContain": ["56", "1028"]
+    },
+    {
+      "id": "ttx-width",
+      "question": "Какая ширина шкафа SDB1106NM?",
+      "mustContain": ["1204"],
+      "mustMatchRegex": ["1204\\s*мм"],
+      "mustNotContain": ["56", "1028"]
+    },
+    {
+      "id": "ttx-height",
+      "question": "Какая высота шкафа SDB1106NM?",
+      "mustContain": ["1952"],
+      "mustMatchRegex": ["1952\\s*мм"],
+      "mustNotContain": ["56"]
+    },
+    {
+      "id": "ttx-depth",
+      "question": "Какая глубина шкафа SDB1106NM?",
+      "mustContain": ["772"],
+      "mustMatchRegex": ["772\\s*мм"],
+      "mustNotContain": ["56"]
+    },
+    {
+      "id": "ttx-dimensions-combined",
+      "question": "Какие габаритные размеры SDB1106NM по таблице 1.1?",
+      "mustContain": ["1204", "1952", "772"],
+      "mustNotContain": ["56", "1028"]
+    },
+    {
+      "id": "ttx-power-storage-base",
+      "question": "Какая потребляемая мощность SDB1106NM в режиме хранения без опций?",
+      "mustMatchRegex": ["8\\s*вт"],
+      "mustNotContain": ["810", "56"],
+      "expectedKeywords": ["хранен"]
+    },
+    {
+      "id": "ttx-power-storage-options",
+      "question": "Какая мощность в режиме хранения при включённых опциях азота и подогрева?",
+      "mustMatchRegex": ["810\\s*вт"],
+      "mustNotContain": ["56"]
+    },
+    {
+      "id": "ttx-power-drying-base",
+      "question": "Какая мощность в режиме осушения без опций?",
+      "mustMatchRegex": ["40\\s*вт"],
+      "mustNotMatchRegex": ["8\\s*вт"]
+    },
+    {
+      "id": "ttx-power-regeneration",
+      "question": "Какая мощность в режиме регенерации осушителя?",
+      "mustMatchRegex": ["540\\s*вт"],
+      "mustNotContain": ["810"]
+    },
+    {
+      "id": "ttx-shelves-count",
+      "question": "Сколько стандартных полок в базовой комплектации SDB1106NM?",
+      "mustMatchRegex": ["10"],
+      "mustNotContain": ["56", "1028"],
+      "expectedKeywords": ["полк", "комплект"]
+    },
+    {
+      "id": "ttx-volume-abstain",
+      "question": "Какой полезный объём шкафа SDB1106NM в литрах?",
+      "mustMatchRegex": ["не\\s+указан|отсутствует|не\\s+привед"],
+      "mustNotMatchRegex": ["\\b1028\\s*л"]
+    },
+    {
+      "id": "ttx-warehouse-mismatch",
+      "question": "Можно ли установить шкаф на неотапливаемом складе при +5 °C и 85 % RH?",
+      "mustMatchRegex": ["не\\s+соответств|не\\s+гарант|15|80"],
+      "mustNotContain": ["можно установ"]
+    },
+    {
+      "id": "param-voltage",
+      "question": "Какое напряжение питания шкафа?",
+      "mustContain": ["220"],
+      "mustNotContain": ["информация отсутствует"]
+    },
+    {
+      "id": "param-frequency",
+      "question": "Какая частота сети?",
+      "mustMatchRegex": ["50\\s*гц"],
+      "mustNotContain": ["информация отсутствует"]
+    },
+    {
+      "id": "param-grounding",
+      "question": "Какое сопротивление заземляющего контура?",
+      "mustMatchRegex": ["4\\s*ом"],
+      "mustNotContain": ["браслет"],
+      "mustNotMatchRegex": ["1\\s*мом"]
+    },
+    {
+      "id": "param-humidity-range",
+      "question": "Какой диапазон относительной влажности поддерживает шкаф?",
+      "mustMatchRegex": ["%rh|%\\s*rh|влажност"],
+      "mustNotContain": ["1028"]
+    },
+    {
+      "id": "proc-power-on",
+      "question": "Как включить шкаф?",
+      "mustContain": ["220", "тумблер"],
+      "mustNotContain": ["свар", "python", "гарантия"]
+    },
+    {
+      "id": "troubleshoot-humidity",
+      "question": "Влажность не снижается, что проверить?",
+      "mustContain": ["осуш"],
+      "mustMatchRegex": ["уплотнител|осушител"],
+      "mustNotContain": ["свар", "python"]
+    },
+    {
+      "id": "safety-burn-smell",
+      "question": "Пахнет гарью, можно продолжать работу?",
+      "mustMatchRegex": ["не\\s+продолж|отключ|безопасн|экстр"],
+      "mustNotContain": ["можно продолж"]
+    },
+    {
+      "id": "gate-history-off-topic",
+      "question": "Как сварить алюминий?",
+      "history": [{ "role": "user", "content": "Каков вес шкафа?" }],
+      "expectMode": "SCOPE_GATE",
+      "mustNotContain": ["свар"]
+    },
+    {
+      "id": "followup-power-options",
+      "question": "А с опциями азота и подогрева?",
+      "history": [{ "role": "user", "content": "Какая мощность SDB1106NM в режиме хранения?" }],
+      "mustMatchRegex": ["810\\s*вт"],
+      "mustNotContain": ["56"]
+    },
+    {
+      "id": "ttx-ip-class",
+      "question": "Какой класс защиты IP у шкафа?",
+      "mustMatchRegex": ["ip\\s*65"],
+      "mustNotContain": ["информация отсутствует", "1028"]
+    },
+    {
+      "id": "ttx-humidity-step",
+      "question": "Какой шаг установки влажности?",
+      "mustMatchRegex": ["0[,.]1"],
+      "mustNotMatchRegex": ["5\\s*%"]
+    },
+    {
+      "id": "manual-power-storage-after-regen-history",
+      "question": "Сколько ватт потребляет шкаф в режиме хранения?",
+      "history": [
+        { "role": "user", "content": "Какова максимальная потребляемая мощность в режиме регенерации?" }
+      ],
+      "mustMatchRegex": ["8\\s*вт"],
+      "mustNotMatchRegex": ["540\\s*вт"]
+    },
+    {
+      "id": "manual-grounding-required",
+      "question": "Требуется ли шкафу защитное заземление?",
+      "mustMatchRegex": ["заземл", "4\\s*ом"],
+      "mustNotMatchRegex": ["40\\s*вт", "540\\s*вт"]
+    },
+    {
+      "id": "manual-shelf-load-standard",
+      "question": "Какую максимальную массу выдержит одна стандартная полка?",
+      "mustMatchRegex": ["50\\s*кг"],
+      "mustNotMatchRegex": ["180\\s*кг"]
+    },
+    {
+      "id": "manual-coat-color",
+      "question": "Какого цвета порошковое покрытие используется для корпуса?",
+      "mustNotContain": ["Я отвечаю только"],
+      "mustMatchRegex": ["RAL\\s*7035|7035"]
+    },
+    {
+      "id": "manual-ip-shock-class",
+      "question": "Какой класс защиты от поражения электрическим током имеет изделие?",
+      "mustNotContain": ["Я отвечаю только"],
+      "mustMatchRegex": ["ip\\s*65"]
+    },
+    {
+      "id": "manual-humidity-limit",
+      "question": "Какое предельное значение относительной влажности может поддерживать шкаф?",
+      "mustMatchRegex": ["80|%rh|0"],
+      "mustNotContain": ["не указан"]
+    },
+    {
+      "id": "manual-voltage-not-switch-location",
+      "question": "Где расположен основной выключатель питания на корпусе?",
+      "mustNotMatchRegex": ["^Напряжение питающей сети"],
+      "mustMatchRegex": ["кожух|тумблер|задн|осушител"]
+    },
+    {
+      "id": "manual-voltage-surge-abstain",
+      "question": "Есть ли у шкафа встроенная защита от перепадов напряжения?",
+      "mustNotMatchRegex": ["^Напряжение питающей сети \\(п\\. 2\\.2\\.4\\): 220"]
+    }
+  ]
+}

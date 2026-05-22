@@ -1,0 +1,452 @@
+[
+  {
+    "id": "b1-q1",
+    "block": 1,
+    "question": "Какова точная масса шкафа SDB1106NM в базовой комплектации?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b1-q2",
+    "block": 1,
+    "question": "Какова внешняя ширина шкафа в миллиметрах?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b1-q3",
+    "block": 1,
+    "question": "Какова полная высота шкафа с учетом опор?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b1-q4",
+    "block": 1,
+    "question": "Укажите глубину корпуса шкафа.",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b1-q5",
+    "block": 1,
+    "question": "Сколько стандартных полок идет в комплекте с SDB1106NM?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b1-q6",
+    "block": 1,
+    "question": "Какой объем (в литрах) занимает внутреннее пространство шкафа?",
+    "doc_status": "not_in_doc",
+    "rag_abstain": true,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b1-q7",
+    "block": 1,
+    "question": "Какой материал используется для изготовления прозрачных вставок в дверях?",
+    "doc_status": "partial",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b1-q8",
+    "block": 1,
+    "question": "Какого цвета порошковое покрытие используется для корпуса?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b1-q9",
+    "block": 1,
+    "question": "Укажите диапазон рабочих температур внутри шкафа.",
+    "doc_status": "partial",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b1-q10",
+    "block": 1,
+    "question": "Какое предельное значение относительной влажности может поддерживать шкаф?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b2-q1",
+    "block": 2,
+    "question": "Какое напряжение питания необходимо для работы шкафа?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b2-q2",
+    "block": 2,
+    "question": "Какова максимальная потребляемая мощность в режиме регенерации (база)?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b2-q3",
+    "block": 2,
+    "question": "Сколько ватт потребляет шкаф в режиме хранения?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b2-q4",
+    "block": 2,
+    "question": "Какова пиковая мощность при одновременно включенном подогреве и азоте?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b2-q5",
+    "block": 2,
+    "question": "Какова потребляемая мощность шкафа в режиме обычного осушения (без опций)?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b2-q6",
+    "block": 2,
+    "question": "Требуется ли шкафу защитное заземление?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b2-q7",
+    "block": 2,
+    "question": "Какой класс защиты от поражения электрическим током имеет изделие?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b2-q8",
+    "block": 2,
+    "question": "Где расположен основной выключатель питания на корпусе?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b2-q9",
+    "block": 2,
+    "question": "Какова частота переменного тока в электросети для подключения?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b2-q10",
+    "block": 2,
+    "question": "Есть ли у шкафа встроенная защита от перепадов напряжения?",
+    "doc_status": "not_in_doc",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b3-q1",
+    "block": 3,
+    "question": "Какую максимальную массу выдержит одна стандартная полка?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b3-q2",
+    "block": 3,
+    "question": "Какова допустимая нагрузка на усиленную полку?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b3-q3",
+    "block": 3,
+    "question": "Каков лимит нагрузки на полку, если установлена система подогрева воздуха?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b3-q4",
+    "block": 3,
+    "question": "Какова общая (суммарная) грузоподъемность всех полок шкафа?",
+    "doc_status": "not_in_doc",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b3-q5",
+    "block": 3,
+    "question": "Можно ли устанавливать в шкаф выдвижные полки, и какова их нагрузка?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b3-q6",
+    "block": 3,
+    "question": "На сколько миллиметров можно регулировать полки по высоте?",
+    "doc_status": "partial",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b3-q7",
+    "block": 3,
+    "question": "Какое минимальное расстояние должно быть между полками для корректной конвекции?",
+    "doc_status": "partial",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b3-q8",
+    "block": 3,
+    "question": "Влияет ли установка системы подачи азота на количество доступных полок?",
+    "doc_status": "indirect",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b3-q9",
+    "block": 3,
+    "question": "Что входит в опцию «Освещение рабочего объема»?",
+    "doc_status": "not_in_doc",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b3-q10",
+    "block": 3,
+    "question": "Можно ли дооснастить шкаф колесными опорами вместо стационарных?",
+    "doc_status": "partial",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b4-q1",
+    "block": 4,
+    "question": "Опишите кратко, что происходит в режиме «Регенерация».",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b4-q2",
+    "block": 4,
+    "question": "Как часто и при каких условиях активируется цикл регенерации?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b4-q3",
+    "block": 4,
+    "question": "С какой точностью (в %RH) поддерживается влажность в рабочем объеме?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b4-q4",
+    "block": 4,
+    "question": "Какой шаг установки влажности доступен пользователю на контроллере?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b4-q5",
+    "block": 4,
+    "question": "В течение какого времени шкаф выходит на заданный уровень 5% RH после закрытия двери?",
+    "doc_status": "partial",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b4-q6",
+    "block": 4,
+    "question": "Что произойдет, если оставить дверь открытой более 1 минуты?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b4-q7",
+    "block": 4,
+    "question": "Как работает система контроля концентрации азота?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b4-q8",
+    "block": 4,
+    "question": "Каков диапазон установки таймера подачи азота (если нет датчика)?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b4-q9",
+    "block": 4,
+    "question": "Какова максимальная температура нагрева в опции «Подогрев воздуха»?",
+    "doc_status": "partial",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b4-q10",
+    "block": 4,
+    "question": "Какое химическое вещество используется в качестве поглотителя влаги?",
+    "doc_status": "in_doc",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b5-q1",
+    "block": 5,
+    "question": "Что делать персоналу при обнаружении запаха гари из шкафа?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b5-q2",
+    "block": 5,
+    "question": "Каким стандартам ГОСТ соответствует антистатическое покрытие шкафа?",
+    "doc_status": "in_doc",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b5-q3",
+    "block": 5,
+    "question": "Можно ли использовать шкаф для хранения взрывоопасных веществ?",
+    "doc_status": "not_in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": false
+  },
+  {
+    "id": "b5-q4",
+    "block": 5,
+    "question": "Как часто нужно проводить техническое обслуживание осушительного юнита?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b5-q5",
+    "block": 5,
+    "question": "Можно ли протирать смотровые окна спиртосодержащими растворами?",
+    "doc_status": "not_in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b5-q6",
+    "block": 5,
+    "question": "Какова периодичность калибровки встроенного датчика влажности?",
+    "doc_status": "not_in_doc",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b5-q7",
+    "block": 5,
+    "question": "Какие действия запрещены при выполнении погрузочно-разгрузочных работ?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b5-q8",
+    "block": 5,
+    "question": "Как проверить работоспособность звуковой сигнализации?",
+    "doc_status": "partial",
+    "rag_abstain": false,
+    "mode": "RAG",
+    "passed": true
+  },
+  {
+    "id": "b5-q9",
+    "block": 5,
+    "question": "Допускается ли эксплуатация шкафа при относительной влажности в помещении 90%?",
+    "doc_status": "in_doc",
+    "rag_abstain": false,
+    "mode": "RAG_DETERMINISTIC",
+    "passed": true
+  },
+  {
+    "id": "b5-q10",
+    "block": 5,
+    "question": "Каков назначенный срок службы шкафа SDB1106NM?",
+    "doc_status": "not_in_doc",
+    "rag_abstain": true,
+    "mode": "RAG",
+    "passed": true
+  }
+]

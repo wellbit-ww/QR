@@ -1,0 +1,7 @@
+logs/*.jsonl
+node_modules/
+.cursor/
+data/pdf-*.json
+data/pdf-*.txt
+data/eval-sdb1106nm-parity-last-run.log
+data/manual-docx-rag-run.log

@@ -18,6 +18,10 @@
           <div class="equipment-badge" id="equipmentBadge">
             Оборудование: не выбрано
           </div>
+          <div class="chat-mode-row">
+            <span class="chat-mode-badge" id="chatModeBadge" hidden>Режим: —</span>
+            <span class="chat-mode-hint" id="chatModeHint"></span>
+          </div>
           <p class="chat-subtitle" id="chatSubtitle"></p>
         </header>
 
@@ -25,6 +29,12 @@
           <div class="chat-messages" id="chatMessages"></div>
 
           <form class="chat-form" id="chatForm">
+            <div class="chat-options-bar" style="margin-bottom: 12px; font-size: 0.95em; display: flex; align-items: center; gap: 8px; color: var(--muted, #616161); padding: 0 4px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-weight: 500;">
+                <input type="checkbox" id="directContextMode" name="directContextMode" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary);" />
+                <span>Использовать полный документ напрямую (без RAG)</span>
+              </label>
+            </div>
             <div class="chat-compose">
               <div class="chat-input-wrap">
                 <textarea

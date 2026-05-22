@@ -1,0 +1,2262 @@
+{
+  "generatedAt": "2026-05-22T07:01:58.442Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "caseCount": 30,
+  "directPassRate": 1,
+  "ragPassRate": 1,
+  "parityPassRate": 1,
+  "rows": [
+    {
+      "id": "gate-off-topic-welding",
+      "question": "Как сварить алюминий?",
+      "direct": {
+        "id": "gate-off-topic-welding",
+        "path": "direct",
+        "passed": true,
+        "mode": "SCOPE_GATE",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SCOPE_GATE",
+          "actual": "SCOPE_GATE"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Я отвечаю только по шкафу SDB1106NM и его руководству по сухому хранению. Задайте вопрос по эксплуатации, ТТХ, режимам, неисправностям или безопасности этого шкафа.",
+        "error": null
+      },
+      "rag": {
+        "id": "gate-off-topic-welding",
+        "path": "rag",
+        "passed": true,
+        "mode": "SCOPE_GATE",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SCOPE_GATE",
+          "actual": "SCOPE_GATE"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Я отвечаю только по шкафу SDB1106NM и его руководству по сухому хранению. Задайте вопрос по эксплуатации, ТТХ, режимам, неисправностям или безопасности этого шкафа.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "gate-off-topic-python",
+      "question": "Расскажи про Python",
+      "direct": {
+        "id": "gate-off-topic-python",
+        "path": "direct",
+        "passed": true,
+        "mode": "SCOPE_GATE",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SCOPE_GATE",
+          "actual": "SCOPE_GATE"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Я отвечаю только по шкафу SDB1106NM и его руководству по сухому хранению. Задайте вопрос по эксплуатации, ТТХ, режимам, неисправностям или безопасности этого шкафа.",
+        "error": null
+      },
+      "rag": {
+        "id": "gate-off-topic-python",
+        "path": "rag",
+        "passed": true,
+        "mode": "SCOPE_GATE",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SCOPE_GATE",
+          "actual": "SCOPE_GATE"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Я отвечаю только по шкафу SDB1106NM и его руководству по сухому хранению. Задайте вопрос по эксплуатации, ТТХ, режимам, неисправностям или безопасности этого шкафа.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "gate-foreign-sdb302",
+      "question": "Какая мощность SDB302?",
+      "direct": {
+        "id": "gate-foreign-sdb302",
+        "path": "direct",
+        "passed": true,
+        "mode": "SCOPE_GATE",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SCOPE_GATE",
+          "actual": "SCOPE_GATE"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Я специализируюсь только на модели SDB1106NM. Могу подсказать параметры именно для этого устройства.",
+        "error": null
+      },
+      "rag": {
+        "id": "gate-foreign-sdb302",
+        "path": "rag",
+        "passed": true,
+        "mode": "SCOPE_GATE",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SCOPE_GATE",
+          "actual": "SCOPE_GATE"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Я специализируюсь только на модели SDB1106NM. Могу подсказать параметры именно для этого устройства.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "gate-foreign-sdb702",
+      "question": "Масса шкафа SDB702NM",
+      "direct": {
+        "id": "gate-foreign-sdb702",
+        "path": "direct",
+        "passed": true,
+        "mode": "SCOPE_GATE",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SCOPE_GATE",
+          "actual": "SCOPE_GATE"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Я специализируюсь только на модели SDB1106NM. Могу подсказать параметры именно для этого устройства.",
+        "error": null
+      },
+      "rag": {
+        "id": "gate-foreign-sdb702",
+        "path": "rag",
+        "passed": true,
+        "mode": "SCOPE_GATE",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SCOPE_GATE",
+          "actual": "SCOPE_GATE"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Я специализируюсь только на модели SDB1106NM. Могу подсказать параметры именно для этого устройства.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "safety-smoke",
+      "question": "Внимание! Дым! Что делать?",
+      "direct": {
+        "id": "safety-smoke",
+        "path": "direct",
+        "passed": true,
+        "mode": "SAFETY_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SAFETY_DETERMINISTIC",
+          "actual": "SAFETY_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "При появлении **дыма**, запаха **гари** или других признаков аварии (п. **2.4** «Действия в экстремальных условиях»):\n\n1. **Немедленно отключите питание** шкафа SDB1106NM (снимите ",
+        "error": null
+      },
+      "rag": {
+        "id": "safety-smoke",
+        "path": "rag",
+        "passed": true,
+        "mode": "SAFETY_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "SAFETY_DETERMINISTIC",
+          "skipped": true
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "При появлении **дыма**, запаха **гари** или других признаков аварии (п. **2.4** «Действия в экстремальных условиях»):\n\n1. **Немедленно отключите питание** шкафа SDB1106NM (снимите ",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "safety-regen-shutdown",
+      "question": "Можно выключить шкаф во время регенерации осушителя?",
+      "direct": {
+        "id": "safety-regen-shutdown",
+        "path": "direct",
+        "passed": true,
+        "mode": "SAFETY_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SAFETY_DETERMINISTIC|DIRECT_CONTEXT_DETERMINISTIC",
+          "actual": "SAFETY_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "По руководству SDB1106NM (п. **1.1.4.4.3**):\n\n**ЗАПРЕЩАЕТСЯ** выключать шкаф в режиме **регенерации** осушителя.\n\nДождитесь окончания цикла регенерации (индикация **жёлтым** по п. ",
+        "error": null
+      },
+      "rag": {
+        "id": "safety-regen-shutdown",
+        "path": "rag",
+        "passed": true,
+        "mode": "SAFETY_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "SAFETY_DETERMINISTIC",
+          "skipped": true
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "По руководству SDB1106NM (п. **1.1.4.4.3**):\n\n**ЗАПРЕЩАЕТСЯ** выключать шкаф в режиме **регенерации** осушителя.\n\nДождитесь окончания цикла регенерации (индикация **жёлтым** по п. ",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-mass-cabinet",
+      "question": "Каков вес шкафа SDB1106NM?",
+      "direct": {
+        "id": "ttx-mass-cabinet",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Масса шкафа **SDB1106NM** (табл. 1.1): **180 кг**.\n\nУказывайте только значение для модели SDB1106NM, не путать со строками других моделей в таблице.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-mass-cabinet",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Масса шкафа **SDB1106NM** (табл. 1.1): **180 кг**.\n\nУказывайте только значение для модели SDB1106NM, не путать со строками других моделей в таблице.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-mass-synonym",
+      "question": "Какая масса шкафа?",
+      "direct": {
+        "id": "ttx-mass-synonym",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Масса шкафа **SDB1106NM** (табл. 1.1): **180 кг**.\n\nУказывайте только значение для модели SDB1106NM, не путать со строками других моделей в таблице.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-mass-synonym",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Масса шкафа **SDB1106NM** (табл. 1.1): **180 кг**.\n\nУказывайте только значение для модели SDB1106NM, не путать со строками других моделей в таблице.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-width",
+      "question": "Какая ширина шкафа SDB1106NM?",
+      "direct": {
+        "id": "ttx-width",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Ширина шкафа **SDB1106NM** (табл. 1.1): **1204 мм**.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-width",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Ширина шкафа **SDB1106NM** (табл. 1.1): **1204 мм**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-height",
+      "question": "Какая высота шкафа SDB1106NM?",
+      "direct": {
+        "id": "ttx-height",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Высота шкафа **SDB1106NM** (табл. 1.1): **1952 мм**.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-height",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Высота шкафа **SDB1106NM** (табл. 1.1): **1952 мм**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-depth",
+      "question": "Какая глубина шкафа SDB1106NM?",
+      "direct": {
+        "id": "ttx-depth",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Глубина шкафа **SDB1106NM** (табл. 1.1): **772 мм**.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-depth",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Глубина шкафа **SDB1106NM** (табл. 1.1): **772 мм**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-dimensions-combined",
+      "question": "Какие габаритные размеры SDB1106NM по таблице 1.1?",
+      "direct": {
+        "id": "ttx-dimensions-combined",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Габаритные размеры **SDB1106NM** (табл. 1.1):\n• ширина — **1204 мм**;\n• высота — **1952 мм**;\n• глубина — **772 мм**;\n• масса — **180 кг**.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-dimensions-combined",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Габаритные размеры **SDB1106NM** (табл. 1.1):\n• ширина — **1204 мм**;\n• высота — **1952 мм**;\n• глубина — **772 мм**;\n• масса — **180 кг**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-power-storage-base",
+      "question": "Какая потребляемая мощность SDB1106NM в режиме хранения без опций?",
+      "direct": {
+        "id": "ttx-power-storage-base",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Потребляемая мощность **SDB1106NM** в режиме «Хранения» без опций (п. 1.1.2.7): не более **8 Вт**.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-power-storage-base",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Потребляемая мощность **SDB1106NM** в режиме «Хранения» без опций (п. 1.1.2.7): не более **8 Вт**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-power-storage-options",
+      "question": "Какая мощность в режиме хранения при включённых опциях азота и подогрева?",
+      "direct": {
+        "id": "ttx-power-storage-options",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Потребляемая мощность **SDB1106NM** в режиме «Хранения» при включённых опциях **подачи азота и подогрева воздуха** (п. 1.1.2.7): не более **810 Вт**.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-power-storage-options",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Потребляемая мощность **SDB1106NM** в режиме «Хранения» при включённых опциях **подачи азота и подогрева воздуха** (п. 1.1.2.7): не более **810 Вт**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-power-drying-base",
+      "question": "Какая мощность в режиме осушения без опций?",
+      "direct": {
+        "id": "ttx-power-drying-base",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Потребляемая мощность **SDB1106NM** в режиме «Осушения» без опций (п. 1.1.2.7): не более **40 Вт**.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-power-drying-base",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Потребляемая мощность **SDB1106NM** в режиме «Осушения» без опций (п. 1.1.2.7): не более **40 Вт**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-power-regeneration",
+      "question": "Какая мощность в режиме регенерации осушителя?",
+      "direct": {
+        "id": "ttx-power-regeneration",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Потребляемая мощность **SDB1106NM** в режиме «Регенерации» осушителя (п. 1.1.2.7): не более **540 Вт**.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-power-regeneration",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Потребляемая мощность **SDB1106NM** в режиме «Регенерации» осушителя (п. 1.1.2.7): не более **540 Вт**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-shelves-count",
+      "question": "Сколько стандартных полок в базовой комплектации SDB1106NM?",
+      "direct": {
+        "id": "ttx-shelves-count",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "В **базовой комплектации** шкафа **SDB1106NM** (табл. 1.2, п. 8.1):\n\n• **Полка с перфорацией** — **10 шт.**\n\nДополнительно по табл. 1.2 для SDB1106NM: осушитель — **2 шт.** (п. 6.2",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-shelves-count",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "В **базовой комплектации** шкафа **SDB1106NM** (табл. 1.2, п. 8.1):\n\n• **Полка с перфорацией** — **10 шт.**\n\nДополнительно по табл. 1.2 для SDB1106NM: осушитель — **2 шт.** (п. 6.2",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-volume-abstain",
+      "question": "Какой полезный объём шкафа SDB1106NM в литрах?",
+      "direct": {
+        "id": "ttx-volume-abstain",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "В руководстве по эксплуатации **SDB1106NM** **не указан** полезный **внутренний объём в литрах**.\n\nПо **табл. 1.1** приведены **наружные габариты** базового исполнения:\n• ширина — ",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-volume-abstain",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "В руководстве по эксплуатации **SDB1106NM** **не указан** полезный **внутренний объём в литрах**.\n\nПо **табл. 1.1** приведены **наружные габариты** базового исполнения:\n• ширина — ",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-warehouse-mismatch",
+      "question": "Можно ли установить шкаф на неотапливаемом складе при +5 °C и 85 % RH?",
+      "direct": {
+        "id": "ttx-warehouse-mismatch",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "По руководству SDB1106NM условия **не соответствуют** заявленным на складе (+5 °C, 85 % RH).\n\n**Условия эксплуатации шкафа** (п. 1.1.2.12):\n- температура окружающего воздуха: от **",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-warehouse-mismatch",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "По руководству SDB1106NM условия **не соответствуют** заявленным на складе (+5 °C, 85 % RH).\n\n**Условия эксплуатации шкафа** (п. 1.1.2.12):\n- температура окружающего воздуха: от **",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "param-voltage",
+      "question": "Какое напряжение питания шкафа?",
+      "direct": {
+        "id": "param-voltage",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Напряжение питающей сети (п. 2.2.4): **220 В**.",
+        "error": null
+      },
+      "rag": {
+        "id": "param-voltage",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Напряжение питающей сети (п. 2.2.4): **220 В**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "param-frequency",
+      "question": "Какая частота сети?",
+      "direct": {
+        "id": "param-frequency",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Частота питающей сети (п. 2.2.4): **50 Гц** (±1 Гц).",
+        "error": null
+      },
+      "rag": {
+        "id": "param-frequency",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Частота питающей сети (п. 2.2.4): **50 Гц** (±1 Гц).",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "param-grounding",
+      "question": "Какое сопротивление заземляющего контура?",
+      "direct": {
+        "id": "param-grounding",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Сопротивление заземляющего контура (п. 2.2.4): не более **4 Ом**.",
+        "error": null
+      },
+      "rag": {
+        "id": "param-grounding",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Сопротивление заземляющего контура (п. 2.2.4): не более **4 Ом**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "param-humidity-range",
+      "question": "Какой диапазон относительной влажности поддерживает шкаф?",
+      "direct": {
+        "id": "param-humidity-range",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Диапазон поддержания относительной влажности (п. 1.1.2.1–1.1.2.4): **0–80 %RH**, точность **±1 %RH**.",
+        "error": null
+      },
+      "rag": {
+        "id": "param-humidity-range",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Диапазон поддержания относительной влажности (п. 1.1.2.1–1.1.2.4): **0–80 %RH**, точность **±1 %RH**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "proc-power-on",
+      "question": "Как включить шкаф?",
+      "direct": {
+        "id": "proc-power-on",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Включение шкафа **SDB1106NM** (п. 2.2.4–2.2.5):\n1. Проверьте комплектность и напряжение сети **220 В / 50 Гц**.\n2. Подключите шнур питания к розетке **220 В**.\n3. Переведите **тумб",
+        "error": null
+      },
+      "rag": {
+        "id": "proc-power-on",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Включение шкафа **SDB1106NM** (п. 2.2.4–2.2.5):\n1. Проверьте комплектность и напряжение сети **220 В / 50 Гц**.\n2. Подключите шнур питания к розетке **220 В**.\n3. Переведите **тумб",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "troubleshoot-humidity",
+      "question": "Влажность не снижается, что проверить?",
+      "direct": {
+        "id": "troubleshoot-humidity",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Если **влажность не снижается** в шкафу **SDB1106NM**, проверьте по РЭ:\n\n1. **Уплотнитель дверей** — отсутствие повреждений (п. 2.2.2.2).\n2. **Замки и плотность закрытия** дверей; ",
+        "error": null
+      },
+      "rag": {
+        "id": "troubleshoot-humidity",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Если **влажность не снижается** в шкафу **SDB1106NM**, проверьте по РЭ:\n\n1. **Уплотнитель дверей** — отсутствие повреждений (п. 2.2.2.2).\n2. **Замки и плотность закрытия** дверей; ",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "safety-burn-smell",
+      "question": "Пахнет гарью, можно продолжать работу?",
+      "direct": {
+        "id": "safety-burn-smell",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "При появлении **дыма**, запаха **гари** или других признаков аварии (п. **2.4** «Действия в экстремальных условиях»):\n\n1. **Немедленно отключите питание** шкафа SDB1106NM (снимите ",
+        "error": null
+      },
+      "rag": {
+        "id": "safety-burn-smell",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "При появлении **дыма**, запаха **гари** или других признаков аварии (п. **2.4** «Действия в экстремальных условиях»):\n\n1. **Немедленно отключите питание** шкафа SDB1106NM (снимите ",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "gate-history-off-topic",
+      "question": "Как сварить алюминий?",
+      "direct": {
+        "id": "gate-history-off-topic",
+        "path": "direct",
+        "passed": true,
+        "mode": "SCOPE_GATE",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SCOPE_GATE",
+          "actual": "SCOPE_GATE"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Я отвечаю только по шкафу SDB1106NM и его руководству по сухому хранению. Задайте вопрос по эксплуатации, ТТХ, режимам, неисправностям или безопасности этого шкафа.",
+        "error": null
+      },
+      "rag": {
+        "id": "gate-history-off-topic",
+        "path": "rag",
+        "passed": true,
+        "mode": "SCOPE_GATE",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": "SCOPE_GATE",
+          "actual": "SCOPE_GATE"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Я отвечаю только по шкафу SDB1106NM и его руководству по сухому хранению. Задайте вопрос по эксплуатации, ТТХ, режимам, неисправностям или безопасности этого шкафа.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "followup-power-options",
+      "question": "А с опциями азота и подогрева?",
+      "direct": {
+        "id": "followup-power-options",
+        "path": "direct",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC_RECOVERY",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC_RECOVERY"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Потребляемая мощность **SDB1106NM** в режиме «Хранения» при включённых опциях **подачи азота и подогрева воздуха** (п. 1.1.2.7): не более **810 Вт**.",
+        "error": null
+      },
+      "rag": {
+        "id": "followup-power-options",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC_RECOVERY",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC_RECOVERY"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Потребляемая мощность **SDB1106NM** в режиме «Хранения» при включённых опциях **подачи азота и подогрева воздуха** (п. 1.1.2.7): не более **810 Вт**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-ip-class",
+      "question": "Какой класс защиты IP у шкафа?",
+      "direct": {
+        "id": "ttx-ip-class",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Степень защиты шкафа **SDB1106NM** (п. 1.1.2.9): **IP65**.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-ip-class",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Степень защиты шкафа **SDB1106NM** (п. 1.1.2.9): **IP65**.",
+        "error": null
+      },
+      "parityOk": true
+    },
+    {
+      "id": "ttx-humidity-step",
+      "question": "Какой шаг установки влажности?",
+      "direct": {
+        "id": "ttx-humidity-step",
+        "path": "direct",
+        "passed": true,
+        "mode": "DIRECT_CONTEXT_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "DIRECT_CONTEXT_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 1,
+        "answerPreview": "Шаг установки относительной влажности (п. 1.1.2.1–1.1.2.4): **0,1 %RH**.",
+        "error": null
+      },
+      "rag": {
+        "id": "ttx-humidity-step",
+        "path": "rag",
+        "passed": true,
+        "mode": "RAG_DETERMINISTIC",
+        "keywordScore": 1,
+        "mustContain": {
+          "missing": [],
+          "passed": true
+        },
+        "mustNotContain": {
+          "forbiddenHits": [],
+          "passed": true
+        },
+        "mustNotMatchRegex": {
+          "hits": [],
+          "passed": true
+        },
+        "mustMatchRegex": {
+          "failed": [],
+          "passed": true
+        },
+        "modeCheck": {
+          "passed": true,
+          "expected": null,
+          "actual": "RAG_DETERMINISTIC"
+        },
+        "parameterKeyCheck": {
+          "passed": true,
+          "actual": null
+        },
+        "sourcesCount": 0,
+        "answerPreview": "Шаг установки относительной влажности (п. 1.1.2.1–1.1.2.4): **0,1 %RH**.",
+        "error": null
+      },
+      "parityOk": true
+    }
+  ]
+}

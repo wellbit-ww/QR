@@ -12,13 +12,14 @@ function extractStructuredParameters(text) {
   const s = String(text || "");
   const out = [];
 
-  const add = (parameterKey, value, unit, confidence = 0.9) => {
+  const add = (parameterKey, value, unit, confidence = 0.9, extra = {}) => {
     pushEntry(out, {
       parameterKey,
       value: String(value),
       unit: unit || null,
       aliases: PARAMETER_REGISTRY[parameterKey]?.aliases || [],
       confidence,
+      ...extra,
     });
   };
 
@@ -74,6 +75,51 @@ function extractStructuredParameters(text) {
   while ((m = powerRe.exec(s)) !== null) {
     const unit = /кВт/i.test(m[0]) ? "кВт" : "Вт";
     add("power_consumption", m[1].replace(",", "."), unit, 0.84);
+  }
+
+  const tempRangeRe = new RegExp(
+    `(?:температур[аы]|воздух|окружающ[а-яё\\s]+сред[аы]).{0,120}?от\\s+(?:плюс\\s*)?(${number})\\s*(?:°\\s*[СC]|º\\s*[СC]|град\\.?\\s*цельс).{0,80}?до\\s+(?:плюс\\s*)?(${number})\\s*(?:°\\s*[СC]|º\\s*[СC]|град\\.?\\s*цельс)`,
+    "giu"
+  );
+  while ((m = tempRangeRe.exec(s)) !== null) {
+    add(
+      "ambient_temperature",
+      `+${m[1].replace(",", ".")} - +${m[2].replace(",", ".")}`,
+      "°C",
+      0.9,
+      { qualifier: "range", maxValue: `+${m[2].replace(",", ".")}` }
+    );
+    add("ambient_temperature", `+${m[2].replace(",", ".")}`, "°C", 0.92, {
+      qualifier: "max",
+    });
+  }
+
+  const tempValueRe = new RegExp(`(?:температур[аы]|воздух|окружающ[а-яё\\s]+сред[аы]).{0,100}(?:плюс\\s*)?(${number})\\s*(?:°\\s*[СC]|º\\s*[СC]|град\\.?\\s*цельс)`, "giu");
+  while ((m = tempValueRe.exec(s)) !== null) {
+    const near = s.slice(Math.max(0, m.index - 80), m.index + 160);
+    if (/от\s+(?:плюс\s*)?\d/i.test(near) && /до\s+(?:плюс\s*)?\d/i.test(near)) {
+      continue;
+    }
+    add("ambient_temperature", `+${m[1].replace(",", ".")}`, "°C", 0.74);
+  }
+
+  const ethernetCapacityRe = /ethernet.{0,120}?един(?:ую|ой)\s+сет[ьи].{0,80}?от\s+(\d+)\s+до\s+(\d+)\s+шкаф/giu;
+  while ((m = ethernetCapacityRe.exec(s)) !== null) {
+    add(
+      "ethernet_network_capacity",
+      `${m[1]} - ${m[2]}`,
+      "шкафов",
+      0.9,
+      { qualifier: "network_capacity", maxValue: m[2] }
+    );
+    add("ethernet_network_capacity", m[2], "шкафов", 0.91, {
+      qualifier: "max",
+    });
+  }
+
+  const ethernetConnectorRe = /разъ[её]м\s+для\s+подключения\s+шкафа\s+к\s+сети\s+ethernet.{0,40}?(\d+)\s*(?:шт\.?)?/giu;
+  while ((m = ethernetConnectorRe.exec(s)) !== null) {
+    add("ethernet_connector_count", m[1], "шт.", 0.88);
   }
 
   return out;

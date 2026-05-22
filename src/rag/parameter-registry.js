@@ -1,3 +1,4 @@
+/** Только алиасы для маршрутизации/фокуса retrieval. Числовые ТТХ — только из PDF через LLM. */
 const PARAMETER_REGISTRY = Object.freeze({
   grounding_resistance: {
     aliases: [
@@ -38,6 +39,38 @@ const PARAMETER_REGISTRY = Object.freeze({
     aliases: ["мощность", "потребляемая мощность"],
     expectedUnits: ["вт", "квт"],
   },
+  ambient_temperature: {
+    aliases: [
+      "температура окружающей среды",
+      "температура окружающего воздуха",
+      "температура воздуха",
+      "максимальная температура",
+      "условия эксплуатации",
+      "температура",
+    ],
+    expectedUnits: ["°c", "ºс", "°с"],
+  },
+  ethernet_network_capacity: {
+    aliases: [
+      "ethernet",
+      "локальная сеть",
+      "единая сеть",
+      "объединить шкафы",
+      "количество шкафов",
+      "сеть ethernet",
+    ],
+    expectedUnits: ["шкафов"],
+  },
+  ethernet_connector_count: {
+    aliases: [
+      "разъем ethernet",
+      "разъём ethernet",
+      "разъем для подключения шкафа к сети ethernet",
+      "ethernet разъем",
+      "ethernet разъём",
+    ],
+    expectedUnits: ["шт"],
+  },
 });
 
 function normalizeText(s) {
@@ -77,6 +110,7 @@ function resolveParameter(query, fallbackFocusParameter = null) {
     protection: "protection",
     humidity: "humidity_range",
     load: "shelf_load_max",
+    temperature: "ambient_temperature",
   };
   if (fallbackFocusParameter && focusMap[fallbackFocusParameter]) {
     return {

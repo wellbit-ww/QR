@@ -8,10 +8,16 @@
   },
   "scripts": {
     "start": "node server.js",
+    "dev": "nodemon server.js",
     "docker:db": "docker compose up -d",
     "ingest:knowledge": "node scripts/ingest-knowledge.js",
     "eval:rag": "node scripts/eval-rag.js",
-    "debug:rag": "node scripts/debug-rag-pipeline.js"
+    "eval:parity": "node scripts/eval-sdb1106nm-parity.js",
+    "validate:parity-json": "node scripts/validate-eval-parity-json.js",
+    "test:golden-router": "node scripts/test-sdb1106nm-golden-router.js",
+    "eval:manual-docx": "node scripts/run-manual-docx-rag-test.js",
+    "debug:rag": "node scripts/debug-rag-pipeline.js",
+    "test:gate": "node scripts/test-sdb1106nm-gate.js --api http://127.0.0.1:3000"
   },
   "dependencies": {
     "dompurify": "^3.2.4",
@@ -22,5 +28,8 @@
     "pg": "^8.16.3",
     "undici": "^7.5.0",
     "word-extractor": "^1.0.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }

@@ -1,16 +1,20 @@
 /**
  * Пошаговая диагностика RAG: чанки (offline), intent, augmentation, retrieval (если есть POSTGRES_URL).
- * Запуск: node scripts/debug-rag-pipeline.js
+ * Запуск: node scripts/debug-rag-pipeline.js ["запрос"]
  */
 
-const fs = require("fs");
 const path = require("path");
 const equipmentCatalog = require("../data/equipment.json");
 const { getRagConfig } = require("../src/rag/config");
-const { splitDocumentIntoChunks } = require("../src/rag/chunking");
+const { splitDocumentIntoChunks, extractFaultTableTextChunks } = require("../src/rag/chunking");
 const { classifyQueryIntent } = require("../src/rag/query-intent");
+const {
+  expandRetrievalSynonyms,
+  applyMandatoryRewriteRules,
+} = require("../src/rag/query-rewriting");
 const { rerankChunks } = require("../src/rag/rerank");
 const { retrieveEquipmentContext } = require("../src/rag/retrieval");
+const { loadPrimaryKnowledgeText } = require("./knowledge-content-loader");
 
 const EQUIPMENT_ID = "sdb1106-nm";
 const QUERY =
@@ -38,51 +42,91 @@ const INTENT_REGRESSION_SAMPLES = [
   "Какое питание?",
 ];
 
+function offlineChunkMatchers(query) {
+  const q = String(query || "").toLowerCase();
+  if (/не\s+включается|не\s+запуска/i.test(q)) {
+    return {
+      label: "fault_power_on",
+      test: (t) =>
+        /симптом:\s*[^.]*не\s+включается/i.test(t) ||
+        (/не\s+включается/i.test(t) && /питан|напряжен|предохранител/i.test(t)),
+    };
+  }
+  if (/влажност/i.test(q) && /не\s+падает|не\s+снижается|не\s+выходит/i.test(q)) {
+    return {
+      label: "fault_humidity",
+      test: (t) =>
+        /симптом:\s*[^.]*влажност/i.test(t) ||
+        (/не\s+выходит/i.test(t) && /влажност|уплотнител|осушител/i.test(t)),
+    };
+  }
+  if (/\bшаг\b/i.test(q) && /влажност/i.test(q)) {
+    return {
+      label: "humidity_step",
+      test: (t) => /0[,.]1\s*%?\s*RH|шаг/i.test(t) && /влажност|RH/i.test(t),
+    };
+  }
+  return {
+    label: "humidity_range",
+    test: (t) => t.includes("0") && t.includes("80") && /RH/i.test(t),
+  };
+}
+
 async function main() {
   const config = getRagConfig();
   const equipment = equipmentCatalog[EQUIPMENT_ID];
 
-  const mdPath = path.join(
-    __dirname,
-    "..",
-    "knowledge",
-    EQUIPMENT_ID,
-    "Руководство SDB_2017 [22] 1106NM.md"
-  );
-
+  const knowledge = await loadPrimaryKnowledgeText(EQUIPMENT_ID);
   let mdText = "";
   let step1SkipReason = null;
-  if (fs.existsSync(mdPath)) {
-    mdText = fs.readFileSync(mdPath, "utf8");
+  let knowledgeSource = null;
+
+  if (knowledge && knowledge.text.trim()) {
+    mdText = knowledge.text;
+    knowledgeSource = {
+      path: path.join("knowledge", EQUIPMENT_ID, knowledge.sourcePath),
+      sourceType: knowledge.sourceType,
+      chars: mdText.length,
+    };
   } else {
-    step1SkipReason = `Файл не найден (${mdPath}) — offline chunking пропущен; это не ошибка сборки.`;
+    step1SkipReason =
+      `Нет файлов в knowledge/${EQUIPMENT_ID}/ (.md/.pdf) — offline chunking пропущен.`;
   }
 
-  const chunks = mdText
+  const legacyChunks = mdText
     ? splitDocumentIntoChunks(mdText, config.chunkSize, config.chunkOverlap)
     : [];
+  const faultChunks = mdText
+    ? extractFaultTableTextChunks(mdText, { equipmentName: equipment?.name })
+    : [];
+  const chunks = [...legacyChunks, ...faultChunks];
 
-  /** Шаг 1 */
+  const matcher = offlineChunkMatchers(QUERY);
   const foundChunks = chunks
-    .filter((c) => {
-      const t = c.content;
-      return t.includes("0") && t.includes("80") && /RH/i.test(t);
-    })
+    .filter((c) => matcher.test(c.content))
     .map((c) => ({
       text: c.content.slice(0, 800) + (c.content.length > 800 ? "…" : ""),
       chunkKind: c.metadata.chunkKind,
+      tableToText: Boolean(c.metadata.tableToText),
+      faultTableRow: c.metadata.faultTableRow,
       operatingModes: c.metadata.operatingModes,
       specSheetMerged: Boolean(c.metadata.specSheetMerged),
     }));
 
-  const step1 = { foundChunks };
+  const step1 = {
+    matcher: matcher.label,
+    knowledgeSource,
+    faultTableChunksExtracted: faultChunks.length,
+    foundChunks,
+  };
 
   /** Шаг 4–5 */
   const intent = classifyQueryIntent(QUERY, equipment, { forceSafety: false });
   const originalQuery = QUERY.trim();
+  const rewrittenQuery = applyMandatoryRewriteRules(originalQuery, originalQuery, [], equipment);
   const augmentedQuery = config.ragEmbedAugmentation
-    ? `${intent.embeddingAugmentation}\n${originalQuery}`
-    : originalQuery;
+    ? `${intent.embeddingAugmentation}\n${expandRetrievalSynonyms(rewrittenQuery)}`
+    : expandRetrievalSynonyms(rewrittenQuery);
 
   const step4 = {
     intentType: intent.intentType,
@@ -91,6 +135,7 @@ async function main() {
 
   const step5 = {
     originalQuery,
+    rewrittenQuery,
     augmentedQuery,
     ragEmbedAugmentationEnvOn: config.ragEmbedAugmentation,
   };
@@ -99,10 +144,12 @@ async function main() {
   let step2 = { skipped: true, reason: "POSTGRES_URL не задан — см. offline чанки выше." };
   let step3 = { skipped: true };
 
+  const retrievalQuery = expandRetrievalSynonyms(rewrittenQuery);
+
   if (config.postgresUrl) {
     const baseline = await retrieveEquipmentContext({
       equipmentId: EQUIPMENT_ID,
-      query: QUERY,
+      query: retrievalQuery,
       topK: 10,
       intent: null,
       retrievalOverrides: {
@@ -112,22 +159,21 @@ async function main() {
     });
 
     step2 = {
-      query: QUERY,
+      query: retrievalQuery,
       topK: 10,
-      note: "Без rerank, без intent в запросе эмбеддинга, без augmentation",
+      note: "Без rerank; запрос с синонимами rewrite",
       results: baseline.chunks.map((ch) => ({
         text: ch.content.slice(0, 600) + (ch.content.length > 600 ? "…" : ""),
         score: Number(ch.score.toFixed(4)),
+        tableToText: Boolean(ch.metadata?.tableToText),
       })),
-      has080rh:
-        baseline.chunks.some((ch) =>
-          /\[?\s*0\s*[-–—]\s*80\s*RH\s*%?\]?/i.test(ch.content)
-        ) || baseline.chunks.some((ch) => /0\s*-\s*80\s*RH/i.test(ch.content)),
+      foundAny: baseline.chunks.length > 0,
+      matchesMatcher: baseline.chunks.some((ch) => matcher.test(ch.content)),
     };
 
     const wide = await retrieveEquipmentContext({
       equipmentId: EQUIPMENT_ID,
-      query: QUERY,
+      query: retrievalQuery,
       topK: 40,
       intent,
       retrievalOverrides: {
@@ -139,11 +185,10 @@ async function main() {
     const vectorsOrdered = [...wide.chunks].sort((a, b) => b.score - a.score);
     const reranked = rerankChunks(vectorsOrdered, intent);
 
-    const needle = (txt) =>
-      /\[?\s*0\s*[-–—]\s*80\s*RH\s*%?\]?/i.test(txt) || /0\s*-\s*80\s*RH/i.test(txt);
+    const matchIdx = (list) => list.findIndex((ch) => matcher.test(ch.content));
 
-    const vecIdx = vectorsOrdered.findIndex((ch) => needle(ch.content));
-    const rrIdx = reranked.findIndex((ch) => needle(ch.content));
+    const vecIdx = matchIdx(vectorsOrdered);
+    const rrIdx = matchIdx(reranked);
 
     step3 = {
       note: "Кандидаты: vector-only vs после rerankChunks (как в проде)",
@@ -154,26 +199,29 @@ async function main() {
         vectorScore: ch.vectorScore != null ? Number(ch.vectorScore.toFixed(4)) : null,
         rerankScore: ch.rerankScore != null ? Number(ch.rerankScore.toFixed(4)) : null,
         chunkKind: ch.metadata?.chunkKind,
+        tableToText: Boolean(ch.metadata?.tableToText),
         operatingModes: ch.metadata?.operatingModes,
       })),
     };
   }
 
   const report = {
-    rootCauseHint:
-      step1SkipReason
-        ? step1SkipReason
-        : foundChunks.length === 0
-          ? "Чанк с 0…80 RH не найден в offline — проверить chunking (FIX_CHUNKING)."
-          : foundChunks.some((f) => f.specSheetMerged)
-            ? "Спецификации склеены (spec_sheet merge); если раньше RH и IP были в разных чанках — это была основная потеря контекста."
-            : "Чанки содержат маркеры; при симптомах в проде проверить embeddings/rerank.",
+    rootCauseHint: step1SkipReason
+      ? step1SkipReason
+      : foundChunks.length === 0
+        ? `Offline: нет чанков для matcher=${matcher.label}. Проверьте ingest (fault table) и query rewrite.`
+        : faultChunks.length > 0
+          ? `Table-to-text: ${faultChunks.length} чанков неисправностей; matcher=${matcher.label} OK.`
+          : "Чанки найдены offline; при пустом retrieval в проде — переиндексация и синонимы.",
     intentRegressionSamples: INTENT_REGRESSION_SAMPLES.map((q) => {
       const ci = classifyQueryIntent(q, equipment, { forceSafety: false });
       return {
         query: q,
         intentType: ci.intentType,
         focusParameter: ci.focusParameter,
+        rewritePreview: expandRetrievalSynonyms(
+          applyMandatoryRewriteRules(q, q, [], equipment)
+        ).slice(0, 160),
       };
     }),
     step1_chunkSearch: step1,

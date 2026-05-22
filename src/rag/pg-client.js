@@ -29,10 +29,28 @@ async function ensureRagSchema(pool) {
       content TEXT NOT NULL,
       metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
       embedding VECTOR(1024) NOT NULL,
+      content_tsv tsvector,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       UNIQUE(equipment_id, source_doc, chunk_index)
     );
+  `);
+
+  await pool.query(`
+    ALTER TABLE knowledge_chunks
+      ADD COLUMN IF NOT EXISTS content_tsv tsvector;
+  `);
+
+  /* 'simple' keeps English/alphanumeric model codes (e.g. SDB1106NM); 'russian' stemmer drops them. */
+  await pool.query(`
+    UPDATE knowledge_chunks
+    SET content_tsv = to_tsvector('simple', COALESCE(content, ''))
+    WHERE COALESCE(content, '') <> '';
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS knowledge_chunks_content_tsv_idx
+      ON knowledge_chunks USING GIN (content_tsv);
   `);
 
   await pool.query(`

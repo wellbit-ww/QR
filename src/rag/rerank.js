@@ -3,6 +3,7 @@
  */
 
 const { chunkKindToBlockType, BLOCK_TYPES } = require("./chunking");
+const { chunkIsPossibleFaultsList, isHumidityNotDroppingQuery } = require("./troubleshooting-scope");
 
 function normalizeForMatch(s) {
   return String(s || "")
@@ -440,6 +441,27 @@ function troubleshootingSpecHumidityPenalty(chunk, intentType, queryText) {
   return 0;
 }
 
+function possibleFaultsListBoost(chunk, intent, queryText) {
+  if (intent?.intentType !== "TROUBLESHOOTING_QUERY") {
+    return 0;
+  }
+  let boost = 0;
+  if (chunkIsPossibleFaultsList(chunk)) {
+    boost += 0.34;
+  }
+  const hay = normalizeForMatch(`${chunk.content || ""} ${chunk.section || ""}`);
+  if (/перечень\s+возможных|типов(?:ые|ых)\s+неисправ|таблиц[аы]\s*3\.2/.test(hay)) {
+    boost += 0.2;
+  }
+  if (isHumidityNotDroppingQuery(queryText) && /2\.2\.2\.2|уплотнител|плотность.{0,30}закрыт|2\.2\.2\.3/.test(hay)) {
+    boost += 0.22;
+  }
+  if (isHumidityNotDroppingQuery(queryText) && /2\.2\.2\.1|кожух|осушител|механическ.{0,20}поврежден/.test(hay)) {
+    boost += 0.18;
+  }
+  return Math.min(boost, 0.55);
+}
+
 function humiditySymptomBoost(chunk, intent) {
   if (intent?.intentType !== "TROUBLESHOOTING_QUERY" || intent?.symptomDomain !== "humidity") {
     return 0;
@@ -454,6 +476,8 @@ function humiditySymptomBoost(chunk, intent) {
     "rh",
     "регенерац",
     "desiccant",
+    "замк",
+    "кожух",
   ];
   let hits = 0;
   for (const t of tokens) {
@@ -461,7 +485,7 @@ function humiditySymptomBoost(chunk, intent) {
       hits += 1;
     }
   }
-  return Math.min(0.06 * hits, 0.3);
+  return Math.min(0.06 * hits, 0.36);
 }
 
 function humidityPowerPenalty(chunk, intent) {
@@ -509,6 +533,19 @@ function nitrogenConsistencyScore(chunk, hints) {
     s -= 0.07;
   }
   return s;
+}
+
+function desiccantMaterialQueryBoost(chunk, queryText) {
+  const q = normalizeForMatch(queryText);
+  const hay = normalizeForMatch(`${chunk.content || ""} ${chunk.section || ""}`);
+  const asksMaterial =
+    /абсорбент|адсорбент|химическ(?:ое|ий)\s+веществ|сорбент|наполнител|поглощен|влаг.*из\s+воздух|карман.*осушител|осушител.*карман/.test(q);
+  if (!asksMaterial) {
+    return 0;
+  }
+  const docSignals =
+    /цеолит|силикагел|молекулярн(?:ое|ого)\s+сито|adsorb|zeolite|адсорб|осушител|поглощ.*влаг|влагу\s+из\s+воздух/.test(hay);
+  return docSignals ? 0.12 : 0;
 }
 
 function modelAliasBoost(chunk, aliases, intentType) {
@@ -619,6 +656,7 @@ function rerankChunks(chunks, intent, opts = {}) {
     pushAdj("onboarding_focused_boost", onboardingFocusedBoost(chunk, intent, queryText));
     pushAdj("onboarding_noise", onboardingNoisePenalty(chunk, intent));
     pushAdj("troubleshooting_keywords", troubleshootingKeywordBoost(chunk, intentType, queryText));
+    pushAdj("possible_faults_list", possibleFaultsListBoost(chunk, intent, queryText));
     pushAdj(
       "troubleshooting_humidity_spec_only",
       troubleshootingSpecHumidityPenalty(chunk, intentType, queryText)
@@ -628,6 +666,7 @@ function rerankChunks(chunks, intent, opts = {}) {
     pushAdj("oversized_chunk_penalty", oversizedChunkPenalty(chunk, intent));
     pushAdj("nitrogen_consistency", nitrogenConsistencyScore(chunk, hints));
     pushAdj("model_alias", modelAliasBoost(chunk, aliases, intentType));
+    pushAdj("desiccant_material_query", desiccantMaterialQueryBoost(chunk, queryText));
 
     const rerankScore = Math.max(0, Math.min(1, composed));
 
