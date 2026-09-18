@@ -1,0 +1,62 @@
+{
+  "description": "Парафразы для offline-проверки deterministic-ответов SDB702NM (portal + serial + support)",
+  "cases": [
+    {
+      "id": "portal-support-01",
+      "question": "Как написать в поддержку?",
+      "expect": ["8 (800) 200-54-17", "Техподдержка", "info@sovtest-ate.ru"]
+    },
+    {
+      "id": "portal-support-02",
+      "question": "Куда обратиться в техподдержку?",
+      "expect": ["8 (800) 200-54-17", "Поддержка"]
+    },
+    {
+      "id": "sovtest-phone-01",
+      "question": "Номер совтеста",
+      "expect": ["8 (800) 200-54-17", "Техподдержка", "info@sovtest-ate.ru"]
+    },
+    {
+      "id": "sovtest-phone-02",
+      "question": "Где посмотреть номер совтеста?",
+      "expect": ["8 (800) 200-54-17", "Поддержка"]
+    },
+    {
+      "id": "sovtest-phone-03",
+      "question": "Как позвонить в совтест",
+      "expect": ["8 (800) 200-54-17", "Техподдержка", "info@sovtest-ate.ru"]
+    },
+    {
+      "id": "portal-serial-03",
+      "question": "Серийный номер в профиле",
+      "expect": ["Серийные номера", "кабинете"]
+    },
+    {
+      "id": "factory-serial-01",
+      "question": "Где найти серийный номер шкафа?",
+      "expect": ["заводском знаке", "табличке", "Маркировка"]
+    },
+    {
+      "id": "factory-serial-02",
+      "question": "Какой формат серийного номера?",
+      "expect": ["квартал", "год", "0–9999"]
+    },
+    {
+      "id": "factory-serial-03",
+      "question": "Где табличка с серийным номером?",
+      "expect": ["заводск", "табличк"]
+    },
+    {
+      "id": "factory-serial-04",
+      "question": "Заводской знак — что на нём указано?",
+      "expect": ["серийный номер", "модель"]
+    },
+    {
+      "id": "negative-modbus",
+      "question": "Есть ли поддержка Modbus TCP?",
+      "expectGate": "UNSUPPORTED_SPEC",
+      "expect": ["не указан"],
+      "mustNotContain": ["Серийные номера"]
+    }
+  ]
+}

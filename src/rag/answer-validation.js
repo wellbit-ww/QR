@@ -4,7 +4,7 @@
  */
 
 const { STRICT_ABSTAIN, MODEL_PARAM_NOT_SPECIFIED } = require("./prompts");
-const { goldenNumericMismatchFailures } = require("./sdb1106nm-golden-facts");
+const { goldenNumericMismatchFailures, deterministicTopicMismatchFailures } = require("./sdb1106nm-golden-facts");
 
 const MODE_LABELS = {
   drying: /осушени|осушк|осушител/i,
@@ -646,8 +646,14 @@ function factLengthFailures(answerStr, intent) {
  *   originalQuery?: string,
  *   contextHasSpecOrTableChunks?: boolean,
  * }} intent
+ * @param {{
+ *   skipGoldenFacts?: boolean,
+ *   skipCriticalNumericLeakage?: boolean,
+ * }} [options]
  */
-function validateAnswerAgainstContext(answer, context, intent = {}) {
+function validateAnswerAgainstContext(answer, context, intent = {}, options = {}) {
+  const skipGoldenFacts = Boolean(options.skipGoldenFacts);
+  const skipCriticalNumericLeakage = Boolean(options.skipCriticalNumericLeakage);
   const warnings = [];
   const failures = [];
   const answerStr = String(answer || "");
@@ -665,8 +671,21 @@ function validateAnswerAgainstContext(answer, context, intent = {}) {
   failures.push(...safetyInventionFailures(answerStr, context, intent));
   failures.push(...factLengthFailures(answerStr, intent));
   failures.push(...strictFactualityFailures(answerStr, context));
-  failures.push(...criticalNumericLeakageFailures(answerStr, context));
-  failures.push(...goldenNumericMismatchFailures(answerStr, intent, intent.originalQuery));
+  if (skipCriticalNumericLeakage) {
+    const leakage = criticalNumericLeakageFailures(answerStr, context);
+    if (leakage.length) {
+      warnings.push({
+        code: "numbers_relaxed_critical_leakage",
+        detail: leakage.map((f) => f.claim).filter(Boolean).slice(0, 12),
+      });
+    }
+  } else {
+    failures.push(...criticalNumericLeakageFailures(answerStr, context));
+  }
+  if (!skipGoldenFacts) {
+    failures.push(...goldenNumericMismatchFailures(answerStr, intent, intent.originalQuery));
+    failures.push(...deterministicTopicMismatchFailures(answerStr, intent, intent.originalQuery));
+  }
 
   const gsBleed = gettingStartedScopeBleedWarning(answerStr, intent);
   if (gsBleed) {

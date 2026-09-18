@@ -41,7 +41,7 @@ async function classifyRouteWithLlm(query, equipment) {
     "PROCEDURAL_QA — how to start, install, connect, sequence of steps, preparation.",
     "TROUBLESHOOTING_QA — device misbehaves, errors, no power, humidity not reached, beeps, Ethernet down.",
     "REASONING_QA — why / what happens if / causal explanation.",
-    "SAFETY_QA — safety checklist, emergency, fire, injury risk, ТБ.",
+    "SAFETY_QA — only emergency: smoke, fire, injury, electric shock, ТБ/авария. NOT ambient temperature, 24/7 operation, specs, or ordinary 'what to check before power-on'.",
     "FACT_QA — general factual question about the product not fitting the above.",
   ].join("\n");
 

@@ -24,6 +24,14 @@ function makeDecision({ routerDecision, retrieval, minScoreThreshold }) {
     routerDecision?.intent === "MAINTENANCE_QUERY" && hasChunks && retrievalScore >= minScore * 0.6;
   const operatingCompareRelaxedPass =
     routerDecision?.intent === "COMPARISON_QUERY" && hasChunks && retrievalScore >= minScore * 0.6;
+  const proceduralRelaxedPass =
+    route === ROUTES.PROCEDURAL_QA && hasChunks && retrievalScore >= minScore * 0.55;
+  const reasoningRelaxedPass =
+    route === ROUTES.REASONING_QA && hasChunks && retrievalScore >= minScore * 0.55;
+  const wideContextRelaxedPass =
+    routerDecision?.retrievalMode === "hybrid_wide" &&
+    hasChunks &&
+    retrievalScore >= minScore * 0.55;
   const safetyCriticalPass =
     routerDecision?.route === ROUTES.SAFETY_QA &&
     routerDecision?.safetyAnswerMode === "grounded_text" &&
@@ -33,6 +41,9 @@ function makeDecision({ routerDecision, retrieval, minScoreThreshold }) {
     humidityRelaxedPass ||
     maintenanceRelaxedPass ||
     operatingCompareRelaxedPass ||
+    proceduralRelaxedPass ||
+    reasoningRelaxedPass ||
+    wideContextRelaxedPass ||
     safetyCriticalPass;
 
   if (route === ROUTES.TROUBLESHOOTING_QA && !retrievalPassed) {

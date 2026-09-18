@@ -594,7 +594,7 @@ function extractSpecTableFlattenedChunks(fullText, baseMeta = {}) {
   }
 
   const nmRows = out.filter((ch) => /SDB1106NM/i.test(ch.content));
-  if (!nmRows.length) {
+  if (!nmRows.length && !/sdb302/i.test(String(baseMeta.equipmentName || ""))) {
     pushUnique(extractGoldenTable11Chunks(baseMeta));
   }
 
@@ -684,16 +684,18 @@ function extractPossibleFaultsListChunks(fullText, baseMeta = {}) {
     pushChunk(block, { docSection: "section_2_2_2", inspectionSection: "2.2.2" });
   }
 
-  pushChunk(
-    [
-      "При проблемах с влажностью (не падает, не выходит на заданный режим) — перечень проверок по РЭ:",
-      "1) Состояние резинового (магнитного) уплотнителя дверей: п. 2.2.2.2 — проверить уплотнители дверей на отсутствие повреждений; при механических повреждениях уплотнители необходимо заменить.",
-      "2) Плотность закрытия дверей замками: п. 2.2.2.3 — проверить плотность закрытия дверей замками, при необходимости произвести регулировку ригеля замка.",
-      "3) Визуальное состояние осушающего модуля: п. 2.2.2.1 — убедиться в отсутствии механических повреждений на корпусе шкафа; осушитель установлен на задней стенке в защитном кожухе (п. 1.1.4.2) — осмотреть кожух и осушитель на внешние повреждения.",
-      "Таблица 3.2 (типовые неисправности): при «шкаф не выходит на заданный режим влажности» — уплотнители двери, блок осушения.",
-    ].join(" "),
-    { docSection: "section_2_2_2", humidityInspectionChecklist: true }
-  );
+  if (!/sdb302/i.test(String(baseMeta.equipmentName || ""))) {
+    pushChunk(
+      [
+        "При проблемах с влажностью (не падает, не выходит на заданный режим) — перечень проверок по РЭ:",
+        "1) Состояние резинового (магнитного) уплотнителя дверей: п. 2.2.2.2 — проверить уплотнители дверей на отсутствие повреждений; при механических повреждениях уплотнители необходимо заменить.",
+        "2) Плотность закрытия дверей замками: п. 2.2.2.3 — проверить плотность закрытия дверей замками, при необходимости произвести регулировку ригеля замка.",
+        "3) Визуальное состояние осушающего модуля: п. 2.2.2.1 — убедиться в отсутствии механических повреждений на корпусе шкафа; осушитель установлен на задней стенке в защитном кожухе (п. 1.1.4.2) — осмотреть кожух и осушитель на внешние повреждения.",
+        "Таблица 3.2 (типовые неисправности): при «шкаф не выходит на заданный режим влажности» — уплотнители двери, блок осушения.",
+      ].join(" "),
+      { docSection: "section_2_2_2", humidityInspectionChecklist: true }
+    );
+  }
 
   return out;
 }
@@ -751,7 +753,11 @@ function detectSpecTableSection(text) {
   return null;
 }
 
-const SDB1106NM_MODEL_PREFIX = "[Модель: SDB1106NM]\n";
+function resolveChunkTargetModel(meta = {}) {
+  const source = String(meta.targetEquipmentModel || meta.equipmentName || "").toUpperCase();
+  const match = source.replace(/[\s-]+/g, "").match(/\bSDB(\d{3,4})NM\b/);
+  return match ? `SDB${match[1]}NM` : "SDB1106NM";
+}
 
 function applySdb1106nmModelPrefixToChunk(content, meta = {}) {
   const c = String(content || "").trim();
@@ -765,10 +771,15 @@ function applySdb1106nmModelPrefixToChunk(content, meta = {}) {
   if (!needs) {
     return c;
   }
-  if (c.includes(SDB1106NM_MODEL_PREFIX.trim()) || /^\[Модель:\s*SDB1106NM\]/i.test(c)) {
+  const targetModel = resolveChunkTargetModel(meta);
+  const targetPrefix = `[Модель: ${targetModel}]\n`;
+  if (new RegExp(`^\\[Модель:\\s*${targetModel}\\]`, "i").test(c)) {
     return c;
   }
-  return `${SDB1106NM_MODEL_PREFIX}${c}`;
+  if (/^\[Модель:\s*SDB\d{3,4}NM\]\s*/i.test(c)) {
+    return c.replace(/^\[Модель:\s*SDB\d{3,4}NM\]\s*/i, targetPrefix);
+  }
+  return `${targetPrefix}${c}`;
 }
 
 function detectNormativeSpec(text) {
@@ -1080,7 +1091,7 @@ function trimLeadingIntroBeforeTechSpecs(prose) {
 
 /**
  * Склеивает «проза со спецификациями → таблица габаритов → проза с IP/условиями»,
- * чтобы базовые ТТХ (RH, В/Гц, IP65, таблица моделей) не оказывались в разных чанках.
+ * чтобы базовые ТТХ (RH, В/Гц, IP55, таблица моделей) не оказывались в разных чанках.
  */
 function mergeSpecsAroundDimensionTable(segments) {
   const out = [];
@@ -1096,7 +1107,7 @@ function mergeSpecsAroundDimensionTable(segments) {
       c?.type === "prose" &&
       /-\s*1\.1\.2\.1\b[\s\S]{0,12000}Таблица\s+1\.1/i.test(a.content) &&
       /\|\s*Модель\s*\|/i.test(b.content) &&
-      /(?:Примечания|IP65|1\.1\.2\.(?:9|10|11|12)\b)/i.test(c.content)
+      /(?:Примечания|IP55|1\.1\.2\.(?:9|10|11|12)\b)/i.test(c.content)
     ) {
       const mergedText = [
         trimLeadingIntroBeforeTechSpecs(a.content),
@@ -1261,6 +1272,7 @@ function splitDocumentIntoParentChildChunkRecords(text, equipment, options = {})
       }
       const childMeta = buildChunkMeta(pc, {
         ...parentMeta,
+        targetEquipmentModel: equipment?.name || "",
         equipmentModels,
         parentChunkIndex: pIdx,
         childIndexInParent: cIdx,

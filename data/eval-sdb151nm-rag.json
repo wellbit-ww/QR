@@ -1,0 +1,69 @@
+{
+  "items": [
+    {
+      "id": "sdb151-dimensions",
+      "equipmentId": "sdb151-nm",
+      "question": "Назови габариты SDB151NM.",
+      "expectedKeywords": ["602", "655", "772"],
+      "mustNotContain": ["1358", "1952", "1204"]
+    },
+    {
+      "id": "sdb151-mass",
+      "equipmentId": "sdb151-nm",
+      "question": "Сколько весит шкаф SDB151NM?",
+      "expectedKeywords": ["46", "кг"],
+      "mustNotContain": ["70 кг", "90 кг", "180 кг"]
+    },
+    {
+      "id": "sdb151-shelves",
+      "equipmentId": "sdb151-nm",
+      "question": "Сколько полок входит в базовую поставку?",
+      "expectedKeywords": ["3", "полк"],
+      "mustNotContain": ["5 полок", "7 полок", "10 полок"]
+    },
+    {
+      "id": "sdb151-wheels",
+      "equipmentId": "sdb151-nm",
+      "question": "Входят ли транспортные колёса в базовую поставку?",
+      "expectedKeywords": ["не входят"]
+    },
+    {
+      "id": "sdb151-volume-unknown",
+      "equipmentId": "sdb151-nm",
+      "question": "Какой внутренний объём у SDB151NM?",
+      "expectedKeywords": ["не указан"],
+      "mustNotContain": ["500", "546", "743", "770", "1028"]
+    },
+    {
+      "id": "sdb151-power-storage",
+      "equipmentId": "sdb151-nm",
+      "question": "Какова мощность в режиме хранения?",
+      "expectedKeywords": ["8 Вт", "405 Вт"]
+    },
+    {
+      "id": "sdb151-power-drying",
+      "equipmentId": "sdb151-nm",
+      "question": "Какова мощность в режиме осушения?",
+      "expectedKeywords": ["20 Вт", "415 Вт"]
+    },
+    {
+      "id": "sdb151-regeneration",
+      "equipmentId": "sdb151-nm",
+      "question": "Можно ли выключать шкаф при регенерации?",
+      "expectedKeywords": ["запрещается", "регенерации"]
+    },
+    {
+      "id": "sdb151-foreign-model",
+      "equipmentId": "sdb151-nm",
+      "question": "Какая масса у SDB702NM?",
+      "expectedKeywords": ["только", "SDB151"],
+      "mustNotContain": ["90 кг"]
+    },
+    {
+      "id": "sdb151-unsupported-wifi",
+      "equipmentId": "sdb151-nm",
+      "question": "Поддерживает ли шкаф Wi-Fi?",
+      "expectedKeywords": ["не указан"]
+    }
+  ]
+}

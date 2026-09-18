@@ -1,0 +1,72 @@
+{
+  "meta": {
+    "source": "rag-procedural-2026-05",
+    "equipmentId": "sdb1106-nm",
+    "description": "Вопросы, которые должны идти через retrieval+LLM (mode RAG), не golden-router"
+  },
+  "items": [
+    {
+      "id": "rp01",
+      "question": "Опишите кратко, что происходит в режиме «Регенерация».",
+      "requireModeRegex": "^RAG$",
+      "mustMatchRegex": ["регенерац|желт|60|30|1\\s*rh"],
+      "mustNotMatchRegex": ["810\\s*вт"]
+    },
+    {
+      "id": "rp02",
+      "question": "Что произойдет, если оставить дверь открытой более 1 минуты?",
+      "requireModeRegex": "^RAG$",
+      "mustMatchRegex": ["вентилятор|двер|звук|сигнал|открыт"],
+      "mustNotMatchRegex": ["неисправен один из датчиков"]
+    },
+    {
+      "id": "rp03",
+      "question": "Как работает система контроля концентрации азота?",
+      "requireModeRegex": "^RAG$",
+      "mustMatchRegex": ["ротаметр|Рпос|Ррег|азот"]
+    },
+    {
+      "id": "rp04",
+      "question": "Каков диапазон установки таймера подачи азота (если нет датчика)?",
+      "requireModeRegex": "^RAG$",
+      "mustMatchRegex": ["99\\.9|00\\.0|мин"]
+    },
+    {
+      "id": "rp05",
+      "question": "Какое минимальное расстояние должно быть между полками для корректной конвекции?",
+      "requireModeRegex": "^RAG$",
+      "mustMatchRegex": ["50\\s*мм|стенок|воздух"]
+    },
+    {
+      "id": "rp06",
+      "question": "Какие действия запрещены при выполнении погрузочно-разгрузочных работ?",
+      "requireModeRegex": "^RAG$",
+      "mustMatchRegex": ["запрещ|выдвижн|50\\s*мм|таре"]
+    },
+    {
+      "id": "rp07",
+      "question": "Что делать персоналу при обнаружении запаха гари из шкафа?",
+      "requireModeRegex": "^(RAG|SAFETY)",
+      "mustMatchRegex": ["отключ|2\\.4|питан"]
+    },
+    {
+      "id": "rp08",
+      "question": "Влияет ли установка системы подачи азота на количество доступных полок?",
+      "requireModeRegex": "^RAG$",
+      "mustMatchRegex": ["не\\s+влия|10|полк"]
+    },
+    {
+      "id": "rp09",
+      "question": "Есть ли у шкафа встроенная защита от перепадов напряжения?",
+      "requireModeRegex": "^RAG$",
+      "mustMatchRegex": ["не\\s+указан|отсутств|не\\s+привед|не\\s+содержит"]
+    },
+    {
+      "id": "rp10",
+      "question": "Как проверить работоспособность звуковой сигнализации?",
+      "requireModeRegex": "^RAG$",
+      "mustMatchRegex": ["двер|открыт|сигнал|1\\.1\\.4\\.3\\.4"],
+      "mustNotMatchRegex": ["^Информация отсутствует$"]
+    }
+  ]
+}

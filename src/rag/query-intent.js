@@ -94,6 +94,30 @@ const SDB1106NM_CONTEXT_FILTER_RULES = Object.freeze([
 ]);
 
 const FOREIGN_SDB_MODEL_NAMES = "SDB151, SDB302, SDB702, SDB1560M";
+const SDB702NM_CONTEXT_FILTER_RULES = Object.freeze([
+  "ФИЛЬТР МОДЕЛИ (обязательно для SDB702NM):",
+  "Используй только факты, относящиеся к SDB702NM (или к объединённой строке, где SDB702NM явно перечислена).",
+  "В серийных таблицах игнорируй значения SDB151, SDB302, SDB306, SDB702M, SDB1106, SDB1106NM и SDB1560M.",
+  "Не упоминай другие модели SDB в ответе и не подставляй их габариты, массу, мощности, комплектацию или сроки.",
+]);
+
+const SDB302NM_CONTEXT_FILTER_RULES = Object.freeze([
+  "ФИЛЬТР МОДЕЛИ (обязательно для SDB302NM):",
+  "Используй только факты, относящиеся к SDB302NM (или к объединённой строке, где SDB302NM явно перечислена).",
+  "В серийных таблицах игнорируй значения SDB151, SDB151NM, SDB306, SDB702M, SDB702NM, SDB1106, SDB1106NM и SDB1560M.",
+  "Не упоминай другие модели SDB в ответе и не подставляй их габариты, массу, мощности, комплектацию или сроки.",
+]);
+
+const SDB151NM_CONTEXT_FILTER_RULES = Object.freeze([
+  "ФИЛЬТР МОДЕЛИ (обязательно для SDB151NM):",
+  "Используй только факты, относящиеся к SDB151NM (или к объединённой строке, где SDB151NM явно перечислена).",
+  "В смешанных таблицах игнорируй значения SDB151, SDB302, SDB302NM, SDB306, SDB702, SDB702M, SDB702NM, SDB1106, SDB1106NM и SDB1560M.",
+  "Не указывай внутренний или полный объём и количество дверей: эти модельные параметры пока не подтверждены.",
+  "Колёса в базовую поставку SDB151NM не входят (табл. 1.2). Не приписывай 4 транспортных колеса.",
+  "Опция подогрева воздуха в табл. 1.4 для SDB151NM не приведена — не отвечай +40 °C как доступный режим этой модели.",
+  "В ответе укажи пункт или таблицу РЭ из контекста (п. …, табл. …), если номер есть.",
+  "Не упоминай другие модели SDB и не подставляй их габариты, массу, комплектацию или сроки.",
+]);
 
 function equipmentIsSdb1106nm(equipment) {
   const id = String(equipment?.id || "").toLowerCase();
@@ -101,10 +125,31 @@ function equipmentIsSdb1106nm(equipment) {
   return id.includes("sdb1106") || name.includes("sdb1106");
 }
 
+function equipmentIsSdb702nm(equipment) {
+  const id = String(equipment?.id || "").toLowerCase();
+  const name = String(equipment?.name || "").toLowerCase();
+  return id.includes("sdb702") || name.includes("sdb702");
+}
+
+function equipmentIsSdb302nm(equipment) {
+  const id = String(equipment?.id || "").toLowerCase();
+  const name = String(equipment?.name || "").toLowerCase();
+  return id === "w-700" || /sdb302/.test(id) || /sdb302/.test(name);
+}
+
+function equipmentIsSdb151nm(equipment) {
+  const id = String(equipment?.id || "").toLowerCase();
+  const name = String(equipment?.name || "").toLowerCase();
+  return id.includes("sdb151") || name.includes("sdb151");
+}
+
 /**
  * Нужен ли жёсткий фильтр «только SDB1106NM» для промпта/ответа.
  */
 function shouldApplySdb1106nmModelContextFilter(query, retrievalContext, equipment = null) {
+  if (equipmentIsSdb702nm(equipment) || equipmentIsSdb302nm(equipment) || equipmentIsSdb151nm(equipment)) {
+    return true;
+  }
   if (equipmentIsSdb1106nm(equipment)) {
     return true;
   }
@@ -119,8 +164,16 @@ function shouldApplySdb1106nmModelContextFilter(query, retrievalContext, equipme
   return false;
 }
 
-function modelContextFilterPromptLines() {
-  return [...SDB1106NM_CONTEXT_FILTER_RULES];
+function modelContextFilterPromptLines(equipment = null) {
+  if (equipmentIsSdb151nm(equipment)) {
+    return [...SDB151NM_CONTEXT_FILTER_RULES];
+  }
+  if (equipmentIsSdb302nm(equipment)) {
+    return [...SDB302NM_CONTEXT_FILTER_RULES];
+  }
+  return equipmentIsSdb702nm(equipment)
+    ? [...SDB702NM_CONTEXT_FILTER_RULES]
+    : [...SDB1106NM_CONTEXT_FILTER_RULES];
 }
 
 /** Технический / числовой вопрос (ТТХ, габариты, сроки, мощность и т.д.) — temperature 0. */
@@ -370,6 +423,9 @@ function detectFocusParameter(message) {
     return "temperature";
   }
   if (/нагрузк|полк/i.test(m)) {
+    if (/конвекц|между\s+полк|расстояни.*полк|полк.*расстояни/i.test(m) && !/\bкг\b|нагрузк|выдерж|лимит|масс/i.test(m)) {
+      return null;
+    }
     return "load";
   }
   if (/масс|вес|сколько\s+весит|каков\s+вес|какая\s+масса/i.test(m)) {
@@ -412,7 +468,7 @@ function classifyIntentType(message, opts = {}) {
   }
 
   if (
-    /что\s+проверить|чек-?лист|безопасн|риск|охран[ае]\s+труда|аварийн|ч\s*п\.|п\s*т\.|дым|огонь|пожар|искрен|гарь|задымлен|вспышк|коротк|замыкан|угроз[аы]\s+жизни|эвакуац/i.test(
+    /чек-?лист|безопасн|риск|охран[ае]\s+труда|аварийн|ч\s*п\.|п\s*т\.|дым|огонь|пожар|искрен|гарь|задымлен|вспышк|коротк|замыкан|угроз[аы]\s+жизни|эвакуац/i.test(
       m
     )
   ) {
@@ -541,6 +597,11 @@ function detectRetrievalMode(intentType) {
 const ZERO_TEMP_LLM_OPTIONS = Object.freeze({ temperature: 0, top_p: 0.85 });
 
 /** Параметры генерации LLM: SAFETY и все технические/числовые запросы — temperature 0. */
+function parseEnvNumber(value, fallback) {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
 function llmGenerationOptionsForIntent(intentType, message = "") {
   if (intentType === INTENT_TYPES.SAFETY_QUERY || isTechnicalNumericQuery(message)) {
     return { ...ZERO_TEMP_LLM_OPTIONS };
@@ -552,6 +613,13 @@ function llmGenerationOptionsForIntent(intentType, message = "") {
     (intentType === INTENT_TYPES.FACT_QUERY && /\d/.test(String(message || "")))
   ) {
     return { ...ZERO_TEMP_LLM_OPTIONS };
+  }
+  if (intentType === INTENT_TYPES.GETTING_STARTED_QUERY) {
+    return {
+      temperature: parseEnvNumber(process.env.OLLAMA_TEMPERATURE, 0.1),
+      top_p: 0.85,
+      num_predict: parseEnvNumber(process.env.OLLAMA_GETTING_STARTED_PREDICT, 1280),
+    };
   }
   return null;
 }
@@ -611,6 +679,7 @@ module.exports = {
   QUERY_RISK,
   FOCUS_PARAMETER_LABELS,
   SDB1106NM_CONTEXT_FILTER_RULES,
+  SDB151NM_CONTEXT_FILTER_RULES,
   FOREIGN_SDB_MODEL_NAMES,
   classifyQueryIntent,
   detectQueryOperatingModes,
@@ -626,6 +695,9 @@ module.exports = {
   modelContextFilterPromptLines,
   isTechnicalNumericQuery,
   equipmentIsSdb1106nm,
+  equipmentIsSdb702nm,
+  equipmentIsSdb302nm,
+  equipmentIsSdb151nm,
   llmGenerationOptionsForIntent,
   ZERO_TEMP_LLM_OPTIONS,
 };

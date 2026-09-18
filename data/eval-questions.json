@@ -1,10 +1,10 @@
 {
   "items": [
     {
-      "id": "wattsan-work-area",
-      "equipmentId": "wattsan-1313a",
-      "question": "Какое рабочее поле у Wattsan 1313A?",
-      "expectedKeywords": ["1300", "рабочее поле"]
+      "id": "sdb702-volume",
+      "equipmentId": "sdb702-nm",
+      "question": "Какой внутренний объём у SDB702 NM?",
+      "expectedKeywords": ["743", "л"]
     },
     {
       "id": "w700-operations",

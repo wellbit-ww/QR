@@ -7,10 +7,13 @@ const path = require("path");
 const os = require("os");
 const { spawnSync } = require("child_process");
 const pdfParse = require("pdf-parse");
+const mammoth = require("mammoth");
+const WordExtractor = require("word-extractor");
 
 const ROOT_DIR = path.join(__dirname, "..");
 const KNOWLEDGE_DIR = path.join(ROOT_DIR, "knowledge");
-const SUPPORTED_FILE_EXT = new Set([".md", ".txt", ".pdf"]);
+const SUPPORTED_FILE_EXT = new Set([".md", ".txt", ".pdf", ".doc", ".docx"]);
+const WORD_DOC_EXTRACTOR = new WordExtractor();
 const { extractMandatoryManualExcerpts } = require("../src/rag/sdb1106nm-direct-facts");
 
 function tryConvertPdfToMarkdownViaPython(pdfPath) {
@@ -55,6 +58,34 @@ async function loadPdfText(absolutePath) {
   return { text: pdf.text || "", sourceType: "pdf_parse" };
 }
 
+async function loadWordDocumentText(absolutePath, ext) {
+  if (ext === ".docx") {
+    const result = await mammoth.extractRawText({ path: absolutePath });
+    return { text: result.value || "", sourceType: "docx" };
+  }
+  const extracted = await WORD_DOC_EXTRACTOR.extract(absolutePath);
+  return { text: extracted.getBody() || "", sourceType: "doc" };
+}
+
+function isSdb151nmScopedManualPath(relativePath) {
+  return /руководство\s*sdb151nm\.md$/i.test(String(relativePath || "").replace(/\\/g, "/"));
+}
+
+/** SDB151NM only: if scoped .md exists, do not load the family .doc/.pdf into RAG/direct context. */
+function shouldSkipSdb151FamilyBinary(equipmentId, relativePath, files) {
+  if (String(equipmentId || "") !== "sdb151-nm") {
+    return false;
+  }
+  const hasScoped = (files || []).some((f) =>
+    isSdb151nmScopedManualPath(f.relativePath || f)
+  );
+  if (!hasScoped) {
+    return false;
+  }
+  const rel = String(relativePath || "").replace(/\\/g, "/");
+  return /\.(doc|docx|pdf)$/i.test(rel) && /руководств/i.test(rel);
+}
+
 function listKnowledgeFiles(equipmentId) {
   const dir = path.join(KNOWLEDGE_DIR, equipmentId);
   if (!fsSync.existsSync(dir)) {
@@ -91,6 +122,15 @@ function scoreManualFile(ref) {
   if (/руководств|manual|sdb1106/i.test(name)) {
     score += 50;
   }
+  if (/302nm|sdb302/i.test(name)) {
+    score += 40;
+  }
+  if (/702nm|sdb702/i.test(name)) {
+    score += 40;
+  }
+  if (/151nm|sdb151/i.test(name)) {
+    score += 40;
+  }
   if (/1106nm|sdb1106nm/i.test(name)) {
     score += 40;
   }
@@ -99,6 +139,9 @@ function scoreManualFile(ref) {
   }
   if (ref.ext === ".pdf") {
     score += 20;
+  }
+  if (ref.ext === ".doc" || ref.ext === ".docx") {
+    score += 25;
   }
   if (/rag_/i.test(name)) {
     score -= 100;
@@ -222,10 +265,17 @@ async function loadAllKnowledgeText(equipmentId) {
     if (/rag_/i.test(file.relativePath)) {
       continue;
     }
+    if (shouldSkipSdb151FamilyBinary(equipmentId, file.relativePath, files)) {
+      console.warn(`[LOADER] ${equipmentId}: пропуск семейного ${file.relativePath} (есть Руководство SDB151NM.md)`);
+      continue;
+    }
     try {
       let fileText = "";
       if (file.ext === ".pdf") {
         const loaded = await loadPdfText(file.absolutePath);
+        fileText = loaded.text || "";
+      } else if (file.ext === ".doc" || file.ext === ".docx") {
+        const loaded = await loadWordDocumentText(file.absolutePath, file.ext);
         fileText = loaded.text || "";
       } else {
         fileText = await fs.promises.readFile(file.absolutePath, "utf8");
@@ -274,4 +324,6 @@ module.exports = {
   listKnowledgeFiles,
   loadPrimaryKnowledgeText,
   loadAllKnowledgeText,
+  shouldSkipSdb151FamilyBinary,
+  isSdb151nmScopedManualPath,
 };

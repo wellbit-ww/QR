@@ -6,13 +6,36 @@ const { SDB1106NM_PRODUCT_MODEL } = require("../sdb1106nm-scope");
 const {
   modelContextFilterPromptLines,
   shouldApplySdb1106nmModelContextFilter,
+  equipmentIsSdb702nm,
+  equipmentIsSdb302nm,
+  equipmentIsSdb151nm,
+  equipmentIsSdb1106nm,
 } = require("../query-intent");
+const {
+  SDB702NM_EXPERT_ROLE,
+  SDB702NM_GROUNDING_RULES,
+  buildSdb702nmLlmAnswerCompositionBlocks,
+  buildSdb702nmDirectSystemPrompt,
+} = require("../sdb702nm-prompt-rules");
+const {
+  SDB302NM_EXPERT_ROLE,
+  SDB302NM_GROUNDING_RULES,
+  buildSdb302nmLlmAnswerCompositionBlocks,
+  buildSdb302nmDirectSystemPrompt,
+} = require("../sdb302nm-prompt-rules");
+const {
+  SDB151NM_EXPERT_ROLE,
+  SDB151NM_GROUNDING_RULES,
+  buildSdb151nmLlmAnswerCompositionBlocks,
+  buildSdb151nmDirectSystemPrompt,
+} = require("../sdb151nm-prompt-rules");
 const {
   isEmergencySmokeQuery,
   isRegenerationShutdownQuery,
   contextHasMandatoryAnswerTriggers,
 } = require("../safety-query-scope");
 const { isHumidityNotDroppingQuery, HUMIDITY_MANDATORY_CHECKS } = require("../troubleshooting-scope");
+const { isUnsupportedReplacementQuery } = require("../unsupported-replacement-scope");
 const { resolveNormalIndicatorMode } = require("../indicator-scope");
 const {
   contextHasCompetingSdbModels,
@@ -27,6 +50,9 @@ const {
 /** Роль сервисного инженера — только SDB1106NM, без выдуманных ТТХ и сроков. */
 const SDB1106NM_EXPERT_ROLE = [
   `Ты — сервисный инженер по шкафу ${SDB1106NM_PRODUCT_MODEL}. Пользователь уже обслуживается этой моделью; не проси уточнить артикул.`,
+  "ЯЗЫК ОТВЕТА:",
+  "- Отвечай **только на русском языке** (кириллица). ЗАПРЕЩЕНО использовать китайский, английский и любые иероглифы в ответе пользователю.",
+  "- Технические обозначения из РЭ (SDB1106NM, RH%, IP55, °C) допустимы; пояснения — только по-русски.",
   "СТРОГАЯ ФАКТИЧНОСТЬ:",
   "- ЗАПРЕЩЕНО придумывать ГОСТы, нормативы и ссылки на стандарты, которых нет в контексте.",
   "- ЗАПРЕЩЕНО придумывать химические вещества и материалы: «цеолит» допустим только если он есть в тексте; иные вещества — нет.",
@@ -42,6 +68,37 @@ const SDB1106NM_EXPERT_ROLE = [
   "- Если в таблице несколько моделей — в ответ попадает только строка/столбец SDB1106NM; чужие строки не цитируй и не суммируй.",
 ];
 
+function equipmentModelName(equipment) {
+  return String(equipment?.name || SDB1106NM_PRODUCT_MODEL).replace(/\s+/g, " ").trim();
+}
+
+function buildEquipmentExpertRole(equipment) {
+  const model = equipmentModelName(equipment);
+  if (/sdb1106/i.test(model)) {
+    return SDB1106NM_EXPERT_ROLE;
+  }
+  if (/sdb702/i.test(model)) {
+    return SDB702NM_EXPERT_ROLE;
+  }
+  if (/sdb302/i.test(model)) {
+    return SDB302NM_EXPERT_ROLE;
+  }
+  if (/sdb151/i.test(model)) {
+    return SDB151NM_EXPERT_ROLE;
+  }
+  return [
+    `Ты — сервисный инженер по шкафу ${model}. Пользователь уже обслуживается этой моделью; не проси уточнить артикул.`,
+    "ЯЗЫК ОТВЕТА:",
+    "- Отвечай только на русском языке. Технические обозначения из РЭ допустимы.",
+    "СТРОГАЯ ФАКТИЧНОСТЬ:",
+    `- Используй только факты из контекста, относящиеся к ${model}.`,
+    `- Если точной цифры или формулировки для ${model} нет в контексте — ответь ровно: «${MODEL_PARAM_NOT_SPECIFIED}».`,
+    "ЗАПРЕЩЕНО:",
+    "- Упоминать другие модели SDB, приводить их цифры или сравнивать оборудование.",
+    "- Придумывать характеристики, процедуры, ГОСТы, интервалы обслуживания или причины неисправностей.",
+  ];
+}
+
 /** Цитирование источника цифр ТТХ — снижает подмену чужих моделей и галлюцинации. */
 const TTX_SOURCE_CITATION_RULES = [
   "ЦИТИРОВАНИЕ ТТХ:",
@@ -50,13 +107,32 @@ const TTX_SOURCE_CITATION_RULES = [
   "Без ссылки на пункт/таблицу из контекста не называй число как установленный факт.",
 ];
 
+/** Не копировать внутренний формат индексации чанков. */
+const NO_GOLDEN_TRIPLET_FORMAT_RULES = [
+  "ФОРМАТ ОТВЕТА ПОЛЬЗОВАТЕЛЮ:",
+  "- ЗАПРЕЩЕНО выводить строки вида «Модель: …, Параметр: …, Значение: …» — это служебный формат базы знаний.",
+  "- Переформулируй факт обычными предложениями или буллетами, как в паспорте/РЭ.",
+];
+
+/** Единый визуальный стиль LLM-ответов: UI чата рендерит Markdown безопасно. */
+const MARKDOWN_PRESENTATION_RULES = [
+  "ОФОРМЛЕНИЕ ОТВЕТА (Markdown):",
+  "- Используй Markdown для удобного чтения в чате.",
+  "- Выделяй **жирным** только ключевые технические элементы: названия режимов, узлов и кнопок, числовые значения с единицами, ограничения, запреты и итоговые действия.",
+  "- Не выделяй жирным целые предложения или абзацы.",
+  "- Если есть два и более действия, причины или параметра — оформи их маркированным либо нумерованным списком.",
+  "- Для короткого ответа сохрани структуру «тезис + факт» и выдели только основной параметр и его значение.",
+  "- Не используй таблицы, заголовки Markdown с символом # или служебные блоки кода.",
+];
+
 /** Стиль технического паспорта — не односложно, не «простыня». */
 const PASSPORT_STYLE_RULES = [
   "СТИЛЬ ОТВЕТА:",
   "- Как справка из технического паспорта: чётко, профессионально, с технической содержательностью.",
   "- ЗАПРЕЩЕНО отвечать односложно («180 кг», «8 Вт», «50 кг» без контекста параметра).",
   "- Один параметр — 1–2 предложения «тезис + факт»; несколько режимов/опций/узлов — маркированный список (см. ниже).",
-  "- Без служебных фраз про retrieval, chunks и «по данным контекста».",
+  "- Без служебных фраз про retrieval, chunks, «по данным контекста» и «в предоставленном контексте не указано».",
+  "- Если спрашивают расстояние **между полками** для конвекции: в РЭ обычно нет мм «между полками» — дай правила п. **2.1** (не выступать за край, свободный обдув, **50 мм** от стенок) и п. **1.1.2.8** (регулировка полок), не отказывайся полностью.",
 ];
 
 /** Принцип «термин = суть» — физический смысл каждого пункта. */
@@ -108,6 +184,7 @@ const NO_UNSOLICITED_SETUP_RULES = [
   "НАСТРОЙКА:",
   "- ЗАПРЕЩЕНЫ длинные пошаговые инструкции по меню, диапазонам и таймерам, если пользователь не спрашивал «как настроить / установить / изменить».",
   "- На вопрос «какой диапазон / сколько / какая мощность» — только факт и условия, без меню и кнопок.",
+  "- Если в контексте нет пошаговой замены узла (стекло, дисплей, замок, полка, колёса, электроника и т.п.) — не выдумывай разборку и не отвечай одной фразой «информация отсутствует». Сообщи, что инструкции в РЭ нет, и дай контакты техподдержки SOVTEST ATE: 8 (800) 200-54-17, info@sovtest-ate.ru и форму «Техподдержка».",
 ];
 
 /** Запрет пустых вводных. */
@@ -203,8 +280,8 @@ const TECHNICAL_SYNONYM_GUIDANCE = [
 /** Опция «Система подогрева» — установка температуры (п. 2.3.3.1). */
 const HEATING_OPTION_TEMPERATURE_RULES = [
   "ОПЦИЯ «СИСТЕМА ПОДОГРЕВА» (установка температуры):",
-  "Если пользователь спрашивает про установку/задание температуры нагрева — ищи раздел «Использование шкафа с опцией подогрева» / п. 2.3.3.1, а не только мощность из таблицы ТТХ.",
-  "SDB1106NM: допустимый диапазон установки температуры нагрева — от +20 °C до +40 °C (плюс 20…плюс 40).",
+  "Если пользователь спрашивает про установку/задание температуры нагрева — ищи раздел «Система подогрева воздуха» / п. **1.2.1.1**, а не только мощность из таблицы ТТХ.",
+  "SDB1106NM: допустимый диапазон установки температуры нагрева — от **температуры окружающей среды +5 °C** до **+40 °C** (п. 1.2.1.1).",
   "Любое значение выше +40 °C (например +50 °C) — запрещено; укажи нарушение и верхний предел из РЭ.",
   "Не подменяй ответ мощностью (Вт) из таблицы 1.1.2, если вопрос только про температуру (°C).",
 ];
@@ -257,7 +334,7 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
   const msg = String(userMessage || "");
 
   if (shouldApplySdb1106nmModelContextFilter(msg, ctx, equipment)) {
-    blocks.push("", ...modelContextFilterPromptLines());
+    blocks.push("", ...modelContextFilterPromptLines(equipment));
   }
 
   if (isEmergencySmokeQuery(msg)) {
@@ -271,11 +348,30 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
   }
 
   if (contextHasCompetingSdbModels(ctx)) {
+    const model = equipmentModelName(equipment);
     blocks.push(
       "",
       "ВНИМАНИЕ — в контексте таблица с несколькими моделями:",
-      `Только ${SDB1106NM_PRODUCT_MODEL}; чужие артикулы в ответе запрещены. Формат — полное предложение с цифрой.`,
-      "Пример: «Масса шкафа SDB1106NM в базовой комплектации составляет 180 кг.»",
+      `Только ${model}; чужие артикулы в ответе запрещены. Формат — полное предложение с цифрой.`,
+      equipmentIsSdb302nm(equipment)
+        ? "Пример: «Масса шкафа SDB302NM составляет 70 кг.»"
+        : equipmentIsSdb151nm(equipment)
+        ? "Пример: «Масса шкафа SDB151NM составляет 46 кг.»"
+        : equipmentIsSdb702nm(equipment)
+        ? "Пример: «Масса шкафа SDB702NM составляет 90 кг.»"
+        : `Пример: «Масса шкафа ${SDB1106NM_PRODUCT_MODEL} в базовой комплектации составляет 180 кг.»`,
+    );
+  }
+
+  if (
+    ctx.length > 400 &&
+    /(?:опиш|что\s+произойд|что\s+входит|как\s+работ|запрещ|погрузочн|ротаметр|конвекц)/i.test(msg)
+  ) {
+    blocks.push(
+      "",
+      "Процедурный / описательный вопрос:",
+      "Сначала просмотри весь контекст; если есть связанные абзацы — ответь по ним.",
+      "ЗАПРЕЩЕНО писать «информация отсутствует» / «не указан», если в контексте есть хотя бы частичный ответ по теме.",
     );
   }
 
@@ -288,16 +384,16 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
     );
   }
 
-  if (asksHeatingTemperatureSetup(msg)) {
+  if (asksHeatingTemperatureSetup(msg) && !equipmentIsSdb151nm(equipment)) {
     blocks.push(
       "",
       "ВНИМАНИЕ — опция «Система подогрева» (п. 2.3.3.1):",
-      "Ответ — только температура нагрева (°C), диапазон +20…+40 °C; выше +40 °C (напр. +50 °C) — запрещено.",
+      "Ответ — только температура нагрева (°C), диапазон **T окр. +5 °C … +40 °C**; выше +40 °C (напр. +50 °C) — запрещено.",
       "Не подменяй ответ мощностью (Вт) из таблицы ТТХ, если вопрос только про установку температуры.",
     );
   }
 
-  const normalIndicator = resolveNormalIndicatorMode(msg);
+  const normalIndicator = equipmentIsSdb1106nm(equipment) ? resolveNormalIndicatorMode(msg) : null;
   if (normalIndicator) {
     blocks.push(
       "",
@@ -308,7 +404,7 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
     );
   }
 
-  if (asksOperatingModesOverview(msg)) {
+  if (equipmentIsSdb1106nm(equipment) && asksOperatingModesOverview(msg)) {
     blocks.push(
       "",
       "ВНИМАНИЕ — обзор режимов работы (п. 2.2):",
@@ -317,7 +413,7 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
       "• Осушение: активное снижение влажности до порога.",
       "• Регенерация: восстановление осушителя при нагреве (напр. 540 Вт — если в контексте).",
     );
-  } else if (asksStorageModePower(msg) && contextSupportsStorageMode8W(ctx)) {
+  } else if (equipmentIsSdb1106nm(equipment) && asksStorageModePower(msg) && contextSupportsStorageMode8W(ctx)) {
     blocks.push(
       "",
       "ВНИМАНИЕ — мощность в режиме хранения (п. 2.2.7.1):",
@@ -355,49 +451,89 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
     );
   }
 
+  if (isUnsupportedReplacementQuery(msg)) {
+    blocks.push(
+      "",
+      "ВНИМАНИЕ — замена узла без инструкции в РЭ:",
+      "Не выдумывай разборку и не отвечай одной фразой «информация отсутствует».",
+      "Сообщи, что в руководстве нет инструкции по замене этого узла, и дай контакты техподдержки SOVTEST ATE: 8 (800) 200-54-17, +7 (4712) 54-54-17, info@sovtest-ate.ru и форму «Техподдержка».",
+    );
+  }
+
   if (/дым|гарь|регенерац|выключ.*при|при.*регенерац|2\.4\b|аварийн/i.test(msg)) {
     blocks.push(
       "",
       "ВНИМАНИЕ — SAFETY:",
       "Только формулировки из контекста; без «риск пожара», «может привести», «из-за риска».",
       "Дым/гари — немедленное отключение питания по п. 2.4; регенерация не отменяет это.",
-      "Запрет выключения при регенерации — только п. 1.1.4.4.3, без п. 2.4.",
+      equipmentIsSdb1106nm(equipment)
+        ? "Запрет выключения при регенерации — только п. 1.1.4.4.3, без п. 2.4."
+        : "Запрет выключения при регенерации — только формулировка из контекста РЭ, без п. 2.4.",
     );
+  }
+
+  if (equipmentIsSdb151nm(equipment)) {
+    blocks.push(...buildSdb151nmLlmAnswerCompositionBlocks(ctx, msg));
+  } else if (equipmentIsSdb302nm(equipment)) {
+    blocks.push(...buildSdb302nmLlmAnswerCompositionBlocks(ctx, msg));
+  } else if (equipmentIsSdb702nm(equipment)) {
+    blocks.push(...buildSdb702nmLlmAnswerCompositionBlocks(ctx, msg));
   }
 
   return blocks.length ? blocks.join("\n") : "";
 }
 
 function baseGroundingPrompt(equipment, context, extraBlocks = "") {
+  const isSdb1106nm = /sdb1106/i.test(equipmentModelName(equipment));
+  const isSdb702nm = /sdb702/i.test(equipmentModelName(equipment));
+  const isSdb302nm = /sdb302/i.test(equipmentModelName(equipment));
+  const isSdb151nm = /sdb151/i.test(equipmentModelName(equipment));
   const modelFilterBlock =
     shouldApplySdb1106nmModelContextFilter("", context, equipment) ?
-      modelContextFilterPromptLines().join("\n")
+      modelContextFilterPromptLines(equipment).join("\n")
     : "";
 
-  return [
-    ...SDB1106NM_EXPERT_ROLE,
-    ...(modelFilterBlock ? ["", modelFilterBlock] : []),
+  const commonRules = [
     ...TTX_SOURCE_CITATION_RULES,
-    ...PASSPORT_STYLE_RULES,
-    ...THESIS_PLUS_FACT_FORMAT,
-    ...TERM_EQUALS_ESSENCE_RULES,
-    ...STRUCTURED_BULLET_LIST_RULES,
-    ...TECHNICAL_DETAILS_IN_ITEMS_RULES,
-    ...SDB1106NM_ONLY_MY_CABINET,
+    ...NO_GOLDEN_TRIPLET_FORMAT_RULES,
+    ...MARKDOWN_PRESENTATION_RULES,
     ...NO_UNSOLICITED_SETUP_RULES,
     ...BANNED_INTRO_PHRASES,
-    ...SDB1106NM_KNOWLEDGE_FILTER,
-    ...RANGE_STEP_ACCURACY_RULES,
-    ...SAFETY_LITERAL_RULES,
-    ...CRITICAL_SAFETY_RULES,
-    ...NO_ABSTAIN_WITH_CONTEXT_TRIGGERS,
-    ...OPERATING_MODES_22_RULES,
-    ...SDB1106NM_NITROGEN_RULE,
-    ...SDB1106NM_STORAGE_POWER_RULE,
-    ...SDB1106NM_SHELF_LOAD_EXAMPLE,
-    ...MODEL_TABLE_ROW_EQUIVALENCE,
-    ...OPERATING_CONDITIONS_NUMERIC_COMPARE,
-    ...HEATING_OPTION_TEMPERATURE_RULES,
+  ];
+  const sdb1106nmRules = isSdb1106nm
+    ? [
+        ...PASSPORT_STYLE_RULES,
+        ...THESIS_PLUS_FACT_FORMAT,
+        ...TERM_EQUALS_ESSENCE_RULES,
+        ...STRUCTURED_BULLET_LIST_RULES,
+        ...TECHNICAL_DETAILS_IN_ITEMS_RULES,
+        ...SDB1106NM_ONLY_MY_CABINET,
+        ...SDB1106NM_KNOWLEDGE_FILTER,
+        ...RANGE_STEP_ACCURACY_RULES,
+        ...SAFETY_LITERAL_RULES,
+        ...CRITICAL_SAFETY_RULES,
+        ...NO_ABSTAIN_WITH_CONTEXT_TRIGGERS,
+        ...OPERATING_MODES_22_RULES,
+        ...SDB1106NM_NITROGEN_RULE,
+        ...SDB1106NM_STORAGE_POWER_RULE,
+        ...SDB1106NM_SHELF_LOAD_EXAMPLE,
+        ...MODEL_TABLE_ROW_EQUIVALENCE,
+        ...OPERATING_CONDITIONS_NUMERIC_COMPARE,
+        ...HEATING_OPTION_TEMPERATURE_RULES,
+      ]
+    : [];
+  const sdb702nmRules = isSdb702nm ? SDB702NM_GROUNDING_RULES : [];
+  const sdb302nmRules = isSdb302nm ? SDB302NM_GROUNDING_RULES : [];
+  const sdb151nmRules = isSdb151nm ? SDB151NM_GROUNDING_RULES : [];
+
+  return [
+    ...buildEquipmentExpertRole(equipment),
+    ...(modelFilterBlock ? ["", modelFilterBlock] : []),
+    ...commonRules,
+    ...sdb1106nmRules,
+    ...sdb702nmRules,
+    ...sdb302nmRules,
+    ...sdb151nmRules,
     equipmentHeader(equipment),
     extraBlocks ? String(extraBlocks).trim() : "",
     "Контекст из retrieved RAG chunks:",
@@ -406,8 +542,8 @@ function baseGroundingPrompt(equipment, context, extraBlocks = "") {
     "Запрещено использовать внешние знания и догадки.",
     contextHasMandatoryAnswerTriggers(context)
       ? "В контексте есть данные по вопросу — ответь по ним; не используй формулировку «информация отсутствует»."
-      : `Если данных по ТТХ ${SDB1106NM_PRODUCT_MODEL} недостаточно — «${MODEL_PARAM_NOT_SPECIFIED}»; иначе — «${STRICT_ABSTAIN}».`,
-    "Не придумывай числа, сроки и ГОСТы, которых нет в контексте для SDB1106NM.",
+      : `Если данных по ТТХ ${equipmentModelName(equipment)} недостаточно — «${MODEL_PARAM_NOT_SPECIFIED}»; иначе — «${STRICT_ABSTAIN}».`,
+    `Не придумывай числа, сроки и ГОСТы, которых нет в контексте для ${equipmentModelName(equipment)}.`,
   ].join("\n");
 }
 
@@ -425,6 +561,7 @@ function buildSdb1106nmDirectSystemPrompt(equipment = null, { manualLoaded = fal
   return [
     ...SDB1106NM_EXPERT_ROLE,
     ...TTX_SOURCE_CITATION_RULES,
+    ...MARKDOWN_PRESENTATION_RULES,
     ...SDB1106NM_ONLY_MY_CABINET,
     ...NO_UNSOLICITED_SETUP_RULES,
     ...MODEL_TABLE_ROW_EQUIVALENCE,
@@ -481,9 +618,9 @@ function buildContextualFactSystemPrompt(equipment, context, extraBlocks = "") {
     baseGroundingPrompt(equipment, context, extraBlocks),
     "",
     "Режим: CONTEXTUAL_FACT.",
-    "Один параметр — «тезис + факт»; несколько связанных пунктов — буллеты «термин: суть + цифры»; только SDB1106NM.",
+    `Один параметр — «тезис + факт»; несколько связанных пунктов — буллеты «термин: суть + цифры»; только ${equipmentModelName(equipment)}.`,
     ...TECHNICAL_SYNONYM_GUIDANCE,
-    `Если точного значения для ${SDB1106NM_PRODUCT_MODEL} нет в контексте — ответь ровно: "${MODEL_PARAM_NOT_SPECIFIED}"`,
+    `Если точного значения для ${equipmentModelName(equipment)} нет в контексте — ответь ровно: "${MODEL_PARAM_NOT_SPECIFIED}"`,
   ].join("\n");
 }
 
@@ -491,8 +628,8 @@ function buildContextualFactModelAliasRetryPrompt(equipment, context, extraBlock
   return [
     baseGroundingPrompt(equipment, context, extraBlocks),
     "",
-    "Режим: повторное извлечение факта из таблицы (SDB1106 ≡ SDB1106NM).",
-    "Дай один–два законченных предложения с цифрой из строки SDB1106NM; без списка других моделей.",
+    `Режим: повторное извлечение факта из таблицы для ${equipmentModelName(equipment)}.`,
+    `Дай один–два законченных предложения с цифрой только из строки ${equipmentModelName(equipment)}; без списка других моделей.`,
   ].join("\n");
 }
 
@@ -501,7 +638,7 @@ function buildGeneralFactSystemPrompt(equipment, context, extraBlocks = "") {
     baseGroundingPrompt(equipment, context, extraBlocks),
     "",
     "Режим: GENERAL_FACT_QA.",
-    "Один факт — «тезис + факт»; несколько пунктов — буллеты с сутью и цифрами из контекста; только SDB1106NM.",
+    `Один факт — «тезис + факт»; несколько пунктов — буллеты с сутью и цифрами из контекста; только ${equipmentModelName(equipment)}.`,
     ...TECHNICAL_SYNONYM_GUIDANCE,
   ].join("\n");
 }
@@ -529,21 +666,18 @@ function buildSafetySystemPrompt(equipment, context, extraBlocks = "") {
   ].join("\n");
 }
 
-const QUERY_REWRITE_RULES = [
-  `Standalone Query только для документации ${SDB1106NM_PRODUCT_MODEL}.`,
-  `В запросе обязателен артикул ${SDB1106NM_PRODUCT_MODEL}.`,
-  "Не подставляй другие артикулы SDB.",
-  "Синонимы для поиска (добавляй к запросу при необходимости):",
-  "шаг → дискретность; точность → погрешность; вещество → сорбент → молекулярное сито.",
-];
-
 function buildQueryRewriteSystemPrompt(equipment) {
+  const model = equipmentModelName(equipment);
   return [
     equipmentHeader(equipment),
     "",
     "Режим: QUERY_REWRITE.",
-    ...QUERY_REWRITE_RULES,
-    "Пример: «Нагрузка на полку» → «Максимальная нагрузка на стандартную полку шкафа SDB1106NM».",
+    `Standalone Query только для документации ${model}.`,
+    `В запросе обязателен артикул ${model}.`,
+    "Верни только один русский поисковый запрос без пояснений, заголовков, Markdown и любых иностранных символов.",
+    "Не подставляй другие артикулы SDB.",
+    "Синонимы для поиска (добавляй к запросу при необходимости): шаг → дискретность; точность → погрешность; вещество → сорбент → молекулярное сито.",
+    `Пример: «Нагрузка на полку» → «Максимальная нагрузка на стандартную полку шкафа ${model}».`,
   ].join("\n");
 }
 
@@ -579,8 +713,10 @@ module.exports = {
   SDB1106NM_PRODUCT_MODEL,
   SDB1106NM_EXPERT_ROLE,
   buildSdb1106nmDirectSystemPrompt,
+  buildSdb702nmDirectSystemPrompt,
+  buildSdb302nmDirectSystemPrompt,
+  buildSdb151nmDirectSystemPrompt,
   buildLlmAnswerCompositionBlocks,
-  QUERY_REWRITE_RULES,
   buildQueryRewriteSystemPrompt,
   buildQueryRewriteUserMessage,
   buildProceduralSystemPrompt,

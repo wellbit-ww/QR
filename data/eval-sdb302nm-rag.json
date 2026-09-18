@@ -1,0 +1,85 @@
+{
+  "items": [
+    {
+      "id": "sdb302-internal-volume",
+      "equipmentId": "w-700",
+      "question": "Какой внутренний объём у SDB302NM?",
+      "expectedKeywords": ["500", "л"],
+      "mustNotContain": ["743", "1028", "180 кг"]
+    },
+    {
+      "id": "sdb302-dimensions",
+      "equipmentId": "w-700",
+      "question": "Назови габариты SDB302NM.",
+      "expectedKeywords": ["602", "1358", "772"],
+      "mustNotContain": ["1952", "1204", "180 кг"]
+    },
+    {
+      "id": "sdb302-mass-paraphrase",
+      "equipmentId": "w-700",
+      "question": "Сколько весит шкаф 302?",
+      "expectedKeywords": ["70", "кг"],
+      "mustNotContain": ["90", "180"]
+    },
+    {
+      "id": "sdb302-power-storage",
+      "equipmentId": "w-700",
+      "question": "Сколько ватт потребляет в хранении?",
+      "expectedKeywords": ["8", "Вт"],
+      "mustNotContain": ["810"]
+    },
+    {
+      "id": "sdb302-power-regeneration",
+      "equipmentId": "w-700",
+      "question": "Какая максимальная мощность при регенерации осушителя?",
+      "expectedKeywords": ["285", "Вт"],
+      "mustNotContain": ["540"]
+    },
+    {
+      "id": "sdb302-shelves",
+      "equipmentId": "w-700",
+      "question": "Сколько полок в шкафу?",
+      "expectedKeywords": ["5"],
+      "mustNotContain": ["7 полок"]
+    },
+    {
+      "id": "sdb302-humidity",
+      "equipmentId": "w-700",
+      "question": "Какой диапазон поддержания влажности у SDB302NM?",
+      "expectedKeywords": ["0", "80", "RH"],
+      "mustNotContain": ["1–50"]
+    },
+    {
+      "id": "sdb302-foreign-model-1106",
+      "equipmentId": "w-700",
+      "question": "Какой вес у SDB1106NM?",
+      "expectedKeywords": ["только", "SDB302"],
+      "mustNotContain": ["180 кг"]
+    },
+    {
+      "id": "sdb302-foreign-model-702",
+      "equipmentId": "w-700",
+      "question": "Какой внутренний объём у SDB702NM?",
+      "expectedKeywords": ["только", "SDB302"],
+      "mustNotContain": ["743"]
+    },
+    {
+      "id": "sdb302-regeneration-safety",
+      "equipmentId": "w-700",
+      "question": "Можно ли отключить шкаф во время регенерации?",
+      "expectedKeywords": ["запрещается", "регенерации"]
+    },
+    {
+      "id": "sdb302-unsupported-wifi",
+      "equipmentId": "w-700",
+      "question": "Поддерживает ли шкаф Wi-Fi?",
+      "expectedKeywords": ["не указан"]
+    },
+    {
+      "id": "sdb302-off-topic",
+      "equipmentId": "w-700",
+      "question": "Напиши скрипт на Python.",
+      "expectedKeywords": ["только", "SDB302"]
+    }
+  ]
+}

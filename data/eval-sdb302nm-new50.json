@@ -1,0 +1,312 @@
+{
+  "items": [
+    {
+      "id": "n50-red-lamp",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Что за красная лампочка?",
+      "expectedKeywords": ["осушен", "двер"],
+      "mustNotContain": ["обычно ошибка", "обычно означает аварию", "SDB1106"]
+    },
+    {
+      "id": "n50-red-ember",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Красный огонёк горит, это уже поломка или так и надо?",
+      "expectedKeywords": ["осушен"],
+      "mustNotContain": ["SDB1106"]
+    },
+    {
+      "id": "n50-red-solid",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Красный горит постоянно, не мигает — дверь что ли открыта?",
+      "expectedKeywords": ["двер"]
+    },
+    {
+      "id": "n50-green-mode",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Зелёный сигнал горит, это какой режим сейчас?"
+    },
+    {
+      "id": "n50-yellow-lunch",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Жёлтый горит, можно на обед вырубить шкаф?"
+    },
+    {
+      "id": "n50-w-again",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Буква W на дисплее выскочила, это код ошибки?"
+    },
+    {
+      "id": "n50-feet-kit",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Ножки в комплекте вообще есть или только колёса?"
+    },
+    {
+      "id": "n50-wheels-count",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Сколько колёс кладут в поставку 302?"
+    },
+    {
+      "id": "n50-shop-15",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Цех ровно +15, это уже можно включать или ещё рано?"
+    },
+    {
+      "id": "n50-shop-12-again",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Помещение +12 °C, шкаф в рабочем диапазоне или нет?"
+    },
+    {
+      "id": "n50-ambient-range",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Какая температура окружающего воздуха для эксплуатации, не подогрева?"
+    },
+    {
+      "id": "n50-set-menu-how",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "SET нажал — дальше какие кнопки, чтобы влажность задать?"
+    },
+    {
+      "id": "n50-set-dead",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Панель как мёртвая, SET не реагирует совсем, сам кнопку разбирать?"
+    },
+    {
+      "id": "n50-n2-option",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Азот это опция или в базовой поставке уже стоит?"
+    },
+    {
+      "id": "n50-n2-tube",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Какой диаметр трубки на азот и какой расход?"
+    },
+    {
+      "id": "n50-hot-100",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Опция подогрева корпус до ста градусов греет, правда? Обожгусь?"
+    },
+    {
+      "id": "n50-no-cooling",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Там есть контур охлаждения водой? Протекает вроде"
+    },
+    {
+      "id": "n50-ethernet-first",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Чтобы просто включить и сушить, Ethernet обязательно первым делом?"
+    },
+    {
+      "id": "n50-tumbler-where",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Тумблер питания где искать, на кожухе сзади?"
+    },
+    {
+      "id": "n50-rh60-set",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "На экране 60 RH, это сразу авария или смотреть что в SET стоит?"
+    },
+    {
+      "id": "n50-wait-3h",
+      "equipmentId": "w-700",
+      "category": "cards",
+      "question": "Час уже сушит и влажность не упала — это отказ или ещё рано паниковать?"
+    },
+    {
+      "id": "n50-volume-liters",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Сколько литров рабочий объём, не полный?"
+    },
+    {
+      "id": "n50-full-vs-inner",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Полный объём и внутренний — это разные цифры? Какие?"
+    },
+    {
+      "id": "n50-width",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Какая ширина шкафа в миллиметрах?"
+    },
+    {
+      "id": "n50-depth",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Глубина какая, в проём по глубине влезет?"
+    },
+    {
+      "id": "n50-mains-hz",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Сеть 50 герц подойдёт? Напряжение какое?"
+    },
+    {
+      "id": "n50-rh-step",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "С каким шагом влажность в меню ставится?"
+    },
+    {
+      "id": "n50-rh-accuracy",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Какая точность поддержания влажности по паспорту?"
+    },
+    {
+      "id": "n50-power-n2-heat-dry",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Осушение если азот и подогрев оба стоят — сколько ватт максимум?"
+    },
+    {
+      "id": "n50-power-n2-heat-store",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Хранение с азотом и подогревом сколько ест?"
+    },
+    {
+      "id": "n50-ambient-humidity",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Влажность в помещении вокруг шкафа какая допустимая, не внутри?"
+    },
+    {
+      "id": "n50-atm-pressure",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Атмосферное давление для работы какое, не путать с барами азота"
+    },
+    {
+      "id": "n50-operator-group",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Какая группа по электробезопасности у оператора должна быть?"
+    },
+    {
+      "id": "n50-bracelet",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Антистатический браслет в комплекте идёт?"
+    },
+    {
+      "id": "n50-software",
+      "equipmentId": "w-700",
+      "category": "ttx",
+      "question": "Какое ПО в поставке, Dry Storage это оно?"
+    },
+    {
+      "id": "n50-n2-timer",
+      "equipmentId": "w-700",
+      "category": "options",
+      "question": "Без датчика азота таймер подачи до скольки минут?"
+    },
+    {
+      "id": "n50-dn-temp",
+      "equipmentId": "w-700",
+      "category": "procedure",
+      "question": "Температуру на LCD как посмотреть, кнопкой DN что ли?"
+    },
+    {
+      "id": "n50-regen-length",
+      "equipmentId": "w-700",
+      "category": "procedure",
+      "question": "Регенерация сколько минут длится примерно?"
+    },
+    {
+      "id": "n50-serial",
+      "equipmentId": "w-700",
+      "category": "general",
+      "question": "Где на шкафу серийный номер искать?"
+    },
+    {
+      "id": "n50-support-mail",
+      "equipmentId": "w-700",
+      "category": "general",
+      "question": "На какую почту в поддержку писать?"
+    },
+    {
+      "id": "n50-support-hours",
+      "equipmentId": "w-700",
+      "category": "general",
+      "question": "Поддержка в выходные работает?"
+    },
+    {
+      "id": "n50-dispose",
+      "equipmentId": "w-700",
+      "category": "general",
+      "question": "Как шкаф утилизировать когда спишем?"
+    },
+    {
+      "id": "n50-store-warehouse",
+      "equipmentId": "w-700",
+      "category": "general",
+      "question": "На складе выключенный шкаф рядом с кислотами можно держать?"
+    },
+    {
+      "id": "n50-trap-1106-ip",
+      "equipmentId": "w-700",
+      "category": "trap",
+      "question": "У 1106 какой IP, напомни для сравнения с нашим 302",
+      "mustNotContain": ["IP65"]
+    },
+    {
+      "id": "n50-trap-702-mass",
+      "equipmentId": "w-700",
+      "category": "trap",
+      "question": "SDB702 сколько весит, у нас же 302 чат",
+      "mustNotContain": ["90 кг"]
+    },
+    {
+      "id": "n50-trap-catalog-rh",
+      "equipmentId": "w-700",
+      "category": "trap",
+      "question": "Влажность 1 до 50 процентов как в рекламе, так и в РЭ?",
+      "mustNotContain": ["1–50"]
+    },
+    {
+      "id": "n50-unsup-modbus",
+      "equipmentId": "w-700",
+      "category": "unsupported",
+      "question": "Modbus есть у этого шкафа?"
+    },
+    {
+      "id": "n50-unsup-app",
+      "equipmentId": "w-700",
+      "category": "unsupported",
+      "question": "С айфона влажность смотреть можно? Приложение официальное"
+    },
+    {
+      "id": "n50-offtopic-recipe",
+      "equipmentId": "w-700",
+      "category": "unsupported",
+      "question": "Рецепт борща напиши"
+    },
+    {
+      "id": "n50-door-signal",
+      "equipmentId": "w-700",
+      "category": "procedure",
+      "question": "Если дверь открыл, какой сигнал должен быть, только звук или ещё красный?"
+    }
+  ]
+}

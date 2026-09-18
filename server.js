@@ -1,9 +1,11 @@
+require("./scripts/load-env-file").loadEnvFile();
+
 const express = require("express");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const equipmentCatalog = require("./data/equipment.json");
-const { resolveEquipmentProfile } = require("./src/equipment/equipment-runtime");
+const EQUIPMENT_CATALOG_PATH = path.join(__dirname, "data", "equipment.json");
+const { resolveEquipmentProfile, resolveEquipmentId } = require("./src/equipment/equipment-runtime");
 const {
   isChatFileLogEnabled,
   normalizeTestMeta,
@@ -56,9 +58,94 @@ const {
   applySdb1106nmPostGate,
   resolveDeliveryMethodFromLlmTrace,
 } = require("./src/rag/sdb1106nm-post-gate");
-const { STRICT_ABSTAIN, buildSdb1106nmDirectSystemPrompt, buildSafetyGroundedSystemPrompt } = require("./src/rag/prompts");
+const { STRICT_ABSTAIN, buildSdb1106nmDirectSystemPrompt, buildSdb702nmDirectSystemPrompt, buildSdb302nmDirectSystemPrompt, buildSdb151nmDirectSystemPrompt, buildSafetyGroundedSystemPrompt } = require("./src/rag/prompts");
+const {
+  getAuthConfig,
+  isProductionRuntime,
+  isKnownWeakSessionSecret,
+  isKnownDefaultPostgresUrl,
+} = require("./src/auth/auth-config");
+const { ensurePortalSchema } = require("./src/auth/portal-schema");
+const { createSessionMiddleware } = require("./src/auth/session");
+const { mountAuthRoutes } = require("./src/auth/auth-routes");
+const {
+  requireAuth,
+  filterEquipmentListForUser,
+  equipmentAllowedForRequest,
+} = require("./src/auth/require-auth");
+const {
+  normalizeSupportBody,
+  validateSupportRequest,
+  buildSupportEmailContent,
+} = require("./src/support/validate-support-request");
+const { validateSupportAttachments } = require("./src/support/validate-support-attachments");
+const { supportUploadMiddleware } = require("./src/support/support-upload");
+const { sendSupportEmail } = require("./src/support/send-support-email");
 
 const app = express();
+const helmet = require("helmet");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
+const supportLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 8,
+  keyGenerator: (req) => {
+    const userIp = ipKeyGenerator(req.ip || "unknown");
+    const userId = req.session?.user?.id ?? "anon";
+    return `${userIp}_${userId}`;
+  },
+  message: { error: "Слишком много запросов в техподдержку. Попробуйте позже." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const authConfig = getAuthConfig();
+const IS_PRODUCTION = isProductionRuntime();
+
+if (authConfig.trustProxy) {
+  app.set("trust proxy", 1);
+} else {
+  // Клиенты/расширения иногда шлют X-Forwarded-For напрямую на :3000 — без trust proxy
+  // express-rate-limit считает это misconfiguration и ругается в консоль.
+  app.use((req, _res, next) => {
+    delete req.headers["x-forwarded-for"];
+    delete req.headers["x-forwarded-proto"];
+    delete req.headers["x-forwarded-host"];
+    next();
+  });
+}
+
+// Global Security Headers
+app.use(helmet({
+  hsts: false, // Отключаем HSTS (Strict-Transport-Security), так как для локальной сети/HTTP он может всё сломать. В продакшене HSTS обычно ставится на уровне Nginx
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"],
+      upgradeInsecureRequests: null // Отключаем автоматический редирект на HTTPS для локальной сети
+    }
+  }
+}));
+
+// Global Rate Limiting
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  message: "Слишком много запросов с вашего IP, пожалуйста, попробуйте позже.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(globalLimiter);
+
+// Specific Rate Limiting for Chat API to protect LLM from abuse
+const chatLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Слишком много запросов к чату с вашего IP, пожалуйста, попробуйте позже.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 function resolveListenPort() {
   const n = Number(process.env.PORT);
@@ -70,6 +157,9 @@ function resolveListenPort() {
 
 function resolveListenHost() {
   if (process.env.HOST === undefined || process.env.HOST === "") {
+    if (IS_PRODUCTION) {
+      return "127.0.0.1";
+    }
     return "0.0.0.0";
   }
   return process.env.HOST;
@@ -120,6 +210,97 @@ function resolveChatRequestSocketMs() {
     return 0;
   }
   return Math.max(60_000, Number(raw || 180_000));
+}
+
+function shouldExposeDebugChatFields() {
+  if (IS_PRODUCTION) {
+    return false;
+  }
+  const raw = String(process.env.DEBUG_CHAT_RESPONSE ?? "1").trim().toLowerCase();
+  return !(raw === "0" || raw === "false" || raw === "no" || raw === "off");
+}
+
+function sanitizeSourcesForClient(sources) {
+  if (!Array.isArray(sources)) {
+    return [];
+  }
+  return sources.map((source) => ({
+    sourceDoc: source?.sourceDoc ?? null,
+    page: source?.page ?? null,
+    score: source?.score ?? null,
+  }));
+}
+
+function buildChatResponsePayload({
+  equipment,
+  answer,
+  items = [],
+  sources = [],
+  retrieval = null,
+  ragTrace = null,
+  chatMode = null,
+  chatCapabilities = null,
+}) {
+  const payload = {
+    equipmentId: equipment.id,
+    equipmentName: equipment.name,
+    answer,
+    items,
+    sources: IS_PRODUCTION ? sanitizeSourcesForClient(sources) : sources,
+    chatMode,
+  };
+
+  if (shouldExposeDebugChatFields()) {
+    payload.retrieval = retrieval;
+    payload.ragTrace = ragTrace;
+    payload.chatCapabilities = chatCapabilities;
+  }
+
+  return payload;
+}
+
+function normalizeChatHistoryEntries(history) {
+  if (!Array.isArray(history)) {
+    return [];
+  }
+  return history
+    .filter(
+      (entry) =>
+        entry &&
+        (entry.role === "user" || entry.role === "assistant") &&
+        typeof entry.content === "string" &&
+        entry.content.trim()
+    )
+    .slice(-10)
+    .map((entry) => ({
+      role: entry.role,
+      content: entry.content.trim().slice(0, 4000),
+    }));
+}
+
+function getServerChatHistory(req, equipmentId) {
+  const historyByEquipment = req.session?.chatHistory;
+  if (!historyByEquipment || typeof historyByEquipment !== "object") {
+    return [];
+  }
+  return normalizeChatHistoryEntries(historyByEquipment[equipmentId]);
+}
+
+function appendServerChatExchange(req, equipmentId, question, answer) {
+  if (!req.session) {
+    return;
+  }
+  const historyByEquipment =
+    req.session.chatHistory && typeof req.session.chatHistory === "object"
+      ? req.session.chatHistory
+      : {};
+  const current = normalizeChatHistoryEntries(historyByEquipment[equipmentId]);
+  historyByEquipment[equipmentId] = normalizeChatHistoryEntries([
+    ...current,
+    { role: "user", content: question },
+    { role: "assistant", content: answer },
+  ]);
+  req.session.chatHistory = historyByEquipment;
 }
 
 const publicDir = path.join(__dirname, "public");
@@ -453,24 +634,50 @@ function emitChatSessionRecord({
   recordChatExchange(record);
 }
 
+function readEquipmentCatalog() {
+  return JSON.parse(fs.readFileSync(EQUIPMENT_CATALOG_PATH, "utf8"));
+}
+
 function getEquipment(equipmentId) {
-  return equipmentCatalog[equipmentId] || null;
+  const catalog = readEquipmentCatalog();
+  const canonical = resolveEquipmentId(equipmentId);
+  return catalog[canonical] || catalog[equipmentId] || null;
 }
 
 function getEquipmentList() {
-  return Object.values(equipmentCatalog);
+  return Object.values(readEquipmentCatalog());
+}
+
+function sanitizeCatalogUrl(value) {
+  const raw = String(value || "").trim();
+  if (!raw) {
+    return "";
+  }
+  try {
+    const parsed = new URL(raw, "http://portal.local");
+    if (raw.startsWith("/") && parsed.origin === "http://portal.local") {
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    }
+    if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+      return parsed.href;
+    }
+  } catch {
+    return "";
+  }
+  return "";
 }
 
 function toEquipmentSummary(equipment) {
   return {
     id: equipment.id,
+    publicId: equipment.publicId || equipment.id,
     name: equipment.name,
     type: equipment.type,
     description: equipment.description,
-    image: equipment.image,
+    image: sanitizeCatalogUrl(equipment.image),
     imageAlt: equipment.imageAlt,
-    manualUrl: equipment.manualUrl,
-    guideUrl: equipment.guideUrl,
+    manualUrl: sanitizeCatalogUrl(equipment.manualUrl),
+    guideUrl: sanitizeCatalogUrl(equipment.guideUrl),
     summary: equipment.summary,
   };
 }
@@ -541,6 +748,9 @@ function enrichEquipmentForChat(equipment) {
   }
   return {
     ...equipment,
+    image: sanitizeCatalogUrl(equipment.image),
+    manualUrl: sanitizeCatalogUrl(equipment.manualUrl),
+    guideUrl: sanitizeCatalogUrl(equipment.guideUrl),
     chatCapabilities: getChatCapabilities(equipment),
   };
 }
@@ -1454,6 +1664,12 @@ function isLikelyPostgresClientError(error) {
 
 function formatPostgresFailureForClient(error) {
   const raw = error instanceof Error ? error.message : String(error);
+  if (IS_PRODUCTION) {
+    return {
+      error: "Сервис поиска по документации временно недоступен.",
+      details: "Повторите запрос позже или обратитесь в техподдержку.",
+    };
+  }
   const lower = raw.toLowerCase();
   let details =
     "Проверьте, что PostgreSQL запущен и слушает тот же хост/порт, что в переменной POSTGRES_URL.\n\n" +
@@ -1480,6 +1696,12 @@ function formatPostgresFailureForClient(error) {
 /** Человекочитаемый ответ при сбоях Ollama (без сырых JSON в интерфейсе чата). */
 function formatOllamaFailureForClient(error) {
   const raw = error instanceof Error ? error.message : String(error);
+  if (IS_PRODUCTION) {
+    return {
+      error: "Сервис чата временно недоступен.",
+      details: "Повторите запрос позже или обратитесь в техподдержку.",
+    };
+  }
   const lower = raw.toLowerCase();
 
   if (lower.includes("model failed to load")) {
@@ -1731,6 +1953,76 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: "4mb" }));
 
+const portalPool = getPool(ragConfig.postgresUrl);
+
+if (IS_PRODUCTION) {
+  if (!authConfig.authRequired) {
+    logError("Refusing to start in production with AUTH_REQUIRED disabled.");
+    process.exit(1);
+  }
+  if (isKnownWeakSessionSecret(authConfig.sessionSecret)) {
+    logError("Refusing to start in production with a missing, short, or placeholder SESSION_SECRET.");
+    process.exit(1);
+  }
+  if (!ragConfig.postgresUrl || isKnownDefaultPostgresUrl(ragConfig.postgresUrl)) {
+    logError("Refusing to start in production with a missing or placeholder POSTGRES_URL.");
+    process.exit(1);
+  }
+  if (HOST === "0.0.0.0" && process.env.ALLOW_PUBLIC_NODE_BIND !== "1") {
+    logError(
+      "Refusing to bind Node directly to 0.0.0.0 in production. Use HOST=127.0.0.1 behind a reverse proxy, or set ALLOW_PUBLIC_NODE_BIND=1 intentionally.",
+    );
+    process.exit(1);
+  }
+}
+
+if (authConfig.authRequired) {
+  if (!portalPool) {
+    logError(
+      "AUTH_REQUIRED=1, но POSTGRES_URL не задан. Задайте POSTGRES_URL или AUTH_REQUIRED=0 для локальных тестов.",
+    );
+    process.exit(1);
+  }
+  if (!authConfig.sessionSecret || authConfig.sessionSecret.length < 32) {
+    logError(
+      "AUTH_REQUIRED=1 требует SESSION_SECRET (не короче 32 символов).",
+    );
+    process.exit(1);
+  }
+  if (authConfig.trustProxy) {
+    app.set("trust proxy", 1);
+  }
+  app.use(createSessionMiddleware(portalPool, authConfig));
+  logInfo("Portal authentication is enabled.");
+} else {
+  logInfo("Portal authentication is disabled (AUTH_REQUIRED=0).");
+}
+
+function sendPublicFile(res, relativePath, contentType) {
+  const absPath = path.join(publicDir, relativePath);
+  if (!fs.existsSync(absPath)) {
+    return res.status(404).type("text/plain; charset=utf-8").send("Not found.");
+  }
+  if (contentType) {
+    res.type(contentType);
+  }
+  res.setHeader("Cache-Control", "no-cache, must-revalidate");
+  return res.sendFile(absPath);
+}
+
+app.get("/styles.css", (req, res) => sendPublicFile(res, "styles.css", "text/css; charset=utf-8"));
+app.get("/favicon.svg", (req, res) => sendPublicFile(res, "favicon.svg", "image/svg+xml"));
+app.get("/login.js", (req, res) =>
+  sendPublicFile(res, "login.js", "application/javascript; charset=utf-8")
+);
+
+mountAuthRoutes(app, {
+  publicDir,
+  getPool: () => getPool(ragConfig.postgresUrl),
+});
+
+app.use(requireAuth);
+
 app.get("/manuals/SDB1106NM.pdf", (req, res, next) => {
   const filePath = resolveSdb1106ManualFilePath();
   if (!filePath) {
@@ -1770,13 +2062,24 @@ app.get("/chat", (req, res) => {
   res.sendFile(path.join(publicDir, "chat.html"));
 });
 
+app.get("/support", (req, res) => {
+  res.sendFile(path.join(publicDir, "support.html"));
+});
+
 app.get("/api/equipment", (req, res) => {
-  return res.json({
-    items: getEquipmentList().map(toEquipmentSummary),
-  });
+  const items = filterEquipmentListForUser(getEquipmentList(), req).map(
+    toEquipmentSummary
+  );
+  return res.json({ items });
 });
 
 app.get("/api/equipment/:equipmentId", (req, res) => {
+  if (!equipmentAllowedForRequest(req, req.params.equipmentId)) {
+    return res.status(404).json({
+      error: "Equipment not found.",
+    });
+  }
+
   const equipment = getEquipment(req.params.equipmentId);
 
   if (!equipment) {
@@ -1791,7 +2094,73 @@ app.get("/api/equipment/:equipmentId", (req, res) => {
   return res.json(enrichEquipmentForChat(equipment));
 });
 
+app.post("/api/support-request", supportLimiter, supportUploadMiddleware, async (req, res) => {
+  const attachmentCheck = validateSupportAttachments(req.files);
+  if (!attachmentCheck.ok) {
+    return res.status(400).json({
+      error: attachmentCheck.errors.join(" "),
+      details: attachmentCheck.errors,
+    });
+  }
+  const normalizedBody = normalizeSupportBody(req.body || {}, req.session?.user);
+  if (normalizedBody.equipmentId && !equipmentAllowedForRequest(req, normalizedBody.equipmentId)) {
+    return res.status(403).json({
+      error: "Нет доступа к указанному оборудованию.",
+    });
+  }
+  // Защита от подмены: модель фиксируем из карточки по equipmentId.
+  if (normalizedBody.equipmentId) {
+    const equipment = getEquipment(normalizedBody.equipmentId);
+    if (equipment?.name) {
+      normalizedBody.equipmentModel = equipment.name;
+    }
+  }
+
+  const validation = validateSupportRequest(normalizedBody);
+  if (!validation.ok) {
+    return res.status(400).json({
+      error: validation.errors.join(" "),
+      details: validation.errors,
+    });
+  }
+
+  const { data } = validation;
+
+  const mail = buildSupportEmailContent(data);
+
+  try {
+    await sendSupportEmail({
+      ...mail,
+      replyTo: data.email,
+      attachments: attachmentCheck.attachments,
+    });
+    logInfo("Support request sent.", {
+      equipmentId: data.equipmentId || null,
+      from: data.email,
+    });
+    return res.json({ ok: true, message: "Запрос отправлен в техподдержку." });
+  } catch (error) {
+    const code = error?.code;
+    logError("Support request email failed.", {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    if (code === "SMTP_NOT_CONFIGURED") {
+      return res.status(503).json({
+        error:
+          "Отправка писем временно недоступна. Обратитесь к администратору портала.",
+      });
+    }
+    return res.status(502).json({
+      error: "Не удалось отправить письмо. Попробуйте позже или напишите на service@sovtest-ate.ru.",
+    });
+  }
+});
+
 app.get("/equipment/:equipmentId", (req, res) => {
+  if (!equipmentAllowedForRequest(req, req.params.equipmentId)) {
+    return res.status(404).sendFile(path.join(publicDir, "index.html"));
+  }
+
   const equipment = getEquipment(req.params.equipmentId);
 
   if (!equipment) {
@@ -1847,14 +2216,12 @@ async function getDirectContextForEquipment(equipment) {
       const preamble = buildSdb1106nmDirectPreamble(docText);
       docText = `${preamble}\n\n---\n\n${docText}`;
     }
-  } else if (equipment.id === "wattsan-1313a") {
-    systemPrompt = `Ты — сервисный инженер по лазерному станку по металлу Wattsan 1313A.
-Твоя задача — отвечать на вопросы пользователя по этому станку на основе предоставленной технической информации.
-Будь точен, профессионален и давай ответы строго по делу.`;
+  } else if (equipment.id === "sdb702-nm") {
+    systemPrompt = buildSdb702nmDirectSystemPrompt(equipment, { manualLoaded });
   } else if (equipment.id === "w-700") {
-    systemPrompt = `Ты — технический специалист по горизонтальному токарному станку с ЧПУ W 700.
-Твоя задача — отвечать на вопросы пользователя по этому станку на основе предоставленной информации.
-Будь вежлив, точен и давай технически грамотные ответы.`;
+    systemPrompt = buildSdb302nmDirectSystemPrompt(equipment, { manualLoaded });
+  } else if (equipment.id === "sdb151-nm") {
+    systemPrompt = buildSdb151nmDirectSystemPrompt(equipment, { manualLoaded });
   } else {
     systemPrompt = `Ты — квалифицированный технический специалист по оборудованию ${equipment.name}.
 Твоя задача — отвечать на вопросы пользователя на основе предоставленного документа.
@@ -1864,7 +2231,7 @@ async function getDirectContextForEquipment(equipment) {
   return { docText, sourcePath, sourceType, systemPrompt, manualLoaded };
 }
 
-app.post("/api/chat", async (req, res) => {
+app.post("/api/chat", chatLimiter, async (req, res) => {
   const chatSocketMs = resolveChatRequestSocketMs();
   if (chatSocketMs > 0) {
     req.setTimeout(chatSocketMs);
@@ -1880,7 +2247,7 @@ app.post("/api/chat", async (req, res) => {
     }
   }
 
-  const { equipmentId, message, history, directContextMode, testMeta: rawTestMeta } = req.body || {};
+  const { equipmentId, message, directContextMode, testMeta: rawTestMeta } = req.body || {};
   const trimmedMessage = typeof message === "string" ? message.trim() : "";
   const testMeta = normalizeTestMeta({ testMeta: rawTestMeta });
 
@@ -1898,27 +2265,24 @@ app.post("/api/chat", async (req, res) => {
     });
   }
 
-  const normalizedHistory = Array.isArray(history)
-    ? history
-        .filter(
-          (entry) =>
-            entry &&
-            (entry.role === "user" || entry.role === "assistant") &&
-            typeof entry.content === "string" &&
-            entry.content.trim()
-        )
-        .slice(-10)
-        .map((entry) => ({
-          role: entry.role,
-          content: entry.content.trim(),
-        }))
-    : [];
+  if (!equipmentAllowedForRequest(req, equipmentId)) {
+    logError("Chat request rejected: equipment not allowed for user.", {
+      equipmentId,
+      login: req.session?.user?.login,
+    });
+    return res.status(403).json({
+      error: "Equipment not found.",
+    });
+  }
+
+  const normalizedHistory = getServerChatHistory(req, equipment.id);
 
   const chatStartedAt = Date.now();
   const chatCapabilities = getChatCapabilities(equipment);
   const equipmentProfile = resolveEquipmentProfile(equipment.id);
+  const directContextRequested = !IS_PRODUCTION && Boolean(directContextMode);
   const useDirectContext =
-    Boolean(directContextMode) ||
+    directContextRequested ||
     (Boolean(equipmentProfile?.autoDirectWhenNoPostgres) && !ragConfig.postgresUrl);
 
   logInfo("Chat request received.", {
@@ -1928,13 +2292,13 @@ app.post("/api/chat", async (req, res) => {
     question: trimmedMessage,
   });
 
-  let sdb1106Gate = null;
+  let equipmentGate = null;
 
   if (equipmentProfile?.classifyPreGate) {
     const gate = equipmentProfile.classifyPreGate(trimmedMessage, { history: normalizedHistory });
-    sdb1106Gate = gate;
-    if (gate.action === "OFF_TOPIC" || gate.action === "FOREIGN_MODEL" || gate.action === "CHATTER") {
-      logInfo("SDB1106NM pre-gate: scope reject (no LLM).", {
+    equipmentGate = gate;
+    if (gate.action === "OFF_TOPIC" || gate.action === "FOREIGN_MODEL" || gate.action === "CHATTER" || gate.action === "UNSUPPORTED_SPEC" || gate.action === "CONTACT_SUPPORT") {
+      logInfo("Equipment pre-gate: scope reject (no LLM).", {
         gateAction: gate.action,
         gateReason: gate.reason,
         question: trimmedMessage,
@@ -1966,43 +2330,45 @@ app.post("/api/chat", async (req, res) => {
         },
         gateAction: gate.action,
       });
-      return res.json({
-        equipmentId: equipment.id,
-        equipmentName: equipment.name,
-        answer: gate.reply,
-        items: [],
-        sources: [],
-        retrieval: {
-          route: null,
-          retrievalStrategy: "scope_gate",
-          topScore: 0,
-          chunks: 0,
-          fallback: false,
-          llmUsed: false,
-          deterministicUsed: false,
-          groundingPassed: true,
-          abstained: false,
-        },
-        ragTrace: {
-          used: false,
-          mode: "SCOPE_GATE",
-          gateAction: gate.action,
-          gateReason: gate.reason,
-        },
-        chatMode: buildChatModeInfo({
-          useDirectContext,
-          ragTrace: { mode: "SCOPE_GATE" },
-          capabilities: chatCapabilities,
-        }),
-        chatCapabilities,
+      const gateRetrieval = {
+        route: null,
+        retrievalStrategy: "scope_gate",
+        topScore: 0,
+        chunks: 0,
+        fallback: false,
+        llmUsed: false,
+        deterministicUsed: false,
+        groundingPassed: true,
+        abstained: false,
+      };
+      const gateRagTrace = {
+        used: false,
+        mode: "SCOPE_GATE",
+        gateAction: gate.action,
+        gateReason: gate.reason,
+      };
+      const gateChatMode = buildChatModeInfo({
+        useDirectContext,
+        ragTrace: { mode: "SCOPE_GATE" },
+        capabilities: chatCapabilities,
       });
+      appendServerChatExchange(req, equipment.id, trimmedMessage, gate.reply);
+      return res.json(buildChatResponsePayload({
+        equipment,
+        answer: gate.reply,
+        sources: [],
+        retrieval: gateRetrieval,
+        ragTrace: gateRagTrace,
+        chatMode: gateChatMode,
+        chatCapabilities,
+      }));
     }
   }
 
   if (useDirectContext) {
     logInfo("Running chat in Direct Context Mode (Bypassing RAG).", {
       equipmentId: equipment.id,
-      directContextRequested: Boolean(directContextMode),
+      directContextRequested,
       ragPostgresConfigured: Boolean(ragConfig.postgresUrl),
       autoDirectFallback: chatCapabilities.autoDirectForEquipment,
       question: trimmedMessage.slice(0, 100),
@@ -2012,13 +2378,12 @@ app.post("/api/chat", async (req, res) => {
       const { docText, sourcePath, sourceType, systemPrompt, manualLoaded } =
         await getDirectContextForEquipment(equipment);
 
-      let deterministicAnswer =
-        equipment.id === "sdb1106-nm"
-          ? tryDeterministicSdb1106nmAnswer(trimmedMessage, { history: normalizedHistory })
-          : null;
+      let deterministicAnswer = equipmentProfile?.tryDeterministicAnswer
+        ? equipmentProfile.tryDeterministicAnswer(trimmedMessage, { history: normalizedHistory })
+        : null;
 
-      if (!deterministicAnswer && equipment.id === "sdb1106-nm" && sdb1106Gate?.action === "SAFETY") {
-        const safetyPath = buildSafetyDeterministicOrPrompt(trimmedMessage, docText);
+      if (!deterministicAnswer && equipmentProfile?.buildSafetyDeterministicOrPrompt && equipmentGate?.action === "SAFETY") {
+        const safetyPath = equipmentProfile.buildSafetyDeterministicOrPrompt(trimmedMessage, docText);
         if (safetyPath.mode === "deterministic") {
           deterministicAnswer = safetyPath.answer;
         }
@@ -2026,7 +2391,7 @@ app.post("/api/chat", async (req, res) => {
 
       let answer = deterministicAnswer;
       let ragTraceMode = deterministicAnswer
-        ? sdb1106Gate?.action === "SAFETY"
+        ? equipmentGate?.action === "SAFETY"
           ? "SAFETY_DETERMINISTIC"
           : "DIRECT_CONTEXT_DETERMINISTIC"
         : "DIRECT_CONTEXT";
@@ -2034,23 +2399,23 @@ app.post("/api/chat", async (req, res) => {
       let llmMessages = null;
 
       if (!answer) {
-        const hints =
-          equipment.id === "sdb1106-nm" ? directContextHintsForMessage(trimmedMessage) : "";
+        const hints = equipmentProfile?.directContextHints
+          ? equipmentProfile.directContextHints(trimmedMessage)
+          : "";
         const userContent = hints ? `${trimmedMessage}\n\n[Служебная подсказка: ${hints}]` : trimmedMessage;
 
         let effectiveSystemPrompt = systemPrompt;
-        if (equipment.id === "sdb1106-nm" && sdb1106Gate?.action === "SAFETY") {
-          const safetyExcerpt = extractSafetyDocExcerpt(docText, trimmedMessage);
+        if (equipmentProfile?.extractSafetyDocExcerpt && equipmentGate?.action === "SAFETY") {
+          const safetyExcerpt = equipmentProfile.extractSafetyDocExcerpt(docText, trimmedMessage);
           const equipmentForPrompt = manualLoaded
             ? { id: equipment.id, name: equipment.name }
             : equipment;
           effectiveSystemPrompt = buildSafetyGroundedSystemPrompt(equipmentForPrompt, safetyExcerpt);
         }
 
-        const systemContent =
-          equipment.id === "sdb1106-nm"
-            ? buildSdb1106nmDirectSystemContent(effectiveSystemPrompt, docText)
-            : `${systemPrompt}\n\nПолный текст руководства (единственный источник):\n\n${docText}`;
+        const systemContent = equipmentProfile?.buildDirectSystemContent
+          ? equipmentProfile.buildDirectSystemContent(effectiveSystemPrompt, docText)
+          : `${systemPrompt}\n\nПолный текст руководства (единственный источник):\n\n${docText}`;
 
         llmMessages = [
           { role: "system", content: systemContent },
@@ -2073,16 +2438,16 @@ app.post("/api/chat", async (req, res) => {
       }
 
       let postGate = null;
-      if (equipment.id === "sdb1106-nm") {
+      if (equipmentProfile?.applyPostGate) {
         const deliveryMethod = deterministicAnswer ? "direct_deterministic" : "direct_context";
-        postGate = applySdb1106nmPostGate({
+        postGate = equipmentProfile.applyPostGate({
           answer,
           context: docText,
           message: trimmedMessage,
           equipment,
           deliveryMethod,
           semanticSimilarity: 1,
-          gateAction: sdb1106Gate?.action,
+          gateAction: equipmentGate?.action,
           history: normalizedHistory,
         });
 
@@ -2093,7 +2458,7 @@ app.post("/api/chat", async (req, res) => {
           answer !== STRICT_ABSTAIN;
 
         if (needsRetry) {
-          logInfo("SDB1106NM post-gate: retrying Direct Context LLM after guardrail abstain.", {
+          logInfo("Equipment post-gate: retrying Direct Context LLM after guardrail abstain.", {
             guardrailReason: postGate.guardrails.reason,
             questionPreview: trimmedMessage.slice(0, 120),
           });
@@ -2106,14 +2471,14 @@ app.post("/api/chat", async (req, res) => {
           });
           modelOptions = retryOptions;
           ragTraceMode = "DIRECT_CONTEXT_RETRY";
-          postGate = applySdb1106nmPostGate({
+          postGate = equipmentProfile.applyPostGate({
             answer,
             context: docText,
             message: trimmedMessage,
             equipment,
             deliveryMethod: "direct_context_retry",
             semanticSimilarity: 1,
-            gateAction: sdb1106Gate?.action,
+            gateAction: equipmentGate?.action,
             history: normalizedHistory,
           });
         }
@@ -2133,7 +2498,7 @@ app.post("/api/chat", async (req, res) => {
         topScore: 1.0,
         selectedTopK: 1,
         reason: "Direct context mode (No RAG)",
-        ...(equipment.id === "sdb1106-nm" && postGate
+        ...(equipmentProfile?.applyPostGate && postGate
           ? {
               groundingPassed: postGate.guardrails.passed,
               abstained: postGate.guardrails.action === "ABSTAIN",
@@ -2149,7 +2514,7 @@ app.post("/api/chat", async (req, res) => {
           directContextMode: true,
           documentPath: sourcePath,
           documentLength: docText.length,
-          manualLoaded: equipment.id === "sdb1106-nm" ? manualLoaded : undefined,
+          manualLoaded: equipmentProfile?.applyPostGate ? manualLoaded : undefined,
           systemPromptUsed: systemPrompt,
           modelOptions,
           ...(postGate ? postGate.postGateTrace : {}),
@@ -2165,7 +2530,7 @@ app.post("/api/chat", async (req, res) => {
       logInfo("Direct Context Mode finished.", {
         equipmentId: equipment.id,
         mode: ragTraceMode,
-        gateAction: sdb1106Gate?.action || null,
+        gateAction: equipmentGate?.action || null,
         answerPreview: answer.slice(0, 240),
       });
       emitChatSessionRecord({
@@ -2179,12 +2544,12 @@ app.post("/api/chat", async (req, res) => {
         chatCapabilities,
         ragTrace,
         retrieval,
-        gateAction: sdb1106Gate?.action || null,
+        gateAction: equipmentGate?.action || null,
       });
 
-      return res.json({
-        equipmentId: equipment.id,
-        equipmentName: equipment.name,
+      appendServerChatExchange(req, equipment.id, trimmedMessage, answer);
+      return res.json(buildChatResponsePayload({
+        equipment,
         answer,
         items: [],
         sources,
@@ -2192,7 +2557,7 @@ app.post("/api/chat", async (req, res) => {
         ragTrace,
         chatMode,
         chatCapabilities,
-      });
+      }));
     } catch (directError) {
       logError("Direct Context Mode failed, falling back to RAG pipeline.", {
         equipmentId: equipment.id,
@@ -2223,13 +2588,13 @@ app.post("/api/chat", async (req, res) => {
     let finalRetrieval = result.retrieval;
     let finalRagTrace = result.ragTrace;
 
-    if (equipment.id === "sdb1106-nm") {
+    if (equipmentProfile?.applyPostGate) {
       const semanticHint = Math.max(
         Number(result.retrieval?.topScore) || 0,
         Number(result.retrieval?.fusionScore) || 0,
         Number(result.retrieval?.lexicalScore) || 0,
       );
-      const postGate = applySdb1106nmPostGate({
+      const postGate = equipmentProfile.applyPostGate({
         answer: result.answer,
         context: result.retrievalContext || "",
         message: trimmedMessage,
@@ -2240,7 +2605,7 @@ app.post("/api/chat", async (req, res) => {
             ? "rag_deterministic"
             : resolveDeliveryMethodFromLlmTrace(result.ragTrace?.llm),
         semanticSimilarity: semanticHint,
-        gateAction: sdb1106Gate?.action,
+        gateAction: equipmentGate?.action,
         routerDecision: result.ragTrace?.router,
         retrieval: result.retrieval,
         history: normalizedHistory,
@@ -2261,7 +2626,7 @@ app.post("/api/chat", async (req, res) => {
         },
         chatCapabilities,
       );
-      logInfo("SDB1106NM post-gate applied to RAG answer.", {
+      logInfo(`${equipment.name || equipment.id} post-gate applied to RAG answer.`, {
         guardrailAction: postGate.guardrails.action,
         guardrailReason: postGate.guardrails.reason,
         validationOk: postGate.validation.ok,
@@ -2285,12 +2650,12 @@ app.post("/api/chat", async (req, res) => {
       chatCapabilities,
       ragTrace: finalRagTrace,
       retrieval: finalRetrieval,
-      gateAction: sdb1106Gate?.action || null,
+      gateAction: equipmentGate?.action || null,
     });
 
-    return res.json({
-      equipmentId: equipment.id,
-      equipmentName: equipment.name,
+    appendServerChatExchange(req, equipment.id, trimmedMessage, finalAnswer);
+    return res.json(buildChatResponsePayload({
+      equipment,
       answer: finalAnswer,
       items: [],
       sources: result.sources,
@@ -2298,7 +2663,7 @@ app.post("/api/chat", async (req, res) => {
       ragTrace: finalRagTrace,
       chatMode: ragChatMode,
       chatCapabilities,
-    });
+    }));
   } catch (error) {
     const raw = error instanceof Error ? error.message : String(error);
     if (isLikelyPostgresClientError(error)) {
@@ -2370,7 +2735,7 @@ app.use((err, req, res, next) => {
   });
 
   return res.status(status >= 400 && status < 600 ? status : 500).json({
-    error: err instanceof Error ? err.message : "Internal server error.",
+    error: status === 500 ? "Внутренняя ошибка сервера." : (err instanceof Error ? err.message : "Internal server error."),
   });
 });
 
@@ -2384,6 +2749,10 @@ function shutdownServer(signal) {
   isShuttingDown = true;
   closeChatSessionLog(signal);
   logInfo(`Получен ${signal}, останавливаем сервер…`);
+  if (!server) {
+    process.exit(0);
+    return;
+  }
   server.close((closeErr) => {
     if (closeErr) {
       logError("Ошибка при закрытии HTTP-сервера.", {
@@ -2407,9 +2776,40 @@ function shutdownServer(signal) {
 process.on("SIGINT", () => shutdownServer("SIGINT"));
 process.on("SIGTERM", () => shutdownServer("SIGTERM"));
 
-const server = app.listen(PORT, HOST);
+async function initializeDatabaseSchemas() {
+  const pool = getPool(ragConfig.postgresUrl);
+  if (!pool) {
+    return;
+  }
+  const tasks = [ensureRagSchema(pool)];
+  if (authConfig.authRequired) {
+    tasks.push(ensurePortalSchema(pool));
+  }
+  await Promise.all(tasks);
+}
 
-server.on("error", (err) => {
+let server = null;
+
+initializeDatabaseSchemas()
+  .then(() => {
+    if (ragConfig.postgresUrl) {
+      logInfo("Database schemas are ready.", {
+        auth: authConfig.authRequired,
+        rag: true,
+      });
+    }
+    server = app.listen(PORT, HOST);
+    attachServerLifecycle(server);
+  })
+  .catch((error) => {
+    logError("Failed to initialize database schemas.", {
+      details: error instanceof Error ? error.message : "Unknown error",
+    });
+    process.exit(1);
+  });
+
+function attachServerLifecycle(httpServer) {
+httpServer.on("error", (err) => {
   if (err && err.code === "EADDRINUSE") {
     logError(
       `Порт ${PORT} уже занят — сервер НЕ запущен. Остановите другой процесс (например старый node server.js) или задайте другой PORT.`,
@@ -2426,7 +2826,7 @@ server.on("error", (err) => {
   process.exit(1);
 });
 
-server.on("listening", () => {
+httpServer.on("listening", () => {
   logInfo(`Equipment support server is listening on ${HOST}:${PORT}`, {
     nodeEnv: process.env.NODE_ENV || "production",
     consoleLog: isConsoleLogEnabled(),
@@ -2450,11 +2850,19 @@ server.on("listening", () => {
     logInfo(`Open http://${HOST}:${PORT}`);
   }
   logInfo("Available equipment loaded.", {
-    equipmentIds: Object.keys(equipmentCatalog),
+    equipmentIds: Object.keys(readEquipmentCatalog()),
     ollamaModel: OLLAMA_MODEL,
     ollamaNumCtx: resolveOllamaChatNumCtx(),
     embeddingModel: ragConfig.embeddingModel,
+    portalAuth: authConfig.authRequired,
   });
+  if (!authConfig.authRequired) {
+    logInfo(
+      "Вход отключён (AUTH_REQUIRED=0). Для eval и test:gate используйте этот режим; в проде — AUTH_REQUIRED=1, POSTGRES_URL, SESSION_SECRET."
+    );
+  } else {
+    logInfo("Вход включён. Страница: /login. Создание аккаунта: npm run user:create -- --help");
+  }
   logInfo("Сервер работает. Логи чата — в консоли (CHAT) и в файле logs/*.jsonl. Остановка: Ctrl+C.");
   if (isChatFileLogEnabled()) {
     initChatSessionLog();
@@ -2465,32 +2873,18 @@ server.on("listening", () => {
   }
 });
 
-// HTTP server: long RAG + Ollama (defaults ≥60s; see resolveHttpServerTimeouts / HTTP_SERVER_TIMEOUT_MS).
-server.requestTimeout = 0;
-server.timeout = httpServerTimeouts.socketMs;
-server.keepAliveTimeout = httpServerTimeouts.keepAliveMs;
-server.headersTimeout = httpServerTimeouts.headersMs;
+httpServer.requestTimeout = 0;
+httpServer.timeout = httpServerTimeouts.socketMs;
+httpServer.keepAliveTimeout = httpServerTimeouts.keepAliveMs;
+httpServer.headersTimeout = httpServerTimeouts.headersMs;
 logInfo("HTTP server socket timeouts (ms).", {
-  socket: server.timeout,
-  keepAlive: server.keepAliveTimeout,
-  headers: server.headersTimeout,
+  socket: httpServer.timeout,
+  keepAlive: httpServer.keepAliveTimeout,
+  headers: httpServer.headersTimeout,
   chatRouteSocketMsDefault: resolveChatRequestSocketMs(),
 });
+}
 
-const ragPool = getPool(ragConfig.postgresUrl);
-if (ragPool) {
-  ensureRagSchema(ragPool)
-    .then(() => {
-      logInfo("RAG schema is ready.", {
-        retrievalTopK: ragConfig.retrievalTopK,
-        minSimilarityScore: ragConfig.minSimilarityScore,
-      });
-    })
-    .catch((error) => {
-      logError("Failed to initialize RAG schema.", {
-        details: error instanceof Error ? error.message : "Unknown error",
-      });
-    });
-} else {
+if (!ragConfig.postgresUrl) {
   logInfo("RAG is disabled because POSTGRES_URL is not set.");
 }

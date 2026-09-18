@@ -153,6 +153,14 @@
       "question": "Honeywell или японский бренд у датчика температуры в SDB1106NM?",
       "mustMatchRegex": ["не\\s+указан|бренд|производител"],
       "mustNotMatchRegex": ["диапазон температуры \\*\\*внутри\\*\\* рабочего объёма"]
+    },
+    {
+      "id": "ph-q11a",
+      "topic": "kit_shelf_count",
+      "expectKey": "kit_shelf_count",
+      "question": "Сколько перфорированных полок входит в базовый комплект поставки данного шкафа?",
+      "mustMatchRegex": ["10\\s*шт", "перфорир|1\\.2"],
+      "mustNotMatchRegex": ["не\\s+указан"]
     }
   ]
 }

@@ -1,7 +1,14 @@
 const { generate } = require("./llm/llm-service");
 const { buildQueryRewriteSystemPrompt, buildQueryRewriteUserMessage } = require("./prompts");
 const { ragInfo, ragWarn } = require("./rag-log");
-const { anchorQueryToSdb1106nm, SDB1106NM_PRODUCT_MODEL } = require("./sdb1106nm-scope");
+const { SDB1106NM_PRODUCT_MODEL } = require("./sdb1106nm-scope");
+const { anchorQueryToEquipmentModel } = require("./sdb-model-scope");
+const { expandProceduralRetrievalSynonyms } = require("./sdb1106nm-rag-priority");
+const {
+  expandSdb302nmRetrievalSynonyms,
+  isSdb302nmAmbientTempQuery,
+  isSdb302nmEquipment,
+} = require("./sdb302nm-rag-priority");
 
 const CHATTER_ONLY_RE =
   /^(?:спасибо|благодар(?:ю|им)?|понятно|ясно|окей|ок|хорошо|отлично|принято|да|нет|ага|угу|расскажи\s+подробнее|подробнее|ещё\s+раз|еще\s+раз)\s*[.!?…]*$/iu;
@@ -139,20 +146,28 @@ function expandTroubleshootingSynonyms(query) {
 }
 
 /** Синонимы для hybrid FTS / vector (шаг, точность, сорбент, неисправности). */
-function expandRetrievalSynonyms(query) {
+function expandRetrievalSynonyms(query, equipment) {
   let q = String(query || "").trim();
   if (!q) {
     return q;
   }
-  const extras = [...expandTroubleshootingSynonyms(q), ...expandMaintenanceSynonyms(q)];
+  const extras = [
+    ...expandTroubleshootingSynonyms(q),
+    ...expandMaintenanceSynonyms(q),
+    ...expandProceduralRetrievalSynonyms(q),
+  ];
   if (/\d/.test(q) && /условия\s+эксплуатации|1\.1\.3|допустим|входит\s+ли|соответствует/i.test(q)) {
     extras.push("1.1.3", "условия эксплуатации", "диапазон", "допустимые значения");
   }
   if (/желт|зелен|красн|индикатор|мигает|1\.1\.4\.3\.3/i.test(q) && !/неисправ|не\s+работ/i.test(q)) {
     extras.push("1.1.4.3.3", "световой сигнал", "режим хранения", "режим осушения", "режим регенерации");
   }
-  if (/температур|подогрев|нагрев/i.test(q)) {
+  const skip302Heating = isSdb302nmEquipment(equipment) && isSdb302nmAmbientTempQuery(q);
+  if (/температур|подогрев|нагрев/i.test(q) && String(equipment?.id || "") !== "sdb151-nm" && !skip302Heating) {
     extras.push("система подогрева", "2.3.3.1", "+40", "плюс 40");
+  }
+  if (isSdb302nmEquipment(equipment)) {
+    extras.push(...expandSdb302nmRetrievalSynonyms(q));
   }
   if (/\bшаг\b/iu.test(q) && !/дискретност/iu.test(q)) {
     extras.push("дискретность", "шаг установки");
@@ -182,9 +197,12 @@ function applyMandatoryRewriteRules(standalone, userQuery, history, equipment) {
   if (!q) {
     q = stripChatterFromQuery(userQuery);
   }
-  q = expandRetrievalSynonyms(q);
+  q = expandRetrievalSynonyms(q, equipment);
 
-  if (mentionsStandardShelf(userQuery) || mentionsStandardShelf(q)) {
+  if (
+    String(equipment?.id || "") === "sdb1106-nm" &&
+    (mentionsStandardShelf(userQuery) || mentionsStandardShelf(q))
+  ) {
     q = ensureStandardShelfPhrase(q, null);
   } else if (mentionsReinforcedShelf(userQuery) || mentionsReinforcedShelf(q)) {
     if (!/усиленн[\p{L}]*\s+полк/iu.test(q) && /усиленн/iu.test(userQuery)) {
@@ -192,7 +210,7 @@ function applyMandatoryRewriteRules(standalone, userQuery, history, equipment) {
     }
   }
 
-  return anchorQueryToSdb1106nm(q);
+  return anchorQueryToEquipmentModel(q, equipment);
 }
 
 function parseRewriteModelOutput(raw) {
@@ -260,6 +278,12 @@ async function rewriteQueryForRetrieval({ userQuery, history = [], equipment, ra
       outputSchema: null,
     });
     let standalone = parseRewriteModelOutput(result.content);
+    // Если LLM вернула шаблонную заглушку — откатываемся на оригинал
+    const JUNK_REWRITE_RE =
+      /^(?:стендов|standalone\s+(?:запрос|query)|запрос\s+для\s+документ|query\s+for|перепиш|[а-яё]{0,6}\s*запрос\s+для)[:\s]*/iu;
+    if (JUNK_REWRITE_RE.test(standalone) || standalone.endsWith(":")) {
+      throw new Error("rewrite_junk:" + standalone.slice(0, 60));
+    }
     standalone = applyMandatoryRewriteRules(standalone, original, history, equipment);
     if (!standalone || standalone.length < 6) {
       throw new Error("rewrite_empty");
@@ -271,7 +295,7 @@ async function rewriteQueryForRetrieval({ userQuery, history = [], equipment, ra
       standaloneLen: standalone.length,
     });
     return {
-      standaloneQuery: anchorQueryToSdb1106nm(standalone),
+      standaloneQuery: anchorQueryToEquipmentModel(standalone, equipment),
       rewritten: standalone !== original,
       source: "llm",
       model: result.model,
@@ -281,7 +305,7 @@ async function rewriteQueryForRetrieval({ userQuery, history = [], equipment, ra
     ragWarn("query_rewrite.fallback", { error: details });
     const standalone = heuristicRewrite(original, history, equipment);
     return {
-      standaloneQuery: anchorQueryToSdb1106nm(standalone),
+      standaloneQuery: anchorQueryToEquipmentModel(standalone, equipment),
       rewritten: standalone !== original,
       source: "heuristic",
     };

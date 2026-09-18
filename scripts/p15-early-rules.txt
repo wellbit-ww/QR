@@ -1,0 +1,38 @@
+
+  if (
+    /осмотр|визуальн/i.test(m) &&
+    /(?:отключ|220|кабел|электропитан|заземл)/i.test(m) &&
+    /нужно|надо|должен|следует|можно|требу/i.test(m)
+  ) {
+    return { key: "inspection_power_off", confidence: "high" };
+  }
+
+  if (/датчик/i.test(m) && /производител|бренд|комpan|siemens|honeywell|немецк|японск/i.test(m)) {
+    return { key: "sensor_brand_unknown", confidence: "high" };
+  }
+
+  if (/регенерац/i.test(m) && /цикл|длит|сколько\s+времен|минут|полн/i.test(m)) {
+    return { key: "regen_cycle_duration", confidence: "high" };
+  }
+
+  if (
+    (/замен|ресурс|обслужив|\bто\b/i.test(m) || /часов|тысяч\s+час/i.test(m)) &&
+    /цеолит|осушител|блок.*осуш/i.test(m)
+  ) {
+    return { key: "maintenance_desiccant_replace", confidence: "high" };
+  }
+
+  if (/азот/i.test(m) && /давлен/i.test(m)) {
+    return { key: "nitrogen_pressure_max", confidence: "high" };
+  }
+
+  if (/звук|сигнализац/i.test(m) && /двер/i.test(m)) {
+    return { key: "door_sound_signal", confidence: "high" };
+  }
+
+  if (
+    /жидк|как\s+(?:именно\s+)?осуш|метод\s+осуш|происходит\s+осуш|химическ.*осуш/i.test(m) &&
+    /осуш|влаж/i.test(m)
+  ) {
+    return { key: "desiccant_drying_process", confidence: "high" };
+  }

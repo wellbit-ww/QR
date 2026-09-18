@@ -20,7 +20,99 @@ const GATE_CASES = [
   { label: "foreign SDB302", message: "Мощность SDB302", expectGate: "FOREIGN_MODEL" },
   { label: "smoke", message: "Внимание, дым!", expectGate: "SAFETY", expectDet: /отключ/i },
   { label: "regen shutdown", message: "Можно выключить при регенерации?", expectGate: "SAFETY", expectDet: /ЗАПРЕЩАЕТСЯ/i },
-  { label: "weight in-scope", message: "Каков вес шкафа?", expectGate: "IN_SCOPE" },
+  {
+    label: "broken door glass",
+    message: "Разбилось стекло в двери",
+    expectGate: "IN_SCOPE",
+    expectDet: /механическ[\s\S]*8 \(800\) 200-54-17/i,
+    expectDetNot: /марка или тип стекла/i,
+  },
+  {
+    label: "broken glass follow-up",
+    message: "Оно разбилось",
+    history: [{ role: "user", content: "Разбилось стекло в двери" }],
+    equipmentChatScoped: true,
+    expectGate: "IN_SCOPE",
+    expectDet: /механическ[\s\S]*8 \(800\) 200-54-17/i,
+    expectDetNot: /замене \*\*двери\*\*/i,
+  },
+  {
+    label: "broken door not glass",
+    message: "Сломалась дверь, как починить?",
+    expectGate: "IN_SCOPE",
+    expectDet: /замене \*\*двери\*\*/i,
+    expectDetNot: /стекла двери/i,
+  },
+  {
+    label: "door after glass history uses door",
+    message: "Сломалась дверь, как починить?",
+    history: [{ role: "user", content: "Разбилось стекло в двери" }],
+    equipmentChatScoped: true,
+    expectGate: "IN_SCOPE",
+    expectDet: /замене \*\*двери\*\*/i,
+    expectDetNot: /стекла двери/i,
+  },
+  {
+    label: "replace lcd",
+    message: "Как заменить LCD",
+    expectGate: "IN_SCOPE",
+    expectDet: /нет инструкции по замене[\s\S]*8 \(800\) 200-54-17/i,
+  },
+  {
+    label: "replace lock",
+    message: "Как заменить замок",
+    expectGate: "IN_SCOPE",
+    expectDet: /нет инструкции по замене[\s\S]*8 \(800\) 200-54-17/i,
+  },
+  {
+    label: "replace wheels",
+    message: "Как заменить колёса",
+    expectGate: "IN_SCOPE",
+    expectDet: /нет инструкции по замене[\s\S]*8 \(800\) 200-54-17/i,
+  },
+  {
+    label: "replace heating",
+    message: "Как починить подогрев",
+    expectGate: "IN_SCOPE",
+    expectDet: /нет инструкции по замене[\s\S]*8 \(800\) 200-54-17/i,
+  },
+  {
+    label: "desiccant replace stays documented",
+    message: "Как заменить осушитель",
+    expectGate: "IN_SCOPE",
+    expectDet: /36\s*месяц/i,
+    expectDetNot: /нет инструкции по замене/i,
+  },
+  {
+    label: "seal replace stays documented",
+    message: "Как заменить уплотнитель",
+    expectGate: "IN_SCOPE",
+    expectDetNot: /нет инструкции по замене/i,
+  },
+  {
+    label: "cable replace stays documented",
+    message: "Как заменить кабель питания",
+    expectGate: "IN_SCOPE",
+    expectDetNot: /нет инструкции по замене/i,
+  },
+  {
+    label: "sound signal stays troubleshooting",
+    message: "Как починить звуковой сигнал",
+    expectGate: "IN_SCOPE",
+    expectDetNot: /нет инструкции по замене/i,
+  },
+  {
+    label: "repair contact",
+    message: "Куда мне обратиться, чтобы починили",
+    expectGate: "CONTACT_SUPPORT",
+    expectDet: /8 \(800\) 200-54-17/,
+  },
+  {
+    label: "sovtest phone",
+    message: "Как позвонить в совтест",
+    expectGate: "CONTACT_SUPPORT",
+    expectDet: /info@sovtest-ate\.ru/,
+  },
   { label: "power in-scope", message: "Какая мощность SDB1106NM в режиме хранения?", expectGate: "IN_SCOPE", expectDet: /8\s*Вт/i },
   {
     label: "volume trap 1028",
@@ -45,10 +137,27 @@ const HISTORY_CASES = [
     expectGate: "OFF_TOPIC",
   },
   {
-    label: "follow-up with options",
-    message: "А с опциями азота и подогрева?",
-    history: [{ role: "user", content: "Какая мощность SDB1106NM в режиме хранения?" }],
+    label: "follow-up sensor functions",
+    message: "Какие функции у датчиков",
+    history: [{ role: "user", content: "Кто производит датчик RH внутри камеры — Siemens или другой?" }],
     expectGate: "IN_SCOPE",
+  },
+  {
+    label: "sensor functions standalone",
+    message: "Какие функции у датчиков шкафа?",
+    expectGate: "IN_SCOPE",
+  },
+  {
+    label: "human IP scoped chat",
+    message: "От воды и пыли какой там IP у корпуса, не помню",
+    expectGate: "IN_SCOPE",
+    equipmentChatScoped: true,
+  },
+  {
+    label: "human solvent scoped",
+    message: "Можно ли туда растворитель на ночь оставить?",
+    expectGate: "IN_SCOPE",
+    equipmentChatScoped: true,
   },
 ];
 
@@ -80,11 +189,16 @@ function runGateTests() {
 
   for (const c of [...GATE_CASES, ...HISTORY_CASES]) {
     try {
-      const gate = classifySdb1106nmMessage(c.message, { history: c.history || [] });
+      const gate = classifySdb1106nmMessage(c.message, {
+        history: c.history || [],
+        equipmentChatScoped: Boolean(c.equipmentChatScoped),
+      });
       assert(gate.action === c.expectGate, `[${c.label}] gate ${gate.action} != ${c.expectGate}`);
-      if (c.expectDet) {
-        const det = tryDeterministicSdb1106nmAnswer(c.message);
-        assert(det && c.expectDet.test(det), `[${c.label}] deterministic failed: ${String(det).slice(0, 80)}`);
+      if (c.expectDet || c.expectDetNot) {
+        const det = tryDeterministicSdb1106nmAnswer(c.message, { history: c.history || [] }) || "";
+        if (c.expectDet) {
+          assert(c.expectDet.test(det), `[${c.label}] deterministic failed: ${String(det).slice(0, 80)}`);
+        }
         if (c.expectDetNot) {
           assert(!c.expectDetNot.test(det), `[${c.label}] forbidden deterministic content`);
         }

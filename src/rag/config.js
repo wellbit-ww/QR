@@ -25,7 +25,7 @@ function getRagConfig() {
     safetyRetrievalTopK: parseNumber(process.env.SAFETY_RETRIEVAL_TOP_K, 12),
     emergencyRetrievalTopK: parseNumber(process.env.EMERGENCY_RETRIEVAL_TOP_K, 14),
     synthesisRetrievalTopK: parseNumber(process.env.SYNTHESIS_RETRIEVAL_TOP_K, 12),
-    minSimilarityScore: parseNumber(process.env.RETRIEVAL_MIN_SCORE, 0.35),
+    minSimilarityScore: parseNumber(process.env.RETRIEVAL_MIN_SCORE, 0.28),
     /** Целевой размер чанка по символам (~800–1200 токенов для русских ТТХ — дефолт выше прежнего). */
     chunkSize: parseNumber(process.env.INGEST_CHUNK_SIZE, 3200),
     chunkOverlap: parseNumber(process.env.INGEST_CHUNK_OVERLAP, 500),

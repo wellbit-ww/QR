@@ -9,6 +9,23 @@ function parseNumber(value, fallback) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function mergeIntentLlmOptions(base, intentLlmOptions) {
+  if (!intentLlmOptions || typeof intentLlmOptions !== "object") {
+    return base;
+  }
+  const out = { ...base };
+  if (Number.isFinite(Number(intentLlmOptions.temperature))) {
+    out.temperature = Number(intentLlmOptions.temperature);
+  }
+  if (Number.isFinite(Number(intentLlmOptions.top_p))) {
+    out.top_p = Number(intentLlmOptions.top_p);
+  }
+  if (Number.isFinite(Number(intentLlmOptions.num_predict))) {
+    out.num_predict = Number(intentLlmOptions.num_predict);
+  }
+  return out;
+}
+
 function generationOptionsForRoute(route, intentLlmOptions = null) {
   const base = {
     temperature: parseNumber(process.env.OLLAMA_TEMPERATURE, 0.1),
@@ -18,48 +35,62 @@ function generationOptionsForRoute(route, intentLlmOptions = null) {
   const defaultPredict =
     route === "QUERY_REWRITE"
       ? 200
-      : route === "TROUBLESHOOTING_QA" || route === "SAFETY_QA"
-        ? 260
-        : route === "PROCEDURAL_QA"
-          ? 320
-          : 420;
+      : route === "TROUBLESHOOTING_QA"
+        ? parseNumber(process.env.OLLAMA_TROUBLESHOOTING_PREDICT, 480)
+        : route === "SAFETY_QA"
+          ? 260
+          : route === "PROCEDURAL_QA"
+            ? parseNumber(process.env.OLLAMA_PROCEDURAL_PREDICT, 1024)
+            : 420;
   if (route === "QUERY_REWRITE") {
-    return {
-      ...base,
-      temperature: 0,
-      top_p: 0.9,
-      num_predict: parseNumber(process.env.OLLAMA_QUERY_REWRITE_PREDICT, defaultPredict),
-    };
+    return mergeIntentLlmOptions(
+      {
+        ...base,
+        temperature: 0,
+        top_p: 0.9,
+        num_predict: parseNumber(process.env.OLLAMA_QUERY_REWRITE_PREDICT, defaultPredict),
+      },
+      intentLlmOptions
+    );
   }
   if (route === "SAFETY_QA") {
     const safetyTemp =
       intentLlmOptions && Number.isFinite(Number(intentLlmOptions.temperature))
         ? Number(intentLlmOptions.temperature)
         : 0;
-    return {
-      ...base,
-      temperature: safetyTemp,
-      top_p:
-        intentLlmOptions && Number.isFinite(Number(intentLlmOptions.top_p))
-          ? Number(intentLlmOptions.top_p)
-          : 0.85,
-      num_predict: parseNumber(process.env.OLLAMA_SAFETY_PREDICT, defaultPredict),
-    };
+    return mergeIntentLlmOptions(
+      {
+        ...base,
+        temperature: safetyTemp,
+        top_p:
+          intentLlmOptions && Number.isFinite(Number(intentLlmOptions.top_p))
+            ? Number(intentLlmOptions.top_p)
+            : 0.85,
+        num_predict: parseNumber(process.env.OLLAMA_SAFETY_PREDICT, defaultPredict),
+      },
+      intentLlmOptions
+    );
   }
   if (intentLlmOptions && Number.isFinite(Number(intentLlmOptions.temperature))) {
-    return {
-      ...base,
-      temperature: Number(intentLlmOptions.temperature),
-      top_p: Number.isFinite(Number(intentLlmOptions.top_p))
-        ? Number(intentLlmOptions.top_p)
-        : base.top_p,
-      num_predict: parseNumber(process.env.OLLAMA_NUM_PREDICT, defaultPredict),
-    };
+    return mergeIntentLlmOptions(
+      {
+        ...base,
+        temperature: Number(intentLlmOptions.temperature),
+        top_p: Number.isFinite(Number(intentLlmOptions.top_p))
+          ? Number(intentLlmOptions.top_p)
+          : base.top_p,
+        num_predict: parseNumber(process.env.OLLAMA_NUM_PREDICT, defaultPredict),
+      },
+      intentLlmOptions
+    );
   }
-  return {
-    ...base,
-    num_predict: parseNumber(process.env.OLLAMA_NUM_PREDICT, defaultPredict),
-  };
+  return mergeIntentLlmOptions(
+    {
+      ...base,
+      num_predict: parseNumber(process.env.OLLAMA_NUM_PREDICT, defaultPredict),
+    },
+    intentLlmOptions
+  );
 }
 
 function sleep(ms) {

@@ -1,0 +1,243 @@
+{
+  "meta": {
+    "source": "objective-benchmark-2026-05",
+    "equipmentId": "sdb1106-nm",
+    "mode": "rag",
+    "description": "Объективная оценка: эталонные ТТХ, ловушки, безопасность, рассуждение, отсечение оффтопа и чужих моделей"
+  },
+  "items": [
+    {
+      "id": "ob01",
+      "block": 1,
+      "category": "ttx",
+      "question": "Какова масса шкафа SDB1106NM в базовой комплектации?",
+      "mustMatchRegex": ["180\\s*кг"],
+      "mustNotMatchRegex": ["\\b56\\s*кг", "\\b42\\s*кг", "\\b90\\s*кг"]
+    },
+    {
+      "id": "ob02",
+      "block": 1,
+      "category": "ttx",
+      "question": "Укажите габариты шкафа SDB1106NM: ширина, высота и глубина в миллиметрах.",
+      "mustMatchRegex": ["1204\\s*мм", "1952\\s*мм", "772\\s*мм"]
+    },
+    {
+      "id": "ob03",
+      "block": 1,
+      "category": "trap",
+      "question": "Какой внутренний объём рабочей камеры шкафа SDB1106NM в литрах?",
+      "mustMatchRegex": ["не\\s+указан|отсутств|не\\s+привед|не\\s+содержит"],
+      "mustNotMatchRegex": ["\\b1028\\s*л"]
+    },
+    {
+      "id": "ob04",
+      "block": 1,
+      "category": "ttx",
+      "question": "Какая степень защиты IP корпуса шкафа SDB1106NM?",
+      "mustMatchRegex": ["ip\\s*65|ip65"]
+    },
+    {
+      "id": "ob05",
+      "block": 1,
+      "category": "ttx",
+      "question": "Какой цвет порошкового покрытия корпуса (RAL)?",
+      "mustMatchRegex": ["7035|ral"]
+    },
+    {
+      "id": "ob06",
+      "block": 1,
+      "category": "ttx",
+      "question": "Какова частота питающей сети для шкафа SDB1106NM?",
+      "mustMatchRegex": ["50\\s*гц|50\\s*Гц"],
+      "mustNotMatchRegex": ["60\\s*гц"]
+    },
+    {
+      "id": "ob07",
+      "block": 2,
+      "category": "power",
+      "question": "Потребляемая мощность в режиме «Хранения» без опций (азот и подогрев выключены)?",
+      "mustMatchRegex": ["8\\s*вт"],
+      "mustNotMatchRegex": ["810\\s*вт", "540\\s*вт", "40\\s*вт"]
+    },
+    {
+      "id": "ob08",
+      "block": 2,
+      "category": "power",
+      "question": "Потребляемая мощность в режиме «Осушения» без дополнительных опций?",
+      "mustMatchRegex": ["40\\s*вт"],
+      "mustNotMatchRegex": ["8\\s*вт", "810\\s*вт"]
+    },
+    {
+      "id": "ob09",
+      "block": 2,
+      "category": "power",
+      "question": "Максимальная мощность в режиме «Хранения» при одновременно включённых подаче азота и подогреве воздуха?",
+      "mustMatchRegex": ["810\\s*вт"],
+      "mustNotMatchRegex": ["\\b8\\s*вт\\b"]
+    },
+    {
+      "id": "ob10",
+      "block": 2,
+      "category": "power",
+      "question": "Потребляемая мощность в режиме «Регенерации» осушителя?",
+      "mustMatchRegex": ["540\\s*вт"],
+      "mustNotMatchRegex": ["810\\s*вт", "\\b8\\s*вт"]
+    },
+    {
+      "id": "ob11",
+      "block": 2,
+      "category": "trap",
+      "question": "Сколько ватт потребляет шкаф в режиме хранения, если азот и подогрев выключены?",
+      "mustMatchRegex": ["8\\s*вт"],
+      "mustNotMatchRegex": ["810\\s*вт"]
+    },
+    {
+      "id": "ob12",
+      "block": 3,
+      "category": "safety",
+      "question": "Из шкафа пошёл дым и запах гари. Что оператор должен сделать в первую очередь?",
+      "mustMatchRegex": ["отключ|немедленн|2\\.4"],
+      "mustNotContain": ["можно продолж"]
+    },
+    {
+      "id": "ob13",
+      "block": 3,
+      "category": "safety",
+      "question": "Можно ли выключить шкаф от сети во время регенерации осушителя?",
+      "mustMatchRegex": ["запрещ|ЗАПРЕЩ"],
+      "mustNotMatchRegex": ["можно\\s+выключ"]
+    },
+    {
+      "id": "ob14",
+      "block": 3,
+      "category": "procedure",
+      "question": "Сколько минут длится полный цикл регенерации цеолита?",
+      "mustMatchRegex": ["60\\s*[±\\+-]?\\s*1?\\s*мин"],
+      "mustNotMatchRegex": ["^Поглотитель влаги"]
+    },
+    {
+      "id": "ob15",
+      "block": 3,
+      "category": "procedure",
+      "question": "Нужно ли отключать шкаф от 220 В перед визуальным осмотром заземления?",
+      "mustMatchRegex": ["отключ|220|2\\.2\\.2"],
+      "mustNotMatchRegex": ["можно\\s+под\\s+напряжен|без\\s+отключ"]
+    },
+    {
+      "id": "ob16",
+      "block": 3,
+      "category": "procedure",
+      "question": "Как часто по регламенту ТО заменять блок осушения (цеолит)?",
+      "mustMatchRegex": ["36\\s*месяц|тридцать\\s*шесть"]
+    },
+    {
+      "id": "ob17",
+      "block": 4,
+      "category": "reasoning",
+      "question": "120 кг равномерно на двух усиленных полках — выдержит ли шкаф SDB1106NM?",
+      "mustMatchRegex": ["выдерж|не\\s+превыш|60\\s*кг"],
+      "mustNotMatchRegex": ["нельзя\\s+допускать\\s+такую\\s+загрузку"]
+    },
+    {
+      "id": "ob18",
+      "block": 4,
+      "category": "reasoning",
+      "question": "150 кг на трёх стандартных полках равномерно — допустима ли такая загрузка?",
+      "mustMatchRegex": ["превыш|нельзя|не\\s+допуст|50\\s*кг"]
+    },
+    {
+      "id": "ob19",
+      "block": 4,
+      "category": "disambiguation",
+      "question": "Какой шаг установки влажности в процентах RH поддерживает шкаф?",
+      "mustMatchRegex": ["0[,.]1\\s*%|0,1|шаг"],
+      "mustNotMatchRegex": ["180\\s*кг", "1204\\s*мм"]
+    },
+    {
+      "id": "ob20",
+      "block": 4,
+      "category": "disambiguation",
+      "question": "Производитель датчика RH внутри камеры — Siemens или Honeywell?",
+      "mustMatchRegex": ["не\\s+указан|не\\s+привед|бренд|производител"]
+    },
+    {
+      "id": "ob21",
+      "block": 5,
+      "category": "gate",
+      "question": "Как сварить алюминиевый профиль TIG?",
+      "mustMatchRegex": ["SDB1106NM|шкаф|сух\\w*\\s+хранен|отвечаю\\s+только"],
+      "mustNotMatchRegex": ["tig|сварк|аргон"]
+    },
+    {
+      "id": "ob22",
+      "block": 5,
+      "category": "gate",
+      "question": "Напиши на Python скрипт сортировки массива",
+      "mustMatchRegex": ["SDB1106NM|шкаф|отвечаю\\s+только"],
+      "mustNotContain": ["def ", "sort("]
+    },
+    {
+      "id": "ob23",
+      "block": 5,
+      "category": "foreign",
+      "question": "Какая потребляемая мощность у шкафа SDB302?",
+      "mustMatchRegex": ["SDB1106NM|только|не\\s+могу|не\\s+отвеч"],
+      "mustNotMatchRegex": ["\\b8\\s*вт", "\\b810\\s*вт"]
+    },
+    {
+      "id": "ob24",
+      "block": 5,
+      "category": "foreign",
+      "question": "Масса шкафа SDB702NM в килограммах?",
+      "mustMatchRegex": ["SDB1106NM|только|не\\s+могу|не\\s+отвеч|другой\\s+модел"],
+      "mustNotMatchRegex": ["\\b180\\s*кг"]
+    },
+    {
+      "id": "ob25",
+      "block": 6,
+      "category": "climate",
+      "question": "Допустимый диапазон температуры окружающего воздуха при эксплуатации SDB1106NM?",
+      "mustMatchRegex": ["15", "35"]
+    },
+    {
+      "id": "ob26",
+      "block": 6,
+      "category": "climate",
+      "question": "Климатическое исполнение шкафа по ГОСТ 15150?",
+      "mustMatchRegex": ["ухл|4[,.]2"],
+      "mustNotMatchRegex": ["не\\s+содержит|нельзя\\s+ответить"]
+    },
+    {
+      "id": "ob27",
+      "block": 6,
+      "category": "kit",
+      "question": "Сколько перфорированных полок в базовой поставке SDB1106NM?",
+      "mustMatchRegex": ["10\\s*шт|перфорир"],
+      "mustNotMatchRegex": ["\\b4\\s*шт"]
+    },
+    {
+      "id": "ob28",
+      "block": 6,
+      "category": "location",
+      "question": "Где находится основной тумблер ВКЛ/ВЫКЛ питания шкафа?",
+      "mustMatchRegex": ["кожух|осушител|тумблер|задн|2\\.2\\.3"],
+      "mustNotMatchRegex": ["^Напряжение питающей сети"]
+    },
+    {
+      "id": "ob29",
+      "block": 2,
+      "category": "power-trap",
+      "question": "Потребляемая мощность в режиме «Хранения» только с подогревом воздуха, без подачи азота?",
+      "mustMatchRegex": ["8\\s*вт"],
+      "mustNotMatchRegex": ["810\\s*вт"]
+    },
+    {
+      "id": "ob30",
+      "block": 4,
+      "category": "constraint",
+      "question": "Можно ли использовать шкаф SDB1106NM для повышения влажности внутри камеры?",
+      "mustMatchRegex": ["не\\s+предназнач|не\\s+может\\s+превыш|окружающ"],
+      "mustNotMatchRegex": ["можно\\s+повысить|увлажнител"]
+    }
+  ]
+}

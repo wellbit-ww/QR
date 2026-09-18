@@ -8,6 +8,8 @@ const {
   tryDeterministicSdb1106nmAnswer,
   extractSafetyDocExcerpt,
 } = require("./sdb1106nm-direct-facts");
+const { isContactSupportQuery } = require("./sdb1106nm-query-variants");
+const { buildPortalContactSupportAnswer } = require("./portal-contact-support-answer");
 const { ROUTES, computeRegexRouteDecision } = require("./router/query-router");
 
 const CHATTER_ONLY_RE =
@@ -21,7 +23,7 @@ const SCOPE_REJECT_REPLY =
 
 /** Тематика шкафа / РЭ — широкий whitelist домена сухого хранения. */
 const IN_SCOPE_WHITELIST_RE =
-  /(?:влажност|%?\s*rh\b|осуш|регенерац|хранен|полк|нагрузк|мощност|потребля|ттх|характеристик|напряжен|питани|азот|n₂|n2|подогрев|esd|заземл|антистат|включ|запуск|подготов|неисправ|не\s+работ|ошибк|сбой|эксплуатац|условия\s+эксплуатац|комплект|поставк|dry\s*storage|программ|sdb1106|шкаф|сух\w*\s+хранен|осушител|дешикатор|уплотнител|двер|индикатор|режим\s+работ|температур|габарит|масса|вес|степень\s+защиты|\bip\d|частот|\bгц\b|ethernet|сеть|табл|пункт|раздел|дым|гар[иью]|безопасност|эвакуац|обслужив|замен|ресурс|осмотр|проверк|настройк|меню|кнопк|кабель|тумблер|220|вольт|ом\b|браслет|кожух|осушени|регенерац|влажност|rh\b|2\.\d|1\.1|цвет|ral|покрыт|порошков|освещ|опци|цеолит|поглотител|спирт|протир|смотров|погруз|разгруз|звук|сигнализац|взрыво|легковоспламен|калибр|колес|колёс|выключател|перепад|стабилиз|конвекц|выдвижн|укорочен|вырез|поражен|электрическ|изделие|пиков)/iu;
+  /(?:влажност|%?\s*rh\b|осуш|регенерац|хранен|полк|нагрузк|мощност|потребля|ттх|характеристик|напряжен|питани|азот|n₂|n2|подогрев|esd|заземл|антистат|включ|запуск|подготов|неисправ|не\s+работ|ошибк|сбой|эксплуатац|условия\s+эксплуатац|комплект|поставк|dry\s*storage|программ|sdb1106|шкаф|сух\w*\s+хранен|осушител|дешикатор|уплотнител|двер|индикатор|режим\s+работ|температур|габарит|масса|вес|степень\s+защиты|\bip\d|\bip\b|частот|\bгц\b|ethernet|сеть|табл|пункт|раздел|дым|гар[иью]|безопасност|эвакуац|обслужив|замен|ресурс|осмотр|проверк|настройк|меню|кнопк|кабель|тумблер|рубильник|220|вольт|ом\b|браслет|кожух|осушени|регенерац|влажност|rh\b|2\.\d|1\.1|цвет|ral|покрыт|порошков|освещ|опци|цеолит|поглотител|спирт|растворител|горюч|гранулят|наполнител|паспорт|книжк|ухл|климат|15150|простой\s+режим|коробк|завод|пищит|пищ|жр[её]т|протир|смотров|погруз|разгруз|звук|сигнализац|взрыво|легковоспламен|калибр|колес|колёс|выключател|перепад|стабилиз|конвекц|выдвижн|укорочен|вырез|поражен|электрическ|изделие|пиков|датчик|сенсор|функци|назначен|измер|контрол|индикац|производител|бренд)/iu;
 
 /** Жёсткий blacklist: другое оборудование, общий чат, код, нерелевантные темы. */
 const OFF_TOPIC_BLACKLIST_RE =
@@ -32,7 +34,7 @@ const GREETING_ONLY_RE =
 
 /** Короткий уточняющий вопрос без доменных слов — допустим после in-scope истории. */
 const FOLLOWUP_ONLY_RE =
-  /^(?:а\s+)?(?:если|когда|сколько|почему|зачем|как\s+именно|уточни|подробнее|ещё\s+раз|еще\s+раз|с\s+опци|без\s+опци|да|нет)[\s\S]{0,120}[?.!…]*$/iu;
+  /^(?:а\s+|и\s+)?(?:если|когда|сколько|почему|зачем|как\s+именно|какие|какой|какова|что|расскаж|опиш|перечисл|уточни|подробнее|ещё\s+раз|еще\s+раз|с\s+опци|без\s+опци|да|нет)[\s\S]{0,120}[?.!…]*$/iu;
 
 const SDB1106NM_EQUIPMENT_STUB = { id: "sdb1106-nm", name: "SDB1106NM" };
 
@@ -57,12 +59,17 @@ function matchesInScopeWhitelist(text) {
   return IN_SCOPE_WHITELIST_RE.test(String(text || ""));
 }
 
-function isOffTopic(message, history) {
+function isOffTopic(message, history, { equipmentChatScoped = false } = {}) {
   const q = String(message || "").trim();
 
   // Blacklist / приветствие на текущем сообщении — всегда стоп (история не отменяет).
   if (OFF_TOPIC_BLACKLIST_RE.test(q) || GREETING_ONLY_RE.test(q)) {
     return true;
+  }
+
+  // В чате, уже привязанном к SDB1106NM, не отсекаем бытовые формулировки без слова «шкаф».
+  if (equipmentChatScoped && q.length >= 6) {
+    return false;
   }
 
   // Текущее сообщение явно про шкаф / РЭ.
@@ -103,18 +110,26 @@ function isSafetyTopic(message) {
  * @param {{ history?: Array<{ role: string, content: string }> }} [options]
  * @returns {{ action: string, reason: string, reply?: string }}
  */
-function classifySdb1106nmMessage(message, { history = [] } = {}) {
+function classifySdb1106nmMessage(message, { history = [], equipmentChatScoped = false } = {}) {
   const q = String(message || "").trim();
 
   if (detectForeignSdbModelQuery(q)) {
     return { action: "FOREIGN_MODEL", reason: "foreign_sdb_model", reply: FOREIGN_MODEL_REPLY };
   }
 
+  if (isContactSupportQuery(q)) {
+    return {
+      action: "CONTACT_SUPPORT",
+      reason: "portal_contact_support",
+      reply: buildPortalContactSupportAnswer(),
+    };
+  }
+
   if (CHATTER_ONLY_RE.test(q)) {
     return { action: "CHATTER", reason: "chatter_only", reply: CHATTER_REPLY };
   }
 
-  if (isOffTopic(q, history)) {
+  if (isOffTopic(q, history, { equipmentChatScoped })) {
     return { action: "OFF_TOPIC", reason: "off_topic_blacklist", reply: SCOPE_REJECT_REPLY };
   }
 

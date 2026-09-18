@@ -29,18 +29,29 @@ const PROCEDURAL_RE =
 const TROUBLESHOOTING_RE =
   /(?:не\s+работ|не\s+запуска|не\s+включ|не\s+осуш|не\s+выходит|не\s+достигает|не\s+держ|нет\s+связ|пропада(?:ет|ть)|ошибк|сбой|неисправ|пищит|сигнал|мигает|горит)/iu;
 const REASONING_RE =
-  /(?:почему|что\s+произойдет|что\s+будет|если|при|после|вследствие|приводит)/iu;
+  /(?:почему|что\s+произойдет|что\s+будет|если\b|(?<![\p{L}])при(?![\p{L}])|после|вследствие|приводит)/iu;
 const SAFETY_RE =
   /(?:авар|дым|огонь|пожар|эваку|угроз|коротк|замыкан|чп|тб|безопасност|задымлен|вспышк)/iu;
 const EMERGENCY_SMOKE_RE = /дым|задымлен|вспышк|искр[аы]\s+в\s+шкаф|появил[а-яё]*\s+дым/i;
 const REGENERATION_SHUTDOWN_RE =
   /(?:выключ|отключ|обесточ|снять\s+питан|выруб|отключить\s+питан|можно\s+ли\s+выключ)/iu;
 
+/** «Как проверить сигнализацию» — процедура, не неисправность. */
+function isSoundAlarmProceduralCheckQuery(q) {
+  const s = String(q || "");
+  return (
+    /как\s+(?:проверить|проверка)|работоспособност|проверить\s+работ/i.test(s) &&
+    /сигнал|звук|сигнализац/i.test(s) &&
+    !/не\s+работ|не\s+срабатыв|постоянн|без\s+причин|пищит\s+без|почему/i.test(s)
+  );
+}
+
 const {
   isEmergencySmokeQuery,
   isRegenerationShutdownQuery,
   sectionHintsForQuery,
 } = require("../safety-query-scope");
+const { isShelfConvectionSpacingQuery } = require("../sdb1106nm-query-variants");
 const { troubleshootingSectionHintsForQuery } = require("../troubleshooting-scope");
 const { isMaintenanceQuery, maintenanceSectionHintsForQuery } = require("../maintenance-scope");
 const { resolveNormalIndicatorMode } = require("../indicator-scope");
@@ -62,6 +73,7 @@ function computeRegexRouteDecision({ query, history, equipmentId, equipment }) {
   const symptomTroubleshootingLike =
     symptoms.length > 0 &&
     /почему|причин|провер|пропада|не\s+|нет\s+/iu.test(q) &&
+    !isSoundAlarmProceduralCheckQuery(q) &&
     !emergencySmoke &&
     !regenerationShutdown;
   const normalIndicator = resolveNormalIndicatorMode(q);
@@ -149,6 +161,26 @@ function computeRegexRouteDecision({ query, history, equipmentId, equipment }) {
     };
   }
 
+  if (
+    isShelfConvectionSpacingQuery(q) &&
+    !troubleshootingLike &&
+    !emergencySmoke &&
+    !regenerationShutdown
+  ) {
+    return {
+      intent: "PROCEDURE_QUERY",
+      route: ROUTES.PROCEDURAL_QA,
+      focusParameter: null,
+      symptom,
+      confidence: 0.9,
+      retrievalMode: "procedural_focused",
+      sectionHints: ["2.1", "1.1.2.8", "полк", "конвекция", "50 мм"],
+      symptoms,
+      parameterResolved: null,
+      originalQuery: q,
+    };
+  }
+
   if (parameterResolved && pureParameterQuestion && !troubleshootingLike && !reasoningLike) {
     return {
       intent: "SINGLE_FIELD_QUERY",
@@ -157,6 +189,21 @@ function computeRegexRouteDecision({ query, history, equipmentId, equipment }) {
       symptom,
       confidence: 0.92,
       retrievalMode: "hybrid_wide",
+      symptoms,
+      parameterResolved,
+      originalQuery: q,
+    };
+  }
+
+  if (isSoundAlarmProceduralCheckQuery(q) && !emergencySmoke && !regenerationShutdown) {
+    return {
+      intent: "PROCEDURE_QUERY",
+      route: ROUTES.PROCEDURAL_QA,
+      focusParameter,
+      symptom,
+      confidence: 0.88,
+      retrievalMode: "procedural_focused",
+      sectionHints: ["1.1.4.3.4", "2.2.2.3", "двер", "звук"],
       symptoms,
       parameterResolved,
       originalQuery: q,
@@ -239,6 +286,12 @@ function computeRegexRouteDecision({ query, history, equipmentId, equipment }) {
   };
 }
 
+function looksLikeEmergencySafetyQuery(q) {
+  return /дым|пожар|гарь|задымлен|вспышк|авар(?:ия|ийн)|эваку|угроз|замыкан|травм|ожог|искрен|охран[ае]\s+труда|\bтб\b|ч\s*п\./iu.test(
+    String(q || "")
+  );
+}
+
 function overlayLlmRoute(base, llmRoute) {
   if (!llmRoute || llmRoute === ROUTES.UNKNOWN) {
     return base;
@@ -252,11 +305,20 @@ function overlayLlmRoute(base, llmRoute) {
       retrievalMode: "hybrid_wide",
     };
   }
+  if (llmRoute === ROUTES.SAFETY_QA && !looksLikeEmergencySafetyQuery(base.originalQuery)) {
+    return {
+      ...base,
+      route: ROUTES.UNKNOWN,
+      intent: base.intent && base.intent !== "SAFETY_QUERY" ? base.intent : "FACT_QUERY",
+      confidence: Math.max(Number(base.confidence) || 0.5, 0.72),
+      retrievalMode: "hybrid_wide",
+    };
+  }
   const retrievalModeMap = {
     [ROUTES.PROCEDURAL_QA]: "procedural_focused",
     [ROUTES.TROUBLESHOOTING_QA]: "troubleshooting_focused",
     [ROUTES.REASONING_QA]: "reasoning_causal",
-    [ROUTES.SAFETY_QA]: "safety_checklist",
+    [ROUTES.SAFETY_QA]: "safety_grounded",
   };
   const intentMap = {
     [ROUTES.PROCEDURAL_QA]: "PROCEDURE_QUERY",
@@ -270,6 +332,7 @@ function overlayLlmRoute(base, llmRoute) {
     intent: intentMap[llmRoute] || base.intent,
     confidence: Math.max(Number(base.confidence) || 0.5, 0.78),
     retrievalMode: retrievalModeMap[llmRoute] || base.retrievalMode || "hybrid",
+    ...(llmRoute === ROUTES.SAFETY_QA ? { safetyAnswerMode: "grounded_text" } : {}),
   };
 }
 
@@ -294,4 +357,5 @@ module.exports = {
   ROUTES,
   routeQuery,
   computeRegexRouteDecision,
+  overlayLlmRoute,
 };

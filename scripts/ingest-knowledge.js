@@ -1,3 +1,5 @@
+require("./load-env-file").loadEnvFile();
+
 const fs = require("fs/promises");
 const fsSync = require("fs");
 const path = require("path");
@@ -20,6 +22,7 @@ const {
   extractEquipmentModelIdentifiers,
 } = require("../src/rag/chunking");
 const { embedText, embedTextsBatch, vectorToSqlLiteral } = require("../src/rag/embeddings");
+const { shouldSkipSdb151FamilyBinary } = require("./knowledge-content-loader");
 
 const ROOT_DIR = path.join(__dirname, "..");
 const KNOWLEDGE_DIR = path.join(ROOT_DIR, "knowledge");
@@ -154,6 +157,10 @@ async function loadEquipmentDocuments(equipment) {
   const fileRefs = await collectKnowledgeFiles(equipmentDir);
 
   for (const { absolutePath, relativePath, ext } of fileRefs) {
+    if (shouldSkipSdb151FamilyBinary(equipment.id, relativePath, fileRefs)) {
+      console.log(`[INGEST] ${equipment.id}: skip family ${relativePath} (scoped SDB151NM.md present)`);
+      continue;
+    }
     let content = "";
 
     try {
@@ -163,6 +170,11 @@ async function loadEquipmentDocuments(equipment) {
         `[INGEST] Skipped ${equipment.id}/${relativePath}:`,
         error instanceof Error ? error.message : error
       );
+      continue;
+    }
+
+    if (!String(content || "").trim()) {
+      console.warn(`[INGEST] Skipped ${equipment.id}/${relativePath}: no extractable text`);
       continue;
     }
 
@@ -215,8 +227,15 @@ async function embedTextsWithFallback(config, texts) {
   }
 }
 
+function isRetrievalCardSource(sourceDoc) {
+  return /(?:^|\/)retrieval-cards\//i.test(String(sourceDoc || "").replace(/\\/g, "/"));
+}
+
 function enrichChunkRowMetadata(content, baseMeta, sourceDoc, chunkIndex) {
   const meta = { ...baseMeta };
+  if (isRetrievalCardSource(sourceDoc)) {
+    meta.retrievalCard = true;
+  }
   if (Array.isArray(meta.structuredParameters) && meta.structuredParameters.length > 0) {
     meta.structuredParameters = meta.structuredParameters.map((entry) => ({
       parameterKey: entry.parameterKey || null,
@@ -289,6 +308,9 @@ async function deleteEquipmentChunks(pool, equipmentId) {
 
 async function main() {
   const forceReindex = process.argv.includes("--force");
+  const onlyArg = process.argv.find((a) => String(a).startsWith("--only="));
+  const onlyId = onlyArg ? String(onlyArg).slice("--only=".length).trim() : "";
+  void forceReindex;
   const config = getRagConfig();
   const pool = getPool(config.postgresUrl);
 
@@ -303,10 +325,14 @@ async function main() {
 
   let totalChunks = 0;
   for (const equipment of Object.values(equipmentCatalog)) {
+    if (onlyId && equipment.id !== onlyId) {
+      continue;
+    }
     const docs = await loadEquipmentDocuments(equipment);
     console.log(`[INGEST] Equipment ${equipment.id}: docs=${docs.length}`);
 
     for (const doc of docs) {
+      const retrievalCard = isRetrievalCardSource(doc.sourceDoc);
       const usePc = Boolean(config.useParentChildChunking);
       let chunkObjs = usePc
         ? splitDocumentIntoParentChildChunkRecords(doc.content, equipment, {
@@ -325,27 +351,35 @@ async function main() {
           `[INGEST] ${equipment.id}/${doc.sourceDoc}: +${atomicSafety.length} atomic safety (ЗАПРЕЩАЕТСЯ) chunks`
         );
       }
-      const faultTableChunks = extractFaultTableTextChunks(doc.content, {
-        equipmentName: equipment.name,
-      });
+      const faultTableChunks = retrievalCard
+        ? []
+        : extractFaultTableTextChunks(doc.content, {
+            equipmentName: equipment.name,
+          });
       if (faultTableChunks.length) {
         chunkObjs = [...chunkObjs, ...faultTableChunks];
         console.log(
           `[INGEST] ${equipment.id}/${doc.sourceDoc}: +${faultTableChunks.length} fault table (3.1.4 / табл. 3.2) chunks`
         );
       }
-      const possibleFaultsChunks = extractPossibleFaultsListChunks(doc.content, {
-        equipmentName: equipment.name,
-      });
+      const possibleFaultsChunks =
+        equipment.id === "sdb151-nm" || retrievalCard
+          ? []
+          : extractPossibleFaultsListChunks(doc.content, {
+              equipmentName: equipment.name,
+            });
       if (possibleFaultsChunks.length) {
         chunkObjs = [...chunkObjs, ...possibleFaultsChunks];
         console.log(
           `[INGEST] ${equipment.id}/${doc.sourceDoc}: +${possibleFaultsChunks.length} possible-faults list (2.2.2 / humidity checks) chunks`
         );
       }
-      const specFlatChunks = extractSpecTableFlattenedChunks(doc.content, {
-        equipmentName: equipment.name,
-      });
+      const specFlatChunks =
+        equipment.id === "sdb151-nm" || retrievalCard
+          ? []
+          : extractSpecTableFlattenedChunks(doc.content, {
+              equipmentName: equipment.name,
+            });
       if (specFlatChunks.length) {
         chunkObjs = [...chunkObjs, ...specFlatChunks];
         console.log(
@@ -407,6 +441,36 @@ async function main() {
 
           totalChunks += 1;
         }
+      }
+
+      if (equipment.id === "w-700") {
+        const staleIdx = await pool.query(
+          `DELETE FROM knowledge_chunks
+           WHERE equipment_id = $1
+             AND source_doc = $2
+             AND chunk_index >= $3`,
+          [equipment.id, doc.sourceDoc, chunkObjs.length]
+        );
+        if (staleIdx.rowCount) {
+          console.log(
+            `[INGEST] ${equipment.id}/${doc.sourceDoc}: removed ${staleIdx.rowCount} leftover chunk indices`
+          );
+        }
+      }
+    }
+
+    if (equipment.id === "sdb151-nm" && docs.length) {
+      const keep = docs.map((d) => d.sourceDoc);
+      const stale = await pool.query(
+        `DELETE FROM knowledge_chunks
+         WHERE equipment_id = $1
+           AND NOT (source_doc = ANY($2::text[]))`,
+        [equipment.id, keep]
+      );
+      if (stale.rowCount) {
+        console.log(
+          `[INGEST] sdb151-nm: removed ${stale.rowCount} leftover chunks not in current sources`
+        );
       }
     }
   }

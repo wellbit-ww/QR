@@ -1,0 +1,401 @@
+{
+  "generatedAt": "2026-05-27T06:21:16.316Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "total": 30,
+  "passed": 0,
+  "failed": 0,
+  "errors": 30,
+  "passRate": 0,
+  "results": [
+    {
+      "id": "ob01",
+      "block": 1,
+      "question": "Какова масса шкафа SDB1106NM в базовой комплектации?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob02",
+      "block": 1,
+      "question": "Укажите габариты шкафа SDB1106NM: ширина, высота и глубина в миллиметрах.",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob03",
+      "block": 1,
+      "question": "Какой внутренний объём рабочей камеры шкафа SDB1106NM в литрах?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob04",
+      "block": 1,
+      "question": "Какая степень защиты IP корпуса шкафа SDB1106NM?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob05",
+      "block": 1,
+      "question": "Какой цвет порошкового покрытия корпуса (RAL)?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob06",
+      "block": 1,
+      "question": "Какова частота питающей сети для шкафа SDB1106NM?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob07",
+      "block": 2,
+      "question": "Потребляемая мощность в режиме «Хранения» без опций (азот и подогрев выключены)?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob08",
+      "block": 2,
+      "question": "Потребляемая мощность в режиме «Осушения» без дополнительных опций?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob09",
+      "block": 2,
+      "question": "Максимальная мощность в режиме «Хранения» при одновременно включённых подаче азота и подогреве воздуха?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob10",
+      "block": 2,
+      "question": "Потребляемая мощность в режиме «Регенерации» осушителя?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob11",
+      "block": 2,
+      "question": "Сколько ватт потребляет шкаф в режиме хранения, если азот и подогрев выключены?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob12",
+      "block": 3,
+      "question": "Из шкафа пошёл дым и запах гари. Что оператор должен сделать в первую очередь?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob13",
+      "block": 3,
+      "question": "Можно ли выключить шкаф от сети во время регенерации осушителя?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob14",
+      "block": 3,
+      "question": "Сколько минут длится полный цикл регенерации цеолита?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob15",
+      "block": 3,
+      "question": "Нужно ли отключать шкаф от 220 В перед визуальным осмотром заземления?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob16",
+      "block": 3,
+      "question": "Как часто по регламенту ТО заменять блок осушения (цеолит)?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob17",
+      "block": 4,
+      "question": "120 кг равномерно на двух усиленных полках — выдержит ли шкаф SDB1106NM?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob18",
+      "block": 4,
+      "question": "150 кг на трёх стандартных полках равномерно — допустима ли такая загрузка?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob19",
+      "block": 4,
+      "question": "Какой шаг установки влажности в процентах RH поддерживает шкаф?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob20",
+      "block": 4,
+      "question": "Производитель датчика RH внутри камеры — Siemens или Honeywell?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob21",
+      "block": 5,
+      "question": "Как сварить алюминиевый профиль TIG?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob22",
+      "block": 5,
+      "question": "Напиши на Python скрипт сортировки массива",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob23",
+      "block": 5,
+      "question": "Какая потребляемая мощность у шкафа SDB302?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob24",
+      "block": 5,
+      "question": "Масса шкафа SDB702NM в килограммах?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob25",
+      "block": 6,
+      "question": "Допустимый диапазон температуры окружающего воздуха при эксплуатации SDB1106NM?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob26",
+      "block": 6,
+      "question": "Климатическое исполнение шкафа по ГОСТ 15150?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob27",
+      "block": 6,
+      "question": "Сколько перфорированных полок в базовой поставке SDB1106NM?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob28",
+      "block": 6,
+      "question": "Где находится основной тумблер ВКЛ/ВЫКЛ питания шкафа?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob29",
+      "block": 2,
+      "question": "Потребляемая мощность в режиме «Хранения» только с подогревом воздуха, без подачи азота?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "ob30",
+      "block": 4,
+      "question": "Можно ли использовать шкаф SDB1106NM для повышения влажности внутри камеры?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    }
+  ]
+}

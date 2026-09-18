@@ -83,7 +83,9 @@ async function unifiedRetrieve({
         maintenanceSections: routerDecision?.intent === "MAINTENANCE_QUERY",
         indicatorNormalMode: Boolean(routerDecision?.indicatorNormalMode),
         table11Flatten:
-          equipmentId === "sdb1106-nm"
+          equipmentId === "sdb151-nm"
+            ? false
+            : equipmentId === "sdb1106-nm"
             ? shouldInjectTable11(query, routerDecision) ||
               routerDecision?.focusParameter === "dimensions" ||
               routerDecision?.focusParameter === "load" ||
@@ -93,6 +95,7 @@ async function unifiedRetrieve({
               /масс|габарит|ширин|высот|глубин|таблиц[аы]?\s*1\.1|1\.1\.2\.8/i.test(String(query || "")),
         p1GoldenFacts:
           equipmentId === "sdb1106-nm" && shouldInjectP1GoldenFacts(query, routerDecision),
+        sdb302RetrievalCards: equipmentId === "w-700",
       },
     },
   });

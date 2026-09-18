@@ -1,0 +1,165 @@
+const { getRagConfig } = require("./config");
+const { runGuardrails } = require("./guardrails/guardrail-engine");
+const { validateSdb151nmAnswerAgainstContext } = require("./sdb151nm-answer-validation");
+const { tryDeterministicSdb151nmAnswer } = require("./sdb151nm-direct-facts");
+const {
+  buildValidationIntent,
+  resolveAbstainAnswer,
+} = require("./sdb1106nm-post-gate");
+const { STRICT_ABSTAIN } = require("./prompts");
+
+const ragConfig = getRagConfig();
+const RECOVERY_FAILURE_CODES = new Set([
+  "foreign_model_mention_other_sdb",
+  "foreign_model_numeric_leak",
+  "unconfirmed_sdb151_model_parameter",
+  "invented_base_delivery_item",
+  "invented_sdb151_base_wheels",
+  "invented_sdb151_heating_option",
+  "invented_procedure_step",
+  "invented_procedure_steps",
+  "invented_door_opening_procedure",
+  "unsupported_spec_in_answer",
+]);
+
+function hasRecoverableValidationFailure(validation) {
+  return (validation.failures || []).some((f) => RECOVERY_FAILURE_CODES.has(f.detail));
+}
+
+function applyDeterministicRecovery(message, context, intent, history = []) {
+  const det = tryDeterministicSdb151nmAnswer(message, { history });
+  if (!det) {
+    return null;
+  }
+  const validation = validateSdb151nmAnswerAgainstContext(det, context, intent);
+  if (!validation.ok) {
+    return null;
+  }
+  return { answer: det, validation };
+}
+
+function applySdb151nmPostGate({
+  answer,
+  context,
+  message,
+  equipment,
+  deliveryMethod = "standard",
+  semanticSimilarity = 1,
+  gateAction,
+  routerDecision,
+  retrieval,
+  history = [],
+}) {
+  const answerText = String(answer || "").trim();
+  if (deliveryMethod === "rag_deterministic" || deliveryMethod === "direct_deterministic") {
+    return {
+      answer: answerText || STRICT_ABSTAIN,
+      guardrails: { action: "ALLOW", passed: true, reason: "trusted_sdb151_deterministic_fact" },
+      validation: { ok: true, failures: [], warnings: [] },
+      postGateTrace: {
+        postGate: "sdb151-nm",
+        guardrailsAction: "ALLOW",
+        validationOk: true,
+        deterministicTrusted: true,
+      },
+    };
+  }
+
+  const intent = buildValidationIntent({
+    message,
+    equipment,
+    gateAction,
+    routerDecision,
+    retrieval,
+  });
+
+  const originalValidation = validateSdb151nmAnswerAgainstContext(answerText, context, intent);
+  if (hasRecoverableValidationFailure(originalValidation)) {
+    const recovery = applyDeterministicRecovery(message, context, intent, history);
+    if (recovery) {
+      return {
+        answer: recovery.answer,
+        guardrails: {
+          action: "ALLOW",
+          passed: true,
+          reason: "sdb151_deterministic_recovery_pre_guardrails",
+        },
+        validation: recovery.validation,
+        intent,
+        postGateTrace: {
+          postGate: "sdb151-nm",
+          postGateApplied: true,
+          guardrailsAction: "ALLOW",
+          validationOk: true,
+          deterministicRecovery: true,
+          mode: "RAG_DETERMINISTIC_RECOVERY",
+        },
+      };
+    }
+  }
+
+  const guardrails = runGuardrails({
+    answer,
+    retrievalContext: context,
+    intent,
+    hints: {
+      deliveryMethod,
+      semanticSimilarity,
+      semanticRescueThreshold: ragConfig.semanticRescueThreshold,
+      originalQuery: message,
+      validationProfile: "sdb151",
+    },
+  });
+
+  const candidate =
+    guardrails.action === "ALLOW" && guardrails.passed
+      ? String(guardrails.outputText || answer || "").trim()
+      : resolveAbstainAnswer(message, intent, equipment, history);
+
+  const validation = validateSdb151nmAnswerAgainstContext(candidate, context, intent);
+  let finalAnswer = validation.ok ? candidate : resolveAbstainAnswer(message, intent, equipment, history);
+  let recoveryApplied = false;
+
+  if (!validation.ok && hasRecoverableValidationFailure(validation)) {
+    const recovery = applyDeterministicRecovery(message, context, intent, history);
+    if (recovery) {
+      finalAnswer = recovery.answer;
+      recoveryApplied = true;
+      return {
+        answer: finalAnswer,
+        guardrails,
+        validation: recovery.validation,
+        intent,
+        postGateTrace: {
+          postGate: "sdb151-nm",
+          postGateApplied: true,
+          guardrailsAction: guardrails.action,
+          guardrailReason: guardrails.reason,
+          semanticRescue: Boolean(guardrails.semanticRescue),
+          validationOk: true,
+          deterministicRecovery: true,
+          mode: "RAG_DETERMINISTIC_RECOVERY",
+        },
+      };
+    }
+  }
+
+  return {
+    answer: finalAnswer,
+    guardrails,
+    validation,
+    intent,
+    postGateTrace: {
+      postGate: "sdb151-nm",
+      postGateApplied: true,
+      guardrailsAction: guardrails.action,
+      guardrailReason: guardrails.reason,
+      semanticRescue: Boolean(guardrails.semanticRescue),
+      validationOk: validation.ok,
+      validationFailureCodes: (validation.failures || []).map((f) => f.code).filter(Boolean),
+      deterministicRecovery: recoveryApplied,
+    },
+  };
+}
+
+module.exports = { applySdb151nmPostGate };

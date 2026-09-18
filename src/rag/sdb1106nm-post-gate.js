@@ -7,6 +7,16 @@ const {
 } = require("./query-intent");
 const { STRICT_ABSTAIN, MODEL_PARAM_NOT_SPECIFIED } = require("./prompts");
 const { tryDeterministicSdb1106nmAnswer } = require("./sdb1106nm-direct-facts");
+const { resolveGoldenFactKey } = require("./sdb1106nm-golden-facts");
+const {
+  deGoldenizeUserFacingAnswer,
+  answerHasForeignScriptLeak,
+} = require("./sdb1106nm-answer-format");
+const {
+  isUnsupportedReplacementQuery,
+  buildUnsupportedReplacementAnswer,
+  modelNameFromEquipment,
+} = require("./unsupported-replacement-scope");
 
 const ragConfig = getRagConfig();
 
@@ -67,7 +77,14 @@ function buildValidationIntent({ message, equipment, gateAction, routerDecision,
   };
 }
 
-function resolveAbstainAnswer(message, intent) {
+function resolveAbstainAnswer(message, intent, equipment = null, history = []) {
+  if (isUnsupportedReplacementQuery(message, history)) {
+    return buildUnsupportedReplacementAnswer(
+      modelNameFromEquipment(equipment),
+      message,
+      history,
+    );
+  }
   if (
     intent.intentType === "SINGLE_FIELD_QUERY" ||
     intent.intentType === "QUICK_FACT_QUERY" ||
@@ -78,22 +95,24 @@ function resolveAbstainAnswer(message, intent) {
   return STRICT_ABSTAIN;
 }
 
-function outboundFromGuardrails(guardrails, fallbackAnswer, message, intent) {
+function outboundFromGuardrails(guardrails, fallbackAnswer, message, intent, equipment, history) {
   if (guardrails.action === "ALLOW" && guardrails.passed) {
     const ot = guardrails.outputText;
     if (ot != null && String(ot).trim() !== "") {
       return String(ot);
     }
-    return String(fallbackAnswer || "").trim() || resolveAbstainAnswer(message, intent);
+    return String(fallbackAnswer || "").trim() || resolveAbstainAnswer(message, intent, equipment, history);
   }
   if (guardrails.action === "ABSTAIN") {
-    return resolveAbstainAnswer(message, intent);
+    return resolveAbstainAnswer(message, intent, equipment, history);
   }
-  return resolveAbstainAnswer(message, intent);
+  return resolveAbstainAnswer(message, intent, equipment, history);
 }
 
-function hasGoldenNumericMismatch(validation) {
-  return (validation.failures || []).some((f) => f.code === "golden_numeric_mismatch");
+function hasDeterministicValidationFailure(validation) {
+  return (validation.failures || []).some(
+    (f) => f.code === "golden_numeric_mismatch" || f.code === "deterministic_topic_mismatch",
+  );
 }
 
 function applyDeterministicRecovery(message, context, intent, history = []) {
@@ -102,7 +121,7 @@ function applyDeterministicRecovery(message, context, intent, history = []) {
     return null;
   }
   const revalidation = validateAnswerAgainstContext(det, context, intent);
-  if (!revalidation.ok && hasGoldenNumericMismatch(revalidation)) {
+  if (!revalidation.ok && hasDeterministicValidationFailure(revalidation)) {
     return null;
   }
   return { answer: det, validation: revalidation, guardrails: null };
@@ -144,6 +163,8 @@ function applySdb1106nmPostGate({
     retrieval,
   });
 
+  const factKey = resolveGoldenFactKey(message, history);
+
   const guardrails = runGuardrails({
     answer,
     retrievalContext: context,
@@ -152,28 +173,42 @@ function applySdb1106nmPostGate({
       deliveryMethod,
       semanticSimilarity,
       semanticRescueThreshold: ragConfig.semanticRescueThreshold,
+      originalQuery: message,
+      factKey,
     },
   });
 
-  const outboundAnswer = outboundFromGuardrails(guardrails, answer, message, intent);
+  const outboundAnswer = outboundFromGuardrails(
+    guardrails,
+    answer,
+    message,
+    intent,
+    equipment,
+    history,
+  );
   let validation = validateAnswerAgainstContext(outboundAnswer, context, intent);
-  let finalAnswer = String(outboundAnswer || "").trim() || STRICT_ABSTAIN;
+  let finalAnswer = deGoldenizeUserFacingAnswer(String(outboundAnswer || "").trim() || STRICT_ABSTAIN);
   let recoveryApplied = false;
   let recoveryFailed = false;
 
-  if (
-    !validation.ok &&
-    (hasGoldenNumericMismatch(validation) ||
-      guardrails.action === "ABSTAIN" ||
-      (validation.failures || []).some((f) => f.code === "parameter_leakage"))
-  ) {
+  const needsRecovery =
+    answerHasForeignScriptLeak(finalAnswer) ||
+    (!validation.ok &&
+      (hasDeterministicValidationFailure(validation) ||
+        guardrails.action === "ABSTAIN" ||
+        (validation.failures || []).some((f) => f.code === "parameter_leakage")));
+
+  if (needsRecovery) {
     const recovery = applyDeterministicRecovery(message, context, intent, history);
     if (recovery) {
-      finalAnswer = recovery.answer;
+      finalAnswer = deGoldenizeUserFacingAnswer(recovery.answer);
       validation = recovery.validation;
       recoveryApplied = true;
-    } else if (hasGoldenNumericMismatch(validation)) {
-      finalAnswer = resolveAbstainAnswer(message, intent);
+    } else if (hasDeterministicValidationFailure(validation)) {
+      finalAnswer = resolveAbstainAnswer(message, intent, equipment, history);
+      recoveryFailed = true;
+    } else if (answerHasForeignScriptLeak(finalAnswer)) {
+      finalAnswer = resolveAbstainAnswer(message, intent, equipment, history);
       recoveryFailed = true;
     }
   }

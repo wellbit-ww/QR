@@ -22,7 +22,7 @@ const sdb1106nmProfile = {
   deferGuardrailsToPostGate: true,
 
   classifyPreGate(message, ctx = {}) {
-    return classifySdb1106nmMessage(message, ctx);
+    return classifySdb1106nmMessage(message, { ...ctx, equipmentChatScoped: true });
   },
 
   tryDeterministicAnswer(message, ctx = {}) {

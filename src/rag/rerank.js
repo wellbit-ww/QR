@@ -548,6 +548,20 @@ function desiccantMaterialQueryBoost(chunk, queryText) {
   return docSignals ? 0.12 : 0;
 }
 
+function retrievalCardBoost(chunk, queryText) {
+  const meta = chunk?.metadata || {};
+  const fromCard =
+    meta.retrievalCard === true || /retrieval-cards/i.test(String(chunk?.sourceDoc || ""));
+  if (!fromCard) {
+    return 0;
+  }
+  const overlap = computeKeywordOverlapScore(queryText, chunk);
+  if (overlap < 0.2) {
+    return 0;
+  }
+  return 0.08 + Math.min(0.1, overlap * 0.12);
+}
+
 function modelAliasBoost(chunk, aliases, intentType) {
   if (
     intentType === "FACT_QUERY" ||
@@ -667,6 +681,7 @@ function rerankChunks(chunks, intent, opts = {}) {
     pushAdj("nitrogen_consistency", nitrogenConsistencyScore(chunk, hints));
     pushAdj("model_alias", modelAliasBoost(chunk, aliases, intentType));
     pushAdj("desiccant_material_query", desiccantMaterialQueryBoost(chunk, queryText));
+    pushAdj("retrieval_card", retrievalCardBoost(chunk, queryText));
 
     const rerankScore = Math.max(0, Math.min(1, composed));
 

@@ -1,5 +1,12 @@
 const { validateAnswerAgainstContext } = require("../answer-validation");
+const { validateSdb702nmAnswerAgainstContext } = require("../sdb702nm-answer-validation");
+const { validateSdb302nmAnswerAgainstContext } = require("../sdb302nm-answer-validation");
+const { validateSdb151nmAnswerAgainstContext } = require("../sdb151nm-answer-validation");
 const { validateGrounding } = require("../synthesis/grounding-validation");
+const {
+  goldenNumericMismatchFailures,
+  deterministicTopicMismatchFailures,
+} = require("../sdb1106nm-golden-facts");
 const { STRICT_ABSTAIN } = require("../prompts");
 const { ragInfo, ragWarn } = require("../rag-log");
 
@@ -42,6 +49,23 @@ function detectHallucinations(answer, retrievalContext) {
     suspiciousTokens: suspicious.slice(0, 25),
     ratio: Number(ratio.toFixed(3)),
   };
+}
+
+function validateForProfile(answer, retrievalContext, intent, hints = {}) {
+  if (hints.validationProfile === "sdb702") {
+    return validateSdb702nmAnswerAgainstContext(answer, retrievalContext, intent || {});
+  }
+  if (hints.validationProfile === "sdb302") {
+    return validateSdb302nmAnswerAgainstContext(answer, retrievalContext, intent || {});
+  }
+  if (hints.validationProfile === "sdb151") {
+    return validateSdb151nmAnswerAgainstContext(answer, retrievalContext, intent || {});
+  }
+  return validateAnswerAgainstContext(answer, retrievalContext, intent || {});
+}
+
+function looksLikeAbstainPhrase(text) {
+  return /информац(?:ия|ии)\s+.*отсутств|не\s+найден|недостаточно\s+данных/i.test(String(text || ""));
 }
 
 function isEffectivelyEmptyContext(retrievalContext) {
@@ -135,6 +159,30 @@ function runGuardrails({ answer, retrievalContext, intent, hints = {} }) {
   }
 
   if (deliveryMethod === "direct_deterministic" || deliveryMethod === "rag_deterministic") {
+    const query = String(intent?.originalQuery || hints.originalQuery || "").trim();
+    const intentForCheck = { ...intent, originalQuery: query || intent?.originalQuery };
+    const topicFails = deterministicTopicMismatchFailures(
+      trimmed,
+      intentForCheck,
+      query,
+      hints.factKey,
+    );
+    const numericFails = goldenNumericMismatchFailures(trimmed, intentForCheck, query);
+    const detFails = [...topicFails, ...numericFails];
+    if (detFails.length > 0) {
+      ragWarn("guardrails.deterministic_fail", {
+        deliveryMethod,
+        codes: detFails.map((f) => f.code),
+        details: detFails.map((f) => f.detail).filter(Boolean),
+      });
+      return abstainShape(
+        "deterministic_topic_or_numeric_mismatch",
+        { flagged: false, suspiciousTokens: [], ratio: 0 },
+        { ok: false, warnings: [], failures: detFails },
+        { ok: true, warnings: [], failures: [] },
+        { deliveryMethod, guardrailBypass: "deterministic_rejected" },
+      );
+    }
     ragInfo("guardrails.bypass", { method: "deterministic_trust", deliveryMethod });
     return allowShapeFromModelText(answer, "deterministic_bypass", {
       deliveryMethod,
@@ -143,14 +191,15 @@ function runGuardrails({ answer, retrievalContext, intent, hints = {} }) {
   }
 
   const hallucination = detectHallucinations(answer, retrievalContext);
-  const base = validateAnswerAgainstContext(answer, retrievalContext, intent || {});
-  const grounding = validateGrounding(answer, retrievalContext, intent || {});
+  const base = validateForProfile(answer, retrievalContext, intent, hints);
+  const grounding = validateGrounding(answer, retrievalContext, intent || {}, hints);
 
   const hardFailureCodes = new Set([
     "parameter_leakage",
     "grounding_antistatic_confusion",
     "safety_extra_reasoning",
     "golden_numeric_mismatch",
+    "deterministic_topic_mismatch",
   ]);
   const regenerationHard = (base.failures || []).some((f) => f.code === "regeneration_forbidden_missing");
   const baseHard = (base.failures || []).filter((f) => hardFailureCodes.has(f.code));
@@ -158,6 +207,16 @@ function runGuardrails({ answer, retrievalContext, intent, hints = {} }) {
   const hasHardFailure = baseHard.length > 0 || groundingHard.length > 0;
 
   const softFailed = base.ok === false || grounding.ok === false;
+
+  if (
+    deliveryMethod === "standard" &&
+    textPresent &&
+    trimmed.length < 20 &&
+    !looksLikeAbstainPhrase(trimmed)
+  ) {
+    ragWarn("guardrails.too_short", { deliveryMethod, textLen: trimmed.length, preview: trimmed.slice(0, 24) });
+    return abstainShape("answer_too_short", hallucination, base, grounding, { deliveryMethod });
+  }
 
   if (textPresent && base.ok !== false && grounding.ok !== false && !hallucination.flagged) {
     ragInfo("guardrails.pass_strict", { deliveryMethod, reason: "validation_ok" });

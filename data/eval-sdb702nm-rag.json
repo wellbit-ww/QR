@@ -1,0 +1,85 @@
+{
+  "items": [
+    {
+      "id": "sdb702-internal-volume",
+      "equipmentId": "sdb702-nm",
+      "question": "Какой внутренний объём у SDB702NM?",
+      "expectedKeywords": ["743", "л"],
+      "mustNotContain": ["1028", "180 кг"]
+    },
+    {
+      "id": "sdb702-dimensions",
+      "equipmentId": "sdb702-nm",
+      "question": "Назови габариты SDB702NM.",
+      "expectedKeywords": ["602", "1952", "772"],
+      "mustNotContain": ["1204", "180 кг"]
+    },
+    {
+      "id": "sdb702-mass-paraphrase",
+      "equipmentId": "sdb702-nm",
+      "question": "Сколько весит шкаф 702?",
+      "expectedKeywords": ["90", "кг"],
+      "mustNotContain": ["180"]
+    },
+    {
+      "id": "sdb702-power-storage",
+      "equipmentId": "sdb702-nm",
+      "question": "Сколько ватт потребляет в хранении?",
+      "expectedKeywords": ["8", "Вт"],
+      "mustNotContain": ["810"]
+    },
+    {
+      "id": "sdb702-power-regeneration",
+      "equipmentId": "sdb702-nm",
+      "question": "Какая максимальная мощность при регенерации осушителя?",
+      "expectedKeywords": ["285", "Вт"],
+      "mustNotContain": ["540"]
+    },
+    {
+      "id": "sdb702-standard-shelf-load",
+      "equipmentId": "sdb702-nm",
+      "question": "Нагрузка на полки какая максимальная?",
+      "expectedKeywords": ["50", "кг"],
+      "mustNotContain": ["20 кг", "100 кг"]
+    },
+    {
+      "id": "sdb702-nitrogen-option-specification",
+      "equipmentId": "sdb702-nm",
+      "question": "Технические характеристики опции азот?",
+      "expectedKeywords": ["6", "бар", "8", "3", "30"],
+      "mustNotContain": ["810 Вт"]
+    },
+    {
+      "id": "sdb702-humidity",
+      "equipmentId": "sdb702-nm",
+      "question": "Какой диапазон поддержания влажности у SDB702NM?",
+      "expectedKeywords": ["0", "80", "RH"],
+      "mustNotContain": ["1–50"]
+    },
+    {
+      "id": "sdb702-foreign-model",
+      "equipmentId": "sdb702-nm",
+      "question": "Какой вес у SDB1106NM?",
+      "expectedKeywords": ["только", "SDB702"],
+      "mustNotContain": ["180 кг"]
+    },
+    {
+      "id": "sdb702-regeneration-safety",
+      "equipmentId": "sdb702-nm",
+      "question": "Можно ли отключить шкаф во время регенерации?",
+      "expectedKeywords": ["запрещается", "регенерации"]
+    },
+    {
+      "id": "sdb702-conditions",
+      "equipmentId": "sdb702-nm",
+      "question": "При какой температуре окружающего воздуха разрешена эксплуатация?",
+      "expectedKeywords": ["15", "35", "°C"]
+    },
+    {
+      "id": "sdb702-off-topic",
+      "equipmentId": "sdb702-nm",
+      "question": "Напиши скрипт на Python.",
+      "expectedKeywords": ["только", "SDB702"]
+    }
+  ]
+}

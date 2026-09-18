@@ -17,6 +17,12 @@ function isChatFileLogEnabled() {
   if (raw === "0" || raw === "false" || raw === "off") {
     return false;
   }
+  if (raw === "1" || raw === "true" || raw === "auto") {
+    return true;
+  }
+  if (String(process.env.NODE_ENV || "").trim().toLowerCase() === "production") {
+    return false;
+  }
   return true;
 }
 

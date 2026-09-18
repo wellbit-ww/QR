@@ -1,0 +1,49 @@
+{
+  "template": "sticker-sdb1106nm.png",
+  "fontFamily": "arialbd.ttf",
+  "textColor": [
+    35,
+    35,
+    35
+  ],
+  "fields": {
+    "title": {
+      "valueBox": [
+        61,
+        156,
+        381,
+        305
+      ],
+      "valueMaxFontSize": 39,
+      "valueMinFontSize": 22,
+      "lineSpacing": 5
+    },
+    "login": {
+      "valueBox": [
+        169,
+        354,
+        411,
+        410
+      ],
+      "valueMaxFontSize": 34,
+      "valueMinFontSize": 19,
+      "bottomY": 398
+    },
+    "password": {
+      "valueBox": [
+        181,
+        424,
+        411,
+        480
+      ],
+      "valueMaxFontSize": 29,
+      "valueMinFontSize": 15,
+      "bottomY": 467
+    }
+  },
+  "sizeMm": [
+    75,
+    53
+  ],
+  "dpi": 300
+}

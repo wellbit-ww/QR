@@ -1,0 +1,107 @@
+{
+  "generatedAt": "2026-05-27T06:21:35.054Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "total": 8,
+  "passed": 0,
+  "failed": 0,
+  "errors": 8,
+  "passRate": 0,
+  "results": [
+    {
+      "id": "et01",
+      "question": "Потребляемая мощность в режиме «Хранения» только с подогревом, без азота?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "et02",
+      "question": "Потребляемая мощность в режиме «Хранения» только с азотом, подогрев выключен?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "et03",
+      "question": "Можно ли шкафом SDB1106NM повысить влажность внутри камеры?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "et04",
+      "question": "Габаритная ширина SDB1106NM?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "et05",
+      "question": "120 кг на двух усиленных полках равномерно — допустимо?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "et06",
+      "question": "Сопротивление заземляющего контура — предел?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "et07",
+      "question": "Эксплуатация при 90 % относительной влажности в помещении?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    },
+    {
+      "id": "et08",
+      "question": "Пиковая мощность при включённых азоте и подогреве одновременно?",
+      "passed": false,
+      "failures": [
+        "http_or_empty"
+      ],
+      "mode": "ERROR",
+      "answerPreview": "fetch failed",
+      "answerFull": "fetch failed",
+      "httpStatus": 0
+    }
+  ]
+}

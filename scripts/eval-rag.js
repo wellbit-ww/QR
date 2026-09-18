@@ -1,8 +1,88 @@
 const fs = require("fs/promises");
 const path = require("path");
 
-const EVAL_PATH = path.join(__dirname, "..", "data", "eval-questions.json");
+require("./load-env-file").loadEnvFile();
+
+const EVAL_PATH = process.env.EVAL_DATASET
+  ? path.resolve(process.env.EVAL_DATASET)
+  : path.join(__dirname, "..", "data", "eval-questions.json");
 const BASE_URL = process.env.EVAL_BASE_URL || "http://127.0.0.1:3000";
+const EVAL_DELAY_MS = Number(process.env.EVAL_DELAY_MS) || 300;
+
+let evalAuthCookie = null;
+
+async function provisionEvalUserIfNeeded(defaultEquipmentId) {
+  if (process.env.EVAL_LOGIN && process.env.EVAL_PASSWORD) {
+    return;
+  }
+  if (process.env.EVAL_AUTO_LOGIN !== "1") {
+    return;
+  }
+
+  const { getPool } = require("../src/rag/pg-client");
+  const { getRagConfig } = require("../src/rag/config");
+  const { ensurePortalSchema } = require("../src/auth/portal-schema");
+  const { createPortalUser } = require("../src/auth/portal-users");
+  const { generateRandomPassword } = require("../src/auth/password");
+
+  const pool = getPool(getRagConfig().postgresUrl);
+  if (!pool) {
+    throw new Error("EVAL_AUTO_LOGIN=1 requires POSTGRES_URL.");
+  }
+  await ensurePortalSchema(pool);
+
+  const login = `eval_${Date.now()}`;
+  const password = generateRandomPassword(12);
+  await createPortalUser(pool, {
+    login,
+    password,
+    equipmentIds: [defaultEquipmentId],
+    label: "eval-auto",
+  });
+  await pool.end();
+
+  process.env.EVAL_LOGIN = login;
+  process.env.EVAL_PASSWORD = password;
+  console.log(`Eval auto-login: ${login}`);
+}
+
+async function ensureEvalAuth(baseUrl, equipmentId) {
+  if (evalAuthCookie) {
+    return;
+  }
+  const login = process.env.EVAL_LOGIN;
+  const password = process.env.EVAL_PASSWORD;
+  if (!login || !password) {
+    return;
+  }
+  const origin = baseUrl.replace(/\/$/, "");
+  let res;
+  try {
+    res = await fetch(`${origin}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ login, password, equipment: equipmentId }),
+    });
+  } catch (error) {
+    throw new Error(`Eval login fetch failed (${origin}): ${error.message}`, { cause: error });
+  }
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(`Eval login failed: ${payload.error || res.status}`);
+  }
+  const setCookies =
+    typeof res.headers.getSetCookie === "function"
+      ? res.headers.getSetCookie()
+      : [res.headers.get("set-cookie")].filter(Boolean);
+  evalAuthCookie = setCookies.map((line) => String(line).split(";")[0]).join("; ");
+  if (!evalAuthCookie) {
+    throw new Error("Eval login: no session cookie");
+  }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 async function loadEvalDataset() {
   const raw = await fs.readFile(EVAL_PATH, "utf8");
@@ -124,31 +204,58 @@ function isEmergencyQuestion(question) {
 }
 
 async function askQuestion(item) {
-  const response = await fetch(`${BASE_URL}/api/chat`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      equipmentId: item.equipmentId,
-      message: item.question,
-      history: [],
-    }),
-  });
-
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(payload.error || payload.details || "Chat API error");
+  await ensureEvalAuth(BASE_URL, item.equipmentId);
+  const headers = { "Content-Type": "application/json" };
+  if (evalAuthCookie) {
+    headers.cookie = evalAuthCookie;
   }
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    let response;
+    try {
+      response = await fetch(`${BASE_URL}/api/chat`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          equipmentId: item.equipmentId,
+          message: item.question,
+          history: [],
+        }),
+      });
+    } catch (error) {
+      throw new Error(`Chat fetch failed (${item.id}): ${error.message}`, { cause: error });
+    }
 
-  return payload;
+    const payload = await response.json().catch(() => ({}));
+    if (response.status === 429) {
+      const retryAfter = Number(response.headers.get("retry-after"));
+      const waitMs =
+        Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : 45_000;
+      console.log(`[eval] 429 ${item.id}, retry in ${Math.round(waitMs / 1000)}s`);
+      await sleep(waitMs);
+      continue;
+    }
+    if (!response.ok) {
+      throw new Error(payload.error || payload.details || `Chat API error ${response.status}`);
+    }
+    return payload;
+  }
+  throw new Error(`Chat API 429 exhausted retries (${item.id})`);
 }
 
 async function main() {
   const dataset = await loadEvalDataset();
+  const defaultEquipmentId = dataset[0]?.equipmentId || "sdb702-nm";
+  await provisionEvalUserIfNeeded(defaultEquipmentId);
   const rows = [];
+  const outPath = process.env.EVAL_OUT
+    ? path.resolve(process.env.EVAL_OUT)
+    : path.join(
+        path.dirname(EVAL_PATH),
+        `${path.basename(EVAL_PATH, path.extname(EVAL_PATH))}-results.json`,
+      );
 
   for (const item of dataset) {
+    console.log(`[eval] ${rows.length + 1}/${dataset.length} ${item.id}`);
     const payload = await askQuestion(item);
     const answer = payload.answer || "";
     const sources = Array.isArray(payload.sources) ? payload.sources.length : 0;
@@ -181,7 +288,26 @@ async function main() {
       fullRefusal: isFullRefusal(answer),
       usefulPartial: isUsefulPartialAnswer(answer),
       answerPreview: answer.slice(0, 160),
+      question: item.question,
+      answer,
     });
+    await fs.writeFile(
+      outPath,
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          dataset: EVAL_PATH,
+          partial: true,
+          rows,
+        },
+        null,
+        2
+      ),
+      "utf8"
+    );
+    if (EVAL_DELAY_MS > 0) {
+      await sleep(EVAL_DELAY_MS);
+    }
   }
 
   const avgScore =
@@ -265,9 +391,35 @@ async function main() {
       console.log(`  parameterKey mismatch: expected=${row.parameterKeyExpected}, actual=${row.parameterKeyActual}`);
     }
   });
+
+  await fs.writeFile(
+    outPath,
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        dataset: EVAL_PATH,
+        summary: {
+          questions: rows.length,
+          avgScore,
+          avgSources,
+          containsViolations,
+          forbiddenViolations,
+          parameterKeyViolations,
+        },
+        rows,
+      },
+      null,
+      2,
+    ),
+    "utf8",
+  );
+  console.log(`Results saved: ${outPath}`);
 }
 
 main().catch((error) => {
   console.error("Eval failed:", error instanceof Error ? error.message : error);
+  if (error instanceof Error && error.cause) {
+    console.error("Cause:", error.cause);
+  }
   process.exitCode = 1;
 });

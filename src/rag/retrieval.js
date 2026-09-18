@@ -4,6 +4,7 @@ const { embedText, vectorToSqlLiteral } = require("./embeddings");
 const { rerankChunks, computeKeywordOverlapScore } = require("./rerank");
 const { resolveParameter, PARAMETER_REGISTRY, normalizeParameterText } = require("./parameter-registry");
 const { extractStructuredParameters } = require("./parameter-extraction");
+const { retrievalCardFilesForSdb302nmQuery } = require("./sdb302nm-rag-priority");
 
 function chunkMatchesSectionHints(chunk, hints) {
   if (!hints || hints.length === 0) {
@@ -37,6 +38,25 @@ function mergeEmbeddingQuery(originalQuery, intent, config) {
     /абсорбент|адсорбент|химическ(?:ое|ий)\s+веществ|сорбент|наполнител|поглощен(?:ие|ия|ию)\s+влаг|влаг.*поглощ|осушител.*карман|карман.*осушител|осушительн/i;
   if (materialDesiccantHint.test(q)) {
     return `${q}\nцеолит силикагель адсорбент осушение влага карман осушителя`;
+  }
+  if (
+    /материал/i.test(q) &&
+    /корпус|шкаф|конструкц/i.test(q) &&
+    !/двер|стекл|вставк|прозрач|окон|ral|покрыт|окраск/i.test(q)
+  ) {
+    return `${q}\nкорпус сталь сварно-сборная конструкция антистатическое порошковое покрытие 1.1.4.2`;
+  }
+  if (/регенерац|1\.1\.4\.4/i.test(q)) {
+    return `${q}\nрежим регенерации 60 минут желтый индикатор 1.1.4.4.3`;
+  }
+  if (/азот|ротаметр|концентрац/i.test(q)) {
+    return `${q}\nсистема подачи азота ротаметр Рпос Ррег 1.1.2.6`;
+  }
+  if (/двер|звук|сигнал|пищит/i.test(q)) {
+    return `${q}\n1.1.4.3.4 звуковая сигнализация открытие двери`;
+  }
+  if (/погруз|разгруз|конвекц|50\s*мм/i.test(q)) {
+    return `${q}\nп. 2.1 погрузка разгрузка конвекция расстояние от стенок`;
   }
   return q;
 }
@@ -446,6 +466,52 @@ async function fetchIndicatorSectionChunks(pool, equipmentId, cap = 4) {
       ...sanitizeChunk(row),
       indicatorSectionInjected: true,
       score: Math.max(Number(row.score) || 0, 0.91),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchSdb302nmRetrievalCardChunks(pool, equipmentId, query, cap = 3) {
+  if (equipmentId !== "w-700") {
+    return [];
+  }
+  const take = Math.max(1, Math.min(4, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.89::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            COALESCE(metadata->>'retrievalCard', '') = 'true'
+            OR source_doc ILIKE '%retrieval-cards%'
+          )
+        ORDER BY source_doc, chunk_index
+        LIMIT 40
+      `,
+      [equipmentId]
+    );
+    const wanted = retrievalCardFilesForSdb302nmQuery(query);
+    const scored = r.rows.map((row) => {
+      const chunk = sanitizeChunk(row);
+      const overlap = computeKeywordOverlapScore(query, chunk);
+      const pinned = wanted.some((file) =>
+        String(row.source_doc || "")
+          .replace(/\\/g, "/")
+          .toLowerCase()
+          .endsWith(`/${String(file).toLowerCase()}`)
+      );
+      return { chunk, overlap, pinned };
+    });
+    const pinnedRows = scored.filter((item) => item.pinned);
+    const picked = (pinnedRows.length ? pinnedRows : scored.filter((item) => item.overlap >= 0.18))
+      .sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.overlap - a.overlap)
+      .slice(0, take);
+    return picked.map(({ chunk, overlap, pinned }) => ({
+      ...chunk,
+      sdb302RetrievalCardInjected: true,
+      score: Math.max(Number(chunk.score) || 0, pinned ? 0.93 : 0.84 + Math.min(0.1, overlap * 0.15)),
     }));
   } catch (_e) {
     return [];
@@ -1262,6 +1328,10 @@ async function retrieveEquipmentContext({
   if (boosters.p1GoldenFacts) {
     const p1Rows = await fetchP1GoldenFactsChunks(pool, equipmentId, 10);
     injectedRows = [...p1Rows, ...injectedRows];
+  }
+  if (boosters.sdb302RetrievalCards || equipmentId === "w-700") {
+    const cardRows = await fetchSdb302nmRetrievalCardChunks(pool, equipmentId, originalQuery, 3);
+    injectedRows = [...cardRows, ...injectedRows];
   }
   if (injectedRows.length) {
     ranked = mergeSafetyPriorityChunks(ranked, injectedRows, limit);

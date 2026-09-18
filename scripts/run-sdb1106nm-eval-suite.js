@@ -32,6 +32,7 @@ function main() {
 
   results.push(runStep("Golden router (P0/P1)", "test:golden-router"));
   results.push(runStep("Golden router paraphrase", "test:golden-router-paraphrase"));
+  results.push(runStep("Golden router coverage", "test:golden-router-coverage"));
   results.push(runStep("Validate parity JSON", "validate:parity-json"));
 
   if (live) {

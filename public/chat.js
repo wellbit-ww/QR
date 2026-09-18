@@ -7,6 +7,17 @@ const testSessionParams = {
   sessionLabel: params.get("testSession") || null,
 };
 
+function redirectToLogin() {
+  const loginParams = new URLSearchParams();
+  if (window.equipmentId) {
+    loginParams.set("next", `/equipment/${window.equipmentId}`);
+    loginParams.set("equipment", window.equipmentId);
+  } else {
+    loginParams.set("next", "/");
+  }
+  window.location.href = `/login?${loginParams.toString()}`;
+}
+
 function buildTestMetaPayload() {
   const meta = {};
   if (Number.isFinite(testSessionParams.block) && testSessionParams.block > 0) {
@@ -23,7 +34,7 @@ function buildTestMetaPayload() {
 
 function showTestSessionHint() {
   const meta = buildTestMetaPayload();
-  if (!meta || !chatModeHint) {
+  if (!meta || !chatSubtitle) {
     return;
   }
   const parts = [];
@@ -36,86 +47,110 @@ function showTestSessionHint() {
   if (meta.sessionLabel) {
     parts.push(meta.sessionLabel);
   }
-  chatModeHint.textContent = `Ручной тест: ${parts.join(", ")} — метка попадёт в logs/*.jsonl`;
+  chatSubtitle.textContent = `Ручной тест: ${parts.join(", ")}`;
 }
 
 const equipmentBadge = document.getElementById("equipmentBadge");
 const chatSubtitle = document.getElementById("chatSubtitle");
-const chatModeBadge = document.getElementById("chatModeBadge");
-const chatModeHint = document.getElementById("chatModeHint");
 const backToEquipmentLink = document.getElementById("backToEquipmentLink");
 const chatForm = document.getElementById("chatForm");
 const chatInput = document.getElementById("chatInput");
 const chatMessages = document.getElementById("chatMessages");
+const chatSupportButton = document.getElementById("chatSupportButton");
+const chatHeader = document.getElementById("chatHeader");
+const chatHeaderToggle = document.getElementById("chatHeaderToggle");
 const conversationHistory = [];
 let currentEquipment = null;
 
+function isMobileChatLayout() {
+  return window.matchMedia("(max-width: 640px)").matches;
+}
+
+function scrollChatToBottom() {
+  if (chatMessages) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+}
+
+let mobileViewportSyncTimer = null;
+
+function syncMobileChatViewport() {
+  const viewport = window.visualViewport;
+  if (!isMobileChatLayout() || !viewport) {
+    document.documentElement.style.removeProperty("--chat-viewport-height");
+    return;
+  }
+
+  document.documentElement.style.setProperty(
+    "--chat-viewport-height",
+    `${Math.round(viewport.height)}px`,
+  );
+
+  window.clearTimeout(mobileViewportSyncTimer);
+  mobileViewportSyncTimer = window.setTimeout(scrollChatToBottom, 100);
+}
+
+function setChatHeaderCollapsed(collapsed) {
+  if (!chatHeader) {
+    return;
+  }
+  chatHeader.classList.toggle("chat-header--collapsed", collapsed);
+  if (chatHeaderToggle) {
+    chatHeaderToggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    chatHeaderToggle.title = collapsed ? "Развернуть шапку" : "Свернуть шапку";
+  }
+}
+
+function syncChatHeaderCompact() {
+  if (!isMobileChatLayout()) {
+    chatHeader?.classList.remove("chat-header--collapsed");
+    return;
+  }
+  const hasUserMessages =
+    chatMessages?.querySelectorAll(".message--user").length > 0;
+  if (hasUserMessages) {
+    setChatHeaderCollapsed(true);
+  }
+}
+
+function updateChatSupportButtonVisibility() {
+  if (!chatSupportButton) {
+    return;
+  }
+  const hasUserMessages =
+    chatMessages?.querySelectorAll(".message--user").length > 0;
+  chatSupportButton.hidden = !hasUserMessages || !currentEquipment;
+}
+
+if (chatHeaderToggle) {
+  chatHeaderToggle.addEventListener("click", () => {
+    setChatHeaderCollapsed(!chatHeader?.classList.contains("chat-header--collapsed"));
+  });
+}
+
+window.addEventListener("resize", () => {
+  if (!isMobileChatLayout()) {
+    chatHeader?.classList.remove("chat-header--collapsed");
+  }
+  syncMobileChatViewport();
+});
+
+window.visualViewport?.addEventListener("resize", syncMobileChatViewport);
+window.visualViewport?.addEventListener("scroll", syncMobileChatViewport);
+
 function autoResizeChatInput() {
+  const maxHeight = isMobileChatLayout() ? 140 : 220;
   chatInput.style.height = "auto";
-  chatInput.style.height = `${Math.min(chatInput.scrollHeight, 220)}px`;
+  chatInput.style.height = `${Math.min(chatInput.scrollHeight, maxHeight)}px`;
 }
 
 function setEquipmentUi(equipment) {
   currentEquipment = equipment;
-  equipmentBadge.textContent = `Оборудование: ${equipment.name}`;
+  equipmentBadge.textContent = equipment.name;
   if (chatSubtitle) {
-    chatSubtitle.textContent = `SOVA отвечает только по оборудованию: ${equipment.name}.`;
+    chatSubtitle.textContent = "";
   }
-  backToEquipmentLink.href = `/equipment/${equipment.id}`;
-  updateExpectedChatMode();
-}
-
-function formatExpectedModeHint(capabilities, directChecked) {
-  if (!capabilities) {
-    return "";
-  }
-  if (directChecked) {
-    return "Запросы пойдут в Direct Context (полный PDF в промпт).";
-  }
-  if (!capabilities.ragAvailable) {
-    if (capabilities.autoDirectForEquipment) {
-      return "Postgres не настроен — для этой модели автоматически используется Direct Context.";
-    }
-    return "RAG недоступен (нет POSTGRES_URL) — ответы из полного документа.";
-  }
-  return "RAG активен: поиск по чанкам руководства в Postgres.";
-}
-
-function updateExpectedChatMode() {
-  if (!chatModeBadge || !currentEquipment) {
-    return;
-  }
-  const caps = currentEquipment.chatCapabilities;
-  const directCheckbox = document.getElementById("directContextMode");
-  const directChecked = directCheckbox ? directCheckbox.checked : false;
-  const useDirect =
-    directChecked || (caps && caps.autoDirectForEquipment && !caps.ragAvailable);
-  const path = useDirect ? "direct" : "rag";
-  chatModeBadge.hidden = false;
-  chatModeBadge.dataset.path = path;
-  chatModeBadge.textContent = useDirect
-    ? "Ожидается: Direct Context"
-    : "Ожидается: RAG";
-  if (chatModeHint) {
-    chatModeHint.textContent = formatExpectedModeHint(caps, directChecked);
-  }
-}
-
-function applyResponseChatMode(payload) {
-  if (!chatModeBadge) {
-    return;
-  }
-  const mode = payload?.chatMode;
-  if (!mode) {
-    return;
-  }
-  chatModeBadge.hidden = false;
-  chatModeBadge.dataset.path = mode.path || "";
-  chatModeBadge.textContent = `Ответ: ${mode.label || mode.mode || "—"}`;
-  if (chatModeHint && mode.ragAvailable === false && mode.autoDirect) {
-    chatModeHint.textContent =
-      "Postgres не настроен — Direct Context включён автоматически для SDB1106NM.";
-  }
+  backToEquipmentLink.href = `/equipment/${equipment.publicId || equipment.id}`;
 }
 
 function normalizeAssistantText(text) {
@@ -190,6 +225,32 @@ function renderMarkdownToSafeHtml(markdown) {
   return fallback.innerHTML.replace(/\n/g, "<br>");
 }
 
+/**
+ * Модель не всегда следует Markdown-инструкции. Для обычных RAG-ответов
+ * добавляем лёгкое выделение технических значений и шагов; готовая разметка
+ * deterministic-ответов при этом остаётся нетронутой.
+ */
+function enhancePlainAssistantMarkdown(markdown) {
+  const text = String(markdown || "");
+  if (!text || text.includes("**")) {
+    return text;
+  }
+
+  return text
+    .replace(
+      /^(\s*\d+\.\s+)(Проверьте|Убедитесь|Подключите|Вставьте|Установите|Откройте|Закройте|Нажмите|Выберите|Задайте)(?=\s|[,:.]|$)/gimu,
+      "$1**$2**"
+    )
+    .replace(
+      /\b(?:SDB\d+\s*NM|SDB\d+|Ethernet|RH%?[тп]?|IP\d+|SET|UP|DN|ВКЛ|ВЫКЛ)\b/giu,
+      "**$&**"
+    )
+    .replace(
+      /(?<![\p{L}\p{N}])\d+(?:[.,]\d+)?\s*(?:%RH|кг|Вт|В|Гц|мм|см|м|мин(?:ут[аы]?)?|час(?:а|ов)?)(?![\p{L}\p{N}])/giu,
+      "**$&**"
+    );
+}
+
 function appendMessage(author, text) {
   const message = document.createElement("article");
   message.className = `message message--${author}`;
@@ -198,7 +259,9 @@ function appendMessage(author, text) {
   content.className = "message-body md-body";
   const normalized =
     author === "assistant" ? normalizeAssistantText(text) : text;
-  content.innerHTML = renderMarkdownToSafeHtml(normalized);
+  const presentable =
+    author === "assistant" ? enhancePlainAssistantMarkdown(normalized) : normalized;
+  content.innerHTML = renderMarkdownToSafeHtml(presentable);
 
   if (author === "assistant") {
     const meta = document.createElement("div");
@@ -210,7 +273,65 @@ function appendMessage(author, text) {
   message.append(content);
 
   chatMessages.append(message);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+  scrollChatToBottom();
+  syncChatHeaderCompact();
+  updateChatSupportButtonVisibility();
+}
+
+const CHAT_THINKING_ID = "chatThinkingIndicator";
+/** Минимум показа «SOVA думает» для мгновенных golden/deterministic ответов. */
+const MIN_DETERMINISTIC_THINKING_MS = 900;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isDeterministicChatMode(payload) {
+  const mode = payload?.chatMode?.mode || payload?.ragTrace?.mode || "";
+  return String(mode).includes("DETERMINISTIC");
+}
+
+async function ensureMinThinkingDelay(payload, startedAtMs) {
+  if (!isDeterministicChatMode(payload)) {
+    return;
+  }
+  const remaining = MIN_DETERMINISTIC_THINKING_MS - (Date.now() - startedAtMs);
+  if (remaining > 0) {
+    await sleep(remaining);
+  }
+}
+
+function showThinkingIndicator() {
+  if (document.getElementById(CHAT_THINKING_ID)) {
+    return;
+  }
+
+  const message = document.createElement("article");
+  message.id = CHAT_THINKING_ID;
+  message.className = "message message--assistant message--thinking";
+  message.setAttribute("aria-live", "polite");
+  message.setAttribute("aria-busy", "true");
+
+  const meta = document.createElement("div");
+  meta.className = "message-meta";
+  meta.textContent = "SOVA";
+
+  const content = document.createElement("div");
+  content.className = "message-body chat-thinking";
+  content.innerHTML = `
+    <span class="chat-thinking__label">SOVA думает</span>
+    <span class="chat-thinking__dots" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </span>
+  `;
+
+  message.append(meta, content);
+  chatMessages.append(message);
+  scrollChatToBottom();
+}
+
+function hideThinkingIndicator() {
+  document.getElementById(CHAT_THINKING_ID)?.remove();
 }
 
 function setFormState(isLoading) {
@@ -222,9 +343,15 @@ function setFormState(isLoading) {
     submitButton.disabled = isLoading;
     submitButton.setAttribute(
       "aria-label",
-      isLoading ? "Отправка..." : "Отправить вопрос"
+      isLoading ? "SOVA думает…" : "Отправить вопрос"
     );
-    submitButton.title = isLoading ? "Отправка..." : "Отправить вопрос";
+    submitButton.title = isLoading ? "SOVA думает…" : "Отправить вопрос";
+  }
+
+  if (isLoading) {
+    showThinkingIndicator();
+  } else {
+    hideThinkingIndicator();
   }
 }
 
@@ -239,8 +366,15 @@ function disableChatForm() {
 }
 
 async function fetchEquipment(equipmentId) {
-  const response = await fetch(`/api/equipment/${equipmentId}`);
+  const response = await fetch(`/api/equipment/${equipmentId}`, {
+    credentials: "include",
+  });
   const payload = await response.json().catch(() => ({}));
+
+  if (response.status === 401) {
+    redirectToLogin();
+    throw new Error("Требуется вход.");
+  }
 
   if (!response.ok) {
     throw new Error(payload.error || "Не удалось загрузить оборудование.");
@@ -251,8 +385,6 @@ async function fetchEquipment(equipmentId) {
 
 async function requestAssistantReply(question) {
   const chatUrl = new URL("/api/chat", window.location.origin).href;
-  const directContextCheckbox = document.getElementById("directContextMode");
-  const directContextMode = directContextCheckbox ? directContextCheckbox.checked : false;
   const testMeta = buildTestMetaPayload();
 
   let response;
@@ -260,14 +392,14 @@ async function requestAssistantReply(question) {
     // No AbortSignal / client timeout — RAG + Ollama can take 60s+; server timeouts are in server.js.
     response = await fetch(chatUrl, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         equipmentId: window.equipmentId,
         message: question,
-        history: conversationHistory,
-        directContextMode: directContextMode,
+        directContextMode: false,
         ...(testMeta ? { testMeta } : {}),
       }),
     });
@@ -281,6 +413,11 @@ async function requestAssistantReply(question) {
 
   const payload = await response.json().catch(() => ({}));
 
+  if (response.status === 401) {
+    redirectToLogin();
+    throw new Error("Требуется вход.");
+  }
+
   if (!response.ok) {
     const combined = [payload.error, payload.details].filter(Boolean).join("\n\n");
     throw new Error(combined || "Ошибка запроса к чату.");
@@ -290,18 +427,6 @@ async function requestAssistantReply(question) {
 }
 
 async function initChat() {
-  const directContextCheckbox = document.getElementById("directContextMode");
-  if (directContextCheckbox) {
-    const saved = localStorage.getItem("sova_direct_context_mode");
-    if (saved !== null) {
-      directContextCheckbox.checked = saved === "true";
-    }
-    directContextCheckbox.addEventListener("change", () => {
-      localStorage.setItem("sova_direct_context_mode", directContextCheckbox.checked);
-      updateExpectedChatMode();
-    });
-  }
-
   if (!window.equipmentId) {
     equipmentBadge.textContent = "Оборудование: не выбрано";
     if (chatSubtitle) {
@@ -319,6 +444,9 @@ async function initChat() {
 
   try {
     const equipment = await fetchEquipment(window.equipmentId);
+    if (equipment?.id) {
+      window.equipmentId = equipment.id;
+    }
     setEquipmentUi(equipment);
     showTestSessionHint();
     appendMessage(
@@ -342,6 +470,13 @@ async function initChat() {
   }
 }
 
+chatSupportButton?.addEventListener("click", () => {
+  if (!currentEquipment || !window.SovaSupportModal) {
+    return;
+  }
+  window.SovaSupportModal.open(currentEquipment);
+});
+
 chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
@@ -361,16 +496,21 @@ chatForm.addEventListener("submit", async (event) => {
     content: question,
   });
 
+  if (isMobileChatLayout()) {
+    chatInput.blur();
+  }
+
   chatInput.value = "";
   autoResizeChatInput();
 
+  const thinkingStartedAt = Date.now();
   setFormState(true);
 
   try {
     const payload = await requestAssistantReply(question);
+    await ensureMinThinkingDelay(payload, thinkingStartedAt);
     const answer = payload.answer || "";
 
-    applyResponseChatMode(payload);
     appendMessage("assistant", answer);
     conversationHistory.push({
       role: "assistant",
@@ -385,7 +525,9 @@ chatForm.addEventListener("submit", async (event) => {
     appendMessage("assistant", errorMessage);
   } finally {
     setFormState(false);
-    chatInput.focus();
+    if (!isMobileChatLayout()) {
+      chatInput.focus();
+    }
   }
 });
 
@@ -412,4 +554,5 @@ chatInput.addEventListener("keydown", (event) => {
 });
 
 autoResizeChatInput();
+syncMobileChatViewport();
 initChat();

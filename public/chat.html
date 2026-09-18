@@ -8,40 +8,79 @@
     />
     <title>Чат поддержки оборудования</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles.css?v=20260811" />
   </head>
-  <body>
+  <body class="layout-chat">
     <main class="page page--chat">
       <section class="card card--chat">
-        <header class="chat-header">
-          <h1 class="chat-title">Чат поддержки оборудования</h1>
-          <div class="equipment-badge" id="equipmentBadge">
-            Оборудование: не выбрано
+        <header class="chat-header" id="chatHeader">
+          <a
+            class="chat-back-link chat-back-link--topbar"
+            id="backToEquipmentLink"
+            href="/equipment/sdb702-nm"
+          >
+            <span class="chat-back-link__icon" aria-hidden="true">←</span>
+            <span class="chat-back-link__label">Назад</span>
+          </a>
+          <button
+            type="button"
+            class="chat-header-toggle"
+            id="chatHeaderToggle"
+            aria-expanded="true"
+            aria-controls="chatHeaderDetails"
+            title="Свернуть шапку"
+          >
+            <span class="chat-header-toggle__icon" aria-hidden="true"></span>
+          </button>
+          <div class="chat-header__details" id="chatHeaderDetails">
+            <a href="/" class="site-logo site-logo--compact chat-header-logo" aria-label="SOVTEST — на главную">
+              <img
+                class="site-logo__img"
+                src="/sovtest-logo.png?v=4"
+                alt="SOVTEST"
+                width="160"
+                height="48"
+                decoding="async"
+              />
+            </a>
+            <h1 class="chat-title">Чат</h1>
+            <div class="equipment-badge" id="equipmentBadge">
+              Оборудование: не выбрано
+            </div>
+            <p class="chat-subtitle" id="chatSubtitle"></p>
           </div>
-          <div class="chat-mode-row">
-            <span class="chat-mode-badge" id="chatModeBadge" hidden>Режим: —</span>
-            <span class="chat-mode-hint" id="chatModeHint"></span>
-          </div>
-          <p class="chat-subtitle" id="chatSubtitle"></p>
         </header>
 
         <section class="chat-shell" aria-label="Диалог с SOVA">
           <div class="chat-messages" id="chatMessages"></div>
 
           <form class="chat-form" id="chatForm">
-            <div class="chat-options-bar" style="margin-bottom: 12px; font-size: 0.95em; display: flex; align-items: center; gap: 8px; color: var(--muted, #616161); padding: 0 4px;">
-              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-weight: 500;">
-                <input type="checkbox" id="directContextMode" name="directContextMode" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary);" />
-                <span>Использовать полный документ напрямую (без RAG)</span>
-              </label>
-            </div>
+            <button
+              type="button"
+              class="chat-support-button"
+              id="chatSupportButton"
+              hidden
+              aria-label="Запрос в поддержку"
+            >
+              <svg
+                class="chat-support-button__icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12 1a9 9 0 0 0-9 9v4a3 3 0 0 0 3 3h1v-6H5a7 7 0 1 1 14 0h-2v6h1a3 3 0 0 0 3-3v-4a9 9 0 0 0-9-9Zm-1 14v3a1 1 0 0 0 2 0v-3h-2Z"
+                />
+              </svg>
+              <span class="chat-support-button__label">Поддержка</span>
+            </button>
             <div class="chat-compose">
               <div class="chat-input-wrap">
                 <textarea
                   class="chat-input"
                   id="chatInput"
                   name="message"
-                  rows="3"
+                  rows="2"
                   placeholder="Введите ваш запрос..."
                   required
                 ></textarea>
@@ -67,20 +106,13 @@
           </form>
         </section>
 
-        <div class="chat-footer-actions">
-          <a
-            class="chat-back-link"
-            id="backToEquipmentLink"
-            href="/equipment/wattsan-1313a"
-          >
-            Вернуться к оборудованию
-          </a>
-        </div>
       </section>
     </main>
 
-    <footer class="footer">Система поддержки оборудования</footer>
+    <footer class="footer footer--chat"><span class="footer-brand">SOVTEST</span></footer>
 
+    <script src="/cookie-consent.js?v=20260811"></script>
+    <script src="/support-modal.js" defer></script>
     <script src="/vendor/marked.min.js" defer></script>
     <script src="/vendor/purify.min.js" defer></script>
     <script src="/chat.js" defer></script>

@@ -1,0 +1,39 @@
+{
+  "items": [
+    {
+      "id": "check-serial",
+      "equipmentId": "w-700",
+      "question": "Где на шкафу серийный номер искать?"
+    },
+    {
+      "id": "check-shop-12",
+      "equipmentId": "w-700",
+      "question": "Помещение +12 °C, шкаф в рабочем диапазоне или нет?"
+    },
+    {
+      "id": "check-hot-100",
+      "equipmentId": "w-700",
+      "question": "Опция подогрева корпус до ста градусов греет, правда? Обожгусь?"
+    },
+    {
+      "id": "check-wheels",
+      "equipmentId": "w-700",
+      "question": "Сколько колёс кладут в поставку 302?"
+    },
+    {
+      "id": "check-tumbler",
+      "equipmentId": "w-700",
+      "question": "Тумблер питания где искать, на кожухе сзади?"
+    },
+    {
+      "id": "check-w",
+      "equipmentId": "w-700",
+      "question": "Буква W на дисплее выскочила, это код ошибки?"
+    },
+    {
+      "id": "check-green",
+      "equipmentId": "w-700",
+      "question": "Зелёный сигнал горит, это какой режим сейчас?"
+    }
+  ]
+}

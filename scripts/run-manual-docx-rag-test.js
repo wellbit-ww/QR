@@ -5,7 +5,10 @@
 const fs = require("fs/promises");
 const path = require("path");
 
+require("./load-env-file").loadEnvFile();
+
 const ROOT = path.join(__dirname, "..");
+let evalAuthCookie = null;
 const DEFAULT_DATASET = path.join(ROOT, "data", "eval-manual-docx-rag.json");
 const DEFAULT_OUT = path.join(ROOT, "data", "manual-docx-rag-results.json");
 
@@ -16,6 +19,7 @@ function parseArgs(argv) {
     out: DEFAULT_OUT,
     delayMs: Number(process.env.EVAL_DELAY_MS) || 400,
     timeoutMs: Number(process.env.EVAL_TIMEOUT_MS) || 180000,
+    reportMd: null,
   };
   for (let i = 2; i < argv.length; i += 1) {
     if (argv[i] === "--base-url" && argv[i + 1]) {
@@ -29,6 +33,9 @@ function parseArgs(argv) {
       i += 1;
     } else if (argv[i] === "--delay-ms" && argv[i + 1]) {
       opts.delayMs = Number(argv[i + 1]);
+      i += 1;
+    } else if (argv[i] === "--report-md" && argv[i + 1]) {
+      opts.reportMd = path.isAbsolute(argv[i + 1]) ? argv[i + 1] : path.join(ROOT, argv[i + 1]);
       i += 1;
     }
   }
@@ -64,13 +71,58 @@ function evaluateItem(text, item) {
   return { passed: failures.length === 0, failures };
 }
 
-async function chatRag(baseUrl, question) {
+function evaluateMode(mode, item) {
+  if (!item.requireModeRegex || !mode) {
+    return [];
+  }
+  if (!new RegExp(String(item.requireModeRegex), "iu").test(String(mode))) {
+    return [`requireModeRegex:${item.requireModeRegex}`];
+  }
+  return [];
+}
+
+async function ensureEvalAuth(baseUrl) {
+  if (evalAuthCookie) {
+    return;
+  }
+  const login = process.env.EVAL_LOGIN;
+  const password = process.env.EVAL_PASSWORD;
+  if (!login || !password) {
+    return;
+  }
+  const origin = baseUrl.replace(/\/$/, "");
+  const res = await fetch(`${origin}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ login, password, equipment: "sdb1106-nm" }),
+  });
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(`Eval login failed: ${payload.error || res.status}`);
+  }
+  const setCookies =
+    typeof res.headers.getSetCookie === "function"
+      ? res.headers.getSetCookie()
+      : [res.headers.get("set-cookie")].filter(Boolean);
+  evalAuthCookie = setCookies.map((line) => String(line).split(";")[0]).join("; ");
+  if (!evalAuthCookie) {
+    throw new Error("Eval login: no session cookie");
+  }
+}
+
+async function chatRag(baseUrl, question, timeoutMs) {
+  await ensureEvalAuth(baseUrl);
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), parseArgs(process.argv).timeoutMs);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const headers = { "Content-Type": "application/json" };
+  if (evalAuthCookie) {
+    headers.cookie = evalAuthCookie;
+  }
   try {
     const res = await fetch(`${baseUrl.replace(/\/$/, "")}/api/chat`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
+      credentials: "include",
       body: JSON.stringify({
         equipmentId: "sdb1106-nm",
         message: question,
@@ -115,14 +167,20 @@ async function main() {
   let errors = 0;
 
   console.log(`RAG eval — ${items.length} questions (${path.basename(opts.dataset)})`);
-  console.log(`Base URL: ${opts.baseUrl}\n`);
+  console.log(`Base URL: ${opts.baseUrl}`);
+  if (process.env.EVAL_LOGIN) {
+    console.log(`Auth: EVAL_LOGIN=${process.env.EVAL_LOGIN}`);
+  } else {
+    console.log("Auth: none (задайте EVAL_LOGIN/EVAL_PASSWORD если AUTH_REQUIRED=1)");
+  }
+  console.log();
 
   for (let i = 0; i < items.length; i += 1) {
     const item = items[i];
     process.stdout.write(`[${i + 1}/${items.length}] ${item.id} ... `);
     let response;
     try {
-      response = await chatRag(opts.baseUrl, item.question);
+      response = await chatRag(opts.baseUrl, item.question, opts.timeoutMs);
     } catch (err) {
       response = {
         ok: false,
@@ -134,10 +192,16 @@ async function main() {
     }
 
     const norm = normalize(response.answer);
-    const evalResult =
-      response.ok && norm
-        ? evaluateItem(norm, item)
-        : { passed: false, failures: ["http_or_empty"] };
+    const textEval =
+      response.ok && norm ? evaluateItem(norm, item) : { passed: false, failures: ["http_or_empty"] };
+    const modeFailures = evaluateMode(
+      response.chatMode?.mode || response.ragTrace?.mode || null,
+      item
+    );
+    const evalResult = {
+      passed: textEval.passed && modeFailures.length === 0,
+      failures: [...textEval.failures, ...modeFailures],
+    };
 
     if (!response.ok) errors += 1;
     else if (evalResult.passed) passed += 1;
@@ -177,6 +241,12 @@ async function main() {
 
   await fs.writeFile(opts.out, `${JSON.stringify(report, null, 2)}\n`, "utf8");
 
+  const mdPath =
+    opts.reportMd ||
+    opts.out.replace(/\.json$/i, "-report.md");
+  await writeMarkdownReport(mdPath, report, path.basename(opts.dataset));
+  console.log(`Markdown report: ${mdPath}`);
+
   console.log("\n--- Summary ---");
   console.log(`Passed: ${passed}/${items.length} (${(report.passRate * 100).toFixed(1)}%)`);
   console.log(`Failed checks: ${failed}`);
@@ -195,6 +265,47 @@ async function main() {
   }
 
   process.exit(failed + errors > 0 ? 1 : 0);
+}
+
+function escapeMdCell(text) {
+  return String(text || "")
+    .replace(/\|/g, "\\|")
+    .replace(/\r?\n/g, " ")
+    .slice(0, 800);
+}
+
+async function writeMarkdownReport(mdPath, report, datasetName) {
+  const lines = [
+    `# Отчёт RAG: ${datasetName}`,
+    "",
+    `- **Дата:** ${report.generatedAt}`,
+    `- **URL:** ${report.baseUrl}`,
+    `- **Точность:** ${report.passed}/${report.total} (**${(report.passRate * 100).toFixed(1)}%**)`,
+    `- **Ошибки HTTP:** ${report.errors}`,
+    "",
+    "| № | ID | Верно | Режим | Вопрос | Ответ RAG | Причина, если неверно |",
+    "|---:|---|:---:|---|---|---|---|",
+  ];
+
+  report.results.forEach((row, index) => {
+    const verdict = row.passed ? "да" : "нет";
+    const failReason = row.passed ? "—" : (row.failures || []).join("; ");
+    lines.push(
+      `| ${index + 1} | ${row.id} | **${verdict}** | ${escapeMdCell(row.mode)} | ${escapeMdCell(row.question)} | ${escapeMdCell(row.answerFull || row.answerPreview)} | ${escapeMdCell(failReason)} |`
+    );
+  });
+
+  lines.push("", "## Детали по неверным ответам", "");
+  const wrong = report.results.filter((r) => !r.passed);
+  if (!wrong.length) {
+    lines.push("_Все ответы прошли проверку._");
+  } else {
+    for (const row of wrong) {
+      lines.push(`### ${row.id}`, "", `**Вопрос:** ${row.question}`, "", `**Ответ:**`, "", row.answerFull || row.answerPreview || "(пусто)", "", `**Проверки:** ${(row.failures || []).join(", ")}`, "");
+    }
+  }
+
+  await fs.writeFile(mdPath, `${lines.join("\n")}\n`, "utf8");
 }
 
 main().catch((err) => {

@@ -1,0 +1,1060 @@
+{
+  "items": [
+    {
+      "id": "live-start",
+      "equipmentId": "sdb702-nm",
+      "category": "session",
+      "question": "Как начать работу с шкафом?",
+      "expectedKeywords": [
+        "тумблер",
+        "220"
+      ],
+      "mustNotContain": [
+        "SDB1106",
+        "SDB302NM",
+        "180 кг"
+      ]
+    },
+    {
+      "id": "live-shelves",
+      "equipmentId": "sdb702-nm",
+      "category": "session",
+      "question": "Сколько полок в комплекте",
+      "expectedKeywords": [
+        "7"
+      ],
+      "mustNotContain": [
+        "5 полок"
+      ]
+    },
+    {
+      "id": "live-wheels",
+      "equipmentId": "sdb702-nm",
+      "category": "session",
+      "question": "Идут ли колесики в комплекте",
+      "expectedKeywords": [
+        "колес"
+      ],
+      "mustNotContain": [
+        "не указан"
+      ]
+    },
+    {
+      "id": "live-set-rh",
+      "equipmentId": "sdb702-nm",
+      "category": "session",
+      "question": "Как задать порог влажности",
+      "expectedKeywords": [
+        "SET",
+        "UP"
+      ],
+      "mustNotContain": [
+        "1–50"
+      ]
+    },
+    {
+      "id": "live-rh-spike",
+      "equipmentId": "sdb702-nm",
+      "category": "session",
+      "question": "Что делать есть влажность очень быстро растет",
+      "expectedKeywords": [
+        "2.2.2",
+        "уплотнител",
+        "3.2"
+      ],
+      "mustNotContain": [
+        "SDB1106NM",
+        "180 кг"
+      ]
+    },
+    {
+      "id": "spec-volume",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какой внутренний объём?",
+      "expectedKeywords": [
+        "743"
+      ],
+      "mustNotContain": [
+        "500",
+        "1028"
+      ]
+    },
+    {
+      "id": "spec-full-volume",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какой полный объём шкафа?",
+      "expectedKeywords": [
+        "770"
+      ],
+      "mustNotContain": [
+        "546"
+      ]
+    },
+    {
+      "id": "spec-dims",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какие габариты?",
+      "expectedKeywords": [
+        "602",
+        "1952",
+        "772"
+      ],
+      "mustNotContain": [
+        "1358",
+        "1204"
+      ]
+    },
+    {
+      "id": "spec-mass",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Сколько весит шкаф 702?",
+      "expectedKeywords": [
+        "90"
+      ],
+      "mustNotContain": [
+        "70",
+        "180"
+      ]
+    },
+    {
+      "id": "spec-doors",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Сколько дверей?",
+      "expectedKeywords": [
+        "3"
+      ],
+      "mustNotContain": [
+        "2 двери"
+      ]
+    },
+    {
+      "id": "spec-power-storage",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Сколько ватт в режиме хранения?",
+      "expectedKeywords": [
+        "8"
+      ],
+      "mustNotContain": [
+        "810"
+      ]
+    },
+    {
+      "id": "spec-power-dry",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Сколько потребляет при осушении без опций?",
+      "expectedKeywords": [
+        "20"
+      ],
+      "mustNotContain": [
+        "540"
+      ]
+    },
+    {
+      "id": "spec-power-regen",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какая мощность при регенерации?",
+      "expectedKeywords": [
+        "285"
+      ],
+      "mustNotContain": [
+        "540"
+      ]
+    },
+    {
+      "id": "spec-rh-range",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какой диапазон поддержания влажности?",
+      "expectedKeywords": [
+        "0",
+        "80"
+      ],
+      "mustNotContain": [
+        "1–50"
+      ]
+    },
+    {
+      "id": "spec-ip",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какой класс защиты?",
+      "expectedKeywords": [
+        "IP55"
+      ],
+      "mustNotContain": [
+        "IP65"
+      ]
+    },
+    {
+      "id": "spec-shelf-load",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какая нагрузка на стандартную полку?",
+      "expectedKeywords": [
+        "50"
+      ],
+      "mustNotContain": [
+        "180 кг"
+      ]
+    },
+    {
+      "id": "proc-power-on",
+      "equipmentId": "sdb702-nm",
+      "category": "procedure",
+      "question": "Как включить шкаф?",
+      "expectedKeywords": [
+        "тумблер",
+        "220"
+      ],
+      "mustNotContain": [
+        "SDB1106"
+      ]
+    },
+    {
+      "id": "proc-open-door",
+      "equipmentId": "sdb702-nm",
+      "category": "procedure",
+      "question": "Как открыть дверь?",
+      "expectedKeywords": [
+        "сигнал"
+      ],
+      "mustNotContain": [
+        "выключите питание"
+      ]
+    },
+    {
+      "id": "proc-modes",
+      "equipmentId": "sdb702-nm",
+      "category": "procedure",
+      "question": "Какие режимы работы предусмотрены?",
+      "expectedKeywords": [
+        "Хранения",
+        "Осушения",
+        "Регенерации"
+      ]
+    },
+    {
+      "id": "proc-display",
+      "equipmentId": "sdb702-nm",
+      "category": "procedure",
+      "question": "Что показывает дисплей?",
+      "expectedKeywords": [
+        "влажност"
+      ],
+      "mustNotContain": [
+        "SDB1106NM"
+      ]
+    },
+    {
+      "id": "proc-heat-set",
+      "equipmentId": "sdb702-nm",
+      "category": "procedure",
+      "question": "Как установить температуру подогрева?",
+      "expectedKeywords": [
+        "40"
+      ],
+      "mustNotContain": [
+        "не указан"
+      ]
+    },
+    {
+      "id": "proc-regen-off",
+      "equipmentId": "sdb702-nm",
+      "category": "safety",
+      "question": "Можно ли отключить шкаф во время регенерации?",
+      "expectedKeywords": [
+        "запрещается"
+      ],
+      "mustNotContain": [
+        "можно выключить"
+      ]
+    },
+    {
+      "id": "proc-smoke",
+      "equipmentId": "sdb702-nm",
+      "category": "safety",
+      "question": "Из шкафа идёт дым, что делать?",
+      "expectedKeywords": [
+        "отключ",
+        "питан"
+      ],
+      "mustNotContain": [
+        "уплотнител"
+      ]
+    },
+    {
+      "id": "proc-self-repair",
+      "equipmentId": "sdb702-nm",
+      "category": "safety",
+      "question": "Можно ли самому чинить электронику шкафа?",
+      "expectedKeywords": [
+        "изготовител"
+      ]
+    },
+    {
+      "id": "trouble-rh-not-drop",
+      "equipmentId": "sdb702-nm",
+      "category": "troubleshooting",
+      "question": "Влажность не падает — что делать?",
+      "expectedKeywords": [
+        "3.1.4"
+      ],
+      "mustNotContain": [
+        "SDB1106NM"
+      ]
+    },
+    {
+      "id": "trouble-rh-90",
+      "equipmentId": "sdb702-nm",
+      "category": "troubleshooting",
+      "question": "Влажность скакнула до 90%, что проверять?",
+      "expectedKeywords": [
+        "двер",
+        "уплотнител"
+      ],
+      "mustNotContain": [
+        "перепад напряжения"
+      ]
+    },
+    {
+      "id": "opt-n2",
+      "equipmentId": "sdb702-nm",
+      "category": "options",
+      "question": "Какое максимальное давление азота на входе?",
+      "expectedKeywords": [
+        "6"
+      ],
+      "mustNotContain": [
+        "не указан"
+      ]
+    },
+    {
+      "id": "opt-heat-max",
+      "equipmentId": "sdb702-nm",
+      "category": "options",
+      "question": "Какая максимальная температура подогрева?",
+      "expectedKeywords": [
+        "40"
+      ]
+    },
+    {
+      "id": "maint-dryer",
+      "equipmentId": "sdb702-nm",
+      "category": "maintenance",
+      "question": "Как часто менять блок осушения?",
+      "expectedKeywords": [
+        "36"
+      ]
+    },
+    {
+      "id": "trap-1106-mass",
+      "equipmentId": "sdb702-nm",
+      "category": "trap",
+      "question": "Какой вес у SDB1106NM?",
+      "expectedKeywords": [
+        "только",
+        "SDB702"
+      ],
+      "mustNotContain": [
+        "180 кг"
+      ]
+    },
+    {
+      "id": "trap-702-volume",
+      "equipmentId": "sdb702-nm",
+      "category": "trap",
+      "question": "Какой внутренний объём у SDB302NM?",
+      "expectedKeywords": [
+        "только",
+        "SDB702"
+      ],
+      "mustNotContain": [
+        "500"
+      ]
+    },
+    {
+      "id": "unsupported-wifi",
+      "equipmentId": "sdb702-nm",
+      "category": "unsupported",
+      "question": "Есть ли Wi-Fi?",
+      "expectedKeywords": [
+        "не указан"
+      ]
+    },
+    {
+      "id": "unsupported-mqtt",
+      "equipmentId": "sdb702-nm",
+      "category": "unsupported",
+      "question": "Можно ли подключить шкаф к MQTT?",
+      "expectedKeywords": [
+        "не указан"
+      ]
+    },
+    {
+      "id": "offtopic-python",
+      "equipmentId": "sdb702-nm",
+      "category": "unsupported",
+      "question": "Напиши скрипт на Python.",
+      "expectedKeywords": [
+        "только",
+        "SDB702"
+      ]
+    },
+    {
+      "id": "informal-bought",
+      "equipmentId": "sdb702-nm",
+      "category": "informal",
+      "question": "Только купил шкаф, с чего начать?",
+      "expectedKeywords": [
+        "220"
+      ],
+      "mustNotContain": [
+        "SDB1106NM"
+      ]
+    },
+    {
+      "id": "informal-beep",
+      "equipmentId": "sdb702-nm",
+      "category": "informal",
+      "question": "Почему пищит когда дверь открыта?",
+      "expectedKeywords": [
+        "сигнал"
+      ],
+      "mustNotContain": [
+        "выключите питание"
+      ]
+    },
+    {
+      "id": "informal-set-rh",
+      "equipmentId": "sdb702-nm",
+      "category": "informal",
+      "question": "Как в меню выставить влажность?",
+      "expectedKeywords": [
+        "SET"
+      ],
+      "mustNotContain": [
+        "1–50"
+      ]
+    },
+    {
+      "id": "purpose",
+      "equipmentId": "sdb702-nm",
+      "category": "general",
+      "question": "Для чего предназначен шкаф?",
+      "expectedKeywords": [
+        "хранен",
+        "влаг"
+      ]
+    },
+    {
+      "id": "maker",
+      "equipmentId": "sdb702-nm",
+      "category": "general",
+      "question": "Кто производитель?",
+      "expectedKeywords": [
+        "Совтест"
+      ]
+    },
+    {
+      "id": "transport",
+      "equipmentId": "sdb702-nm",
+      "category": "general",
+      "question": "Как перевозить шкаф?",
+      "expectedKeywords": [
+        "вертикальн"
+      ]
+    },
+    {
+      "id": "talk-cold-shop",
+      "equipmentId": "sdb702-nm",
+      "question": "А у нас в цехе градусов 12, шкаф вообще можно включать или лучше не надо?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-shelves-box",
+      "equipmentId": "sdb702-nm",
+      "question": "Сколько полок в коробке с завода кладут? Не про нагрузку, а просто сколько штук.",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-heat-max",
+      "equipmentId": "sdb702-nm",
+      "question": "Подогрев если есть — до скольки градусов крутить можно максимум?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-ip",
+      "equipmentId": "sdb702-nm",
+      "question": "От воды и пыли какой там IP у корпуса, не помню",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-solvent",
+      "equipmentId": "sdb702-nm",
+      "question": "Можно туда растворитель или что-то горючее на ночь оставить?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-switch",
+      "equipmentId": "sdb702-nm",
+      "question": "Где рубильник выключать если надо питание снять? Сзади что-то было",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-zeolite",
+      "equipmentId": "sdb702-nm",
+      "question": "Чем там внутри влагу вытягивают — какой-то гранулят или что?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-dryer-swap",
+      "equipmentId": "sdb702-nm",
+      "question": "Осушитель когда менять по времени — раз в сколько примерно?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-n2-bar",
+      "equipmentId": "sdb702-nm",
+      "question": "Азот подключаем — сколько бар максимум можно подать, не порвёт?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-idle-watts",
+      "equipmentId": "sdb702-nm",
+      "question": "В простом режиме хранения без всяких опций сколько он жрёт по электричеству?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-climate",
+      "equipmentId": "sdb702-nm",
+      "question": "Климат какой у него по паспорту — ухл или что там в начале книжки написано?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-red-blink",
+      "equipmentId": "sdb702-nm",
+      "question": "Красный мигает, это уже авария или так и должно?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-rh60",
+      "equipmentId": "sdb702-nm",
+      "question": "Влажность 60 показывает, это много? Что делать",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-not-drying",
+      "equipmentId": "sdb702-nm",
+      "question": "Не сушит вообще, уже час стоит, влажность как была так и есть",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-door-wont-latch",
+      "equipmentId": "sdb702-nm",
+      "question": "Дверь не дожимается, писк не прекращается",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-service-phone",
+      "equipmentId": "sdb702-nm",
+      "question": "Куда звонить если сломался, есть телефон сервиса?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-plug",
+      "equipmentId": "sdb702-nm",
+      "question": "Розетка обычная 220 подойдёт или спецпитание надо?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-height",
+      "equipmentId": "sdb702-nm",
+      "question": "Влезет в дверной проём? какой он высокий",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-heavy",
+      "equipmentId": "sdb702-nm",
+      "question": "Тяжёлый? вдвоём поднимем или кран нужен",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-boards-loose",
+      "equipmentId": "sdb702-nm",
+      "question": "Можно платы россыпью на полку кинуть или только в таре?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-phone-app",
+      "equipmentId": "sdb702-nm",
+      "question": "С телефона можно смотреть влажность? приложение есть?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-yellow-long",
+      "equipmentId": "sdb702-nm",
+      "question": "Жёлтый горит уже давно, выключать нельзя же?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-after-door",
+      "equipmentId": "sdb702-nm",
+      "question": "Дверь открыл на минуту — влажность прыгнула, это поломка?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-temp-button",
+      "equipmentId": "sdb702-nm",
+      "question": "Как на циферблате температуру глянуть, там одна влажность",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-set-stuck",
+      "equipmentId": "sdb702-nm",
+      "question": "SET нажал и ничего не происходит, дальше как?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-burn-smell",
+      "equipmentId": "sdb702-nm",
+      "question": "Пахнет горелым слегка, продолжать можно?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-water-floor",
+      "equipmentId": "sdb702-nm",
+      "question": "На полу возле шкафа лужа, это от него?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-how-long-dry",
+      "equipmentId": "sdb702-nm",
+      "question": "Сколько ждать пока высохнет после включения, часами что ли?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-ethernet-must",
+      "equipmentId": "sdb702-nm",
+      "question": "Ethernet обязательно тыкать или можно без компа работать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-off-night",
+      "equipmentId": "sdb702-nm",
+      "question": "На ночь можно выключить чтоб не жрал, или нельзя?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-rh-up-closed",
+      "equipmentId": "sdb702-nm",
+      "question": "Дверь вроде закрыта а влажность всё равно растёт, что смотреть",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-symbol-w",
+      "equipmentId": "sdb702-nm",
+      "question": "На экране какая-то W горит, это что",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-n2-included",
+      "equipmentId": "sdb702-nm",
+      "question": "Азот в комплекте идёт или отдельно докупать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-hot-case",
+      "equipmentId": "sdb702-nm",
+      "question": "Корпус сверху тёплый, не обожгусь? это норма?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-feet-or-wheels",
+      "equipmentId": "sdb702-nm",
+      "question": "Ножки крутить или на колёсах оставлять, как правильнее",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-red-lamp",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Что за красная лампочка?",
+      "expectedKeywords": [
+        "осушен",
+        "двер"
+      ],
+      "mustNotContain": [
+        "обычно ошибка",
+        "обычно означает аварию",
+        "SDB1106"
+      ]
+    },
+    {
+      "id": "n50-red-ember",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Красный огонёк горит, это уже поломка или так и надо?",
+      "expectedKeywords": [
+        "осушен"
+      ],
+      "mustNotContain": [
+        "SDB1106"
+      ]
+    },
+    {
+      "id": "n50-red-solid",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Красный горит постоянно, не мигает — дверь что ли открыта?",
+      "expectedKeywords": [
+        "двер"
+      ]
+    },
+    {
+      "id": "n50-green-mode",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Зелёный сигнал горит, это какой режим сейчас?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-yellow-lunch",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Жёлтый горит, можно на обед вырубить шкаф?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-w-again",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Буква W на дисплее выскочила, это код ошибки?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-feet-kit",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Ножки в комплекте вообще есть или только колёса?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-wheels-count",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Сколько колёс кладут в поставку 702?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-shop-15",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Цех ровно +15, это уже можно включать или ещё рано?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-shop-12-again",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Помещение +12 °C, шкаф в рабочем диапазоне или нет?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-ambient-range",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Какая температура окружающего воздуха для эксплуатации, не подогрева?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-set-menu-how",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "SET нажал — дальше какие кнопки, чтобы влажность задать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-set-dead",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Панель как мёртвая, SET не реагирует совсем, сам кнопку разбирать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-n2-option",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Азот это опция или в базовой поставке уже стоит?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-n2-tube",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Какой диаметр трубки на азот и какой расход?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-hot-100",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Опция подогрева корпус до ста градусов греет, правда? Обожгусь?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-no-cooling",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Там есть контур охлаждения водой? Протекает вроде",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-ethernet-first",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Чтобы просто включить и сушить, Ethernet обязательно первым делом?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-tumbler-where",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Тумблер питания где искать, на кожухе сзади?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-rh60-set",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "На экране 60 RH, это сразу авария или смотреть что в SET стоит?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-wait-3h",
+      "equipmentId": "sdb702-nm",
+      "category": "cards",
+      "question": "Час уже сушит и влажность не упала — это отказ или ещё рано паниковать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-volume-liters",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Сколько литров рабочий объём, не полный?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-full-vs-inner",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Полный объём и внутренний — это разные цифры? Какие?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-width",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какая ширина шкафа в миллиметрах?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-depth",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Глубина какая, в проём по глубине влезет?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-mains-hz",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Сеть 50 герц подойдёт? Напряжение какое?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-rh-step",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "С каким шагом влажность в меню ставится?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-rh-accuracy",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какая точность поддержания влажности по паспорту?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-power-n2-heat-dry",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Осушение если азот и подогрев оба стоят — сколько ватт максимум?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-power-n2-heat-store",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Хранение с азотом и подогревом сколько ест?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-ambient-humidity",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Влажность в помещении вокруг шкафа какая допустимая, не внутри?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-atm-pressure",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Атмосферное давление для работы какое, не путать с барами азота",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-operator-group",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какая группа по электробезопасности у оператора должна быть?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-bracelet",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Антистатический браслет в комплекте идёт?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-software",
+      "equipmentId": "sdb702-nm",
+      "category": "ttx",
+      "question": "Какое ПО в поставке, Dry Storage это оно?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-n2-timer",
+      "equipmentId": "sdb702-nm",
+      "category": "options",
+      "question": "Без датчика азота таймер подачи до скольки минут?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-dn-temp",
+      "equipmentId": "sdb702-nm",
+      "category": "procedure",
+      "question": "Температуру на LCD как посмотреть, кнопкой DN что ли?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-regen-length",
+      "equipmentId": "sdb702-nm",
+      "category": "procedure",
+      "question": "Регенерация сколько минут длится примерно?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-serial",
+      "equipmentId": "sdb702-nm",
+      "category": "general",
+      "question": "Где на шкафу серийный номер искать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-support-mail",
+      "equipmentId": "sdb702-nm",
+      "category": "general",
+      "question": "На какую почту в поддержку писать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-support-hours",
+      "equipmentId": "sdb702-nm",
+      "category": "general",
+      "question": "Поддержка в выходные работает?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-dispose",
+      "equipmentId": "sdb702-nm",
+      "category": "general",
+      "question": "Как шкаф утилизировать когда спишем?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-store-warehouse",
+      "equipmentId": "sdb702-nm",
+      "category": "general",
+      "question": "На складе выключенный шкаф рядом с кислотами можно держать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-trap-1106-ip",
+      "equipmentId": "sdb702-nm",
+      "category": "trap",
+      "question": "У 1106 какой IP, напомни для сравнения с нашим 702",
+      "mustNotContain": [
+        "IP65"
+      ],
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-trap-702-mass",
+      "equipmentId": "sdb702-nm",
+      "category": "trap",
+      "question": "SDB302 сколько весит, у нас же 702 чат",
+      "mustNotContain": [
+        "70 кг"
+      ],
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-trap-catalog-rh",
+      "equipmentId": "sdb702-nm",
+      "category": "trap",
+      "question": "Влажность 1 до 50 процентов как в рекламе, так и в РЭ?",
+      "mustNotContain": [
+        "1–50"
+      ],
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-unsup-modbus",
+      "equipmentId": "sdb702-nm",
+      "category": "unsupported",
+      "question": "Modbus есть у этого шкафа?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-unsup-app",
+      "equipmentId": "sdb702-nm",
+      "category": "unsupported",
+      "question": "С айфона влажность смотреть можно? Приложение официальное",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-offtopic-recipe",
+      "equipmentId": "sdb702-nm",
+      "category": "unsupported",
+      "question": "Рецепт борща напиши",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-door-signal",
+      "equipmentId": "sdb702-nm",
+      "category": "procedure",
+      "question": "Если дверь открыл, какой сигнал должен быть, только звук или ещё красный?",
+      "expectedKeywords": []
+    }
+  ]
+}

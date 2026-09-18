@@ -20,18 +20,34 @@ const {
   STRICT_ABSTAIN,
 } = require("../prompts");
 const { isRegenerationShutdownQuery, isEmergencySmokeQuery } = require("../safety-query-scope");
-const { llmGenerationOptionsForIntent } = require("../query-intent");
+const { llmGenerationOptionsForIntent, equipmentIsSdb151nm } = require("../query-intent");
+const {
+  filterSdb151nmChunks,
+  prependSdb151nmContextPreface,
+} = require("../sdb151nm-context-filter");
 const {
   isHumidityNotDroppingQuery,
   appendHumidityMandatoryChecks,
 } = require("../troubleshooting-scope");
 const { validateAnswerAgainstContext } = require("../answer-validation");
-const { detectForeignSdbModelQuery, FOREIGN_MODEL_REPLY } = require("../sdb1106nm-scope");
-const { tryDeterministicSdb1106nmAnswer } = require("../sdb1106nm-direct-facts");
+const { resolveEquipmentProfile } = require("../../equipment/equipment-runtime");
+const {
+  tryDeterministicSdb1106nmAnswer,
+  directContextHintsForMessage,
+} = require("../sdb1106nm-direct-facts");
+const {
+  resolveGoldenFactMatch,
+  isHighConfidenceDeterministic,
+} = require("../sdb1106nm-golden-facts");
+const {
+  prefersRagOverDeterministic,
+  proceduralSectionHintsForMessage,
+} = require("../sdb1106nm-rag-priority");
 const {
   parseSafetyChecklistItems,
   formatSafetyChecklistLines,
 } = require("../synthesis/safety-checklist-parse");
+const { sanitizeLlmAnswerArtifacts } = require("../synthesis/strip-spurious-checklist");
 const { ragInfo, ragWarn } = require("../rag-log");
 const { rewriteQueryForRetrieval } = require("../query-rewriting");
 
@@ -231,7 +247,31 @@ function isHumidityChecklistIntent(message) {
   );
 }
 
-function isParameterFactLlmQuery(routerDecision) {
+/** Golden есть, но ответ должен быть развёрнутым RAG (дверь >1 мин, описание режима). */
+function goldenShouldDeferToRag(match, message) {
+  const m = String(message || "");
+  const key = match?.key;
+  if (key === "door_sound_signal" && /минут|долго|забыл|что\s+случит|что\s+произойд/i.test(m)) {
+    return true;
+  }
+  if (key === "regen_cycle_duration" && /опиш|кратко|что\s+происход/i.test(m)) {
+    return true;
+  }
+  return false;
+}
+
+function isParameterFactLlmQuery(routerDecision, message = "") {
+  const m = String(message || "");
+  if (
+    /конвекц|как\s+работ|что\s+произойд|что\s+случит|опиш|погруз|разгруз|установить\s+полк|расстояни.*полк|между\s+полк/i.test(
+      m
+    )
+  ) {
+    return false;
+  }
+  if (/конвекц|между\s+полк|расстояни.*полк/i.test(m) && /полк/i.test(m)) {
+    return false;
+  }
   return (
     routerDecision?.intent === "SINGLE_FIELD_QUERY" || Boolean(routerDecision?.parameterResolved)
   );
@@ -239,21 +279,54 @@ function isParameterFactLlmQuery(routerDecision) {
 
 function selectPromptChunks(route, fusedChunks, opts = {}) {
   const chunks = Array.isArray(fusedChunks) ? fusedChunks : [];
-  const wide = opts.retrievalMode === "hybrid_wide";
-  const cap = wide ? 10 : null;
+  const wide = opts.retrievalMode === "hybrid_wide" || opts.ragPriority === true;
+  const cap = wide ? 12 : null;
   const take = (n) => chunks.slice(0, n);
   switch (route) {
     case "TROUBLESHOOTING_QA":
-      return take(cap || 6);
-    case "PROCEDURAL_QA":
-      return take(cap || 6);
-    case "REASONING_QA":
       return take(cap || 8);
+    case "PROCEDURAL_QA":
+      return take(cap || 8);
+    case "REASONING_QA":
+      return take(cap || 10);
     case "SAFETY_QA":
-      return take(cap || 6);
+      return take(cap || 8);
     default:
-      return take(cap || 6);
+      return take(cap || 8);
   }
+}
+
+function mergeSectionHints(routerDecision, message, equipment) {
+  const base = Array.isArray(routerDecision?.sectionHints) ? routerDecision.sectionHints : [];
+  const equipmentId = equipment?.id;
+  if (equipmentId === "sdb1106-nm") {
+    return [...new Set([...base, ...proceduralSectionHintsForMessage(message)])];
+  }
+  const profile = resolveEquipmentProfile(equipmentId);
+  const modelHints = profile?.sectionHints ? profile.sectionHints(message) : [];
+  return [...new Set([...base, ...modelHints])];
+}
+
+function formatContextForEquipmentPrompt(chunks, equipment) {
+  const selected = equipmentIsSdb151nm(equipment) ? filterSdb151nmChunks(chunks) : chunks;
+  let text = formatContextForPrompt(selected);
+  if (equipmentIsSdb151nm(equipment)) {
+    text = prependSdb151nmContextPreface(text);
+  }
+  return { chunks: selected, text };
+}
+
+function prependRetrievalGuidance(message, retrievalContext, equipment) {
+  const equipmentId = equipment?.id;
+  const profile = resolveEquipmentProfile(equipmentId);
+  const hints =
+    equipmentId === "sdb1106-nm"
+      ? directContextHintsForMessage(message)
+      : profile?.directContextHints?.(message);
+  if (!hints) {
+    return retrievalContext;
+  }
+  return `[Ориентиры по разделам РЭ]\n${hints}\n\n---\n\n${retrievalContext}`;
 }
 
 /**
@@ -345,8 +418,9 @@ async function maybeContextualFactAliasRetry({
     );
     const merged = selectPromptChunksDeterministicFactFallback(altPool, chunks, [], 4, 8);
     if (merged.length) {
-      chunks = merged;
-      retryContext = formatContextForPrompt(chunks);
+      const formatted = formatContextForEquipmentPrompt(merged, equipment);
+      chunks = formatted.chunks;
+      retryContext = formatted.text;
     }
   }
 
@@ -413,30 +487,25 @@ async function runPipeline({
   const ragConfig = getRagConfig();
   const trace = new TraceModel({ equipmentId: equipment.id });
   trace.setRouter(routerDecision);
+  const equipmentProfile = resolveEquipmentProfile(equipment.id);
 
-  if (detectForeignSdbModelQuery(message)) {
-    return {
-      answer: FOREIGN_MODEL_REPLY,
-      sources: [],
-      retrieval: {
-        route: routerDecision.route,
-        retrievalStrategy: "scope_reject",
-        topScore: 0,
-        chunks: 0,
-        fallback: false,
-        llmUsed: false,
-        deterministicUsed: false,
-        groundingPassed: true,
-        abstained: false,
-      },
-      ragTrace: trace.build(),
-    };
-  }
+  const ragPriority =
+    equipment.id === "sdb1106-nm" && prefersRagOverDeterministic(message, routerDecision);
 
   if (equipment.id === "sdb1106-nm") {
     const deterministic = tryDeterministicSdb1106nmAnswer(message, { history });
-    if (deterministic) {
-      ragInfo("pipeline.sdb1106nm_deterministic", { mode: "pre_llm", questionLen: message.length });
+    const goldenMatch = resolveGoldenFactMatch(message, history);
+    const forceGoldenDeterministic =
+      deterministic &&
+      goldenMatch &&
+      isHighConfidenceDeterministic(goldenMatch) &&
+      !goldenShouldDeferToRag(goldenMatch, message);
+    if (deterministic && (!ragPriority || forceGoldenDeterministic)) {
+      ragInfo("pipeline.sdb1106nm_deterministic", {
+        mode: forceGoldenDeterministic && ragPriority ? "pre_llm_golden_override" : "pre_llm",
+        questionLen: message.length,
+        factKey: goldenMatch?.key || null,
+      });
       return buildSdb1106nmDeterministicResult(
         equipment,
         message,
@@ -445,6 +514,28 @@ async function runPipeline({
         deterministic
       );
     }
+  } else if (equipmentProfile?.tryDeterministicAnswer) {
+    const deterministic = equipmentProfile.tryDeterministicAnswer(message, { history });
+    if (deterministic) {
+      ragInfo("pipeline.equipment_deterministic", {
+        equipmentId: equipment.id,
+        questionLen: message.length,
+      });
+      return buildSdb1106nmDeterministicResult(
+        equipment,
+        message,
+        routerDecision,
+        trace,
+        deterministic
+      );
+    }
+  }
+
+  if (ragPriority) {
+    ragInfo("pipeline.sdb1106nm_rag_priority", {
+      route: routerDecision?.route,
+      retrievalMode: routerDecision?.retrievalMode,
+    });
   }
 
   const rewriteResult = await rewriteQueryForRetrieval({
@@ -462,19 +553,22 @@ async function runPipeline({
     standaloneLen: String(retrievalQuery).length,
   });
 
+  const sectionHints = mergeSectionHints(routerDecision, message, equipment);
+
   const retrieval = await unifiedRetrieve({
     ragConfig,
     equipmentId: equipment.id,
     query: retrievalQuery,
     routerDecision,
     retrievalTopCap: resolveRetrievalTopK(ragConfig, routerDecision, retrievalQuery),
-    sectionHints: routerDecision.sectionHints,
+    sectionHints,
   });
 
   const fusedChunks = retrieval.fusedChunks || [];
-  const parameterFactLlm = isParameterFactLlmQuery(routerDecision);
+  const parameterFactLlm = isParameterFactLlmQuery(routerDecision, message);
   let promptChunks = selectPromptChunks(routerDecision.route, fusedChunks, {
     retrievalMode: routerDecision.retrievalMode,
+    ragPriority,
   });
   if (parameterFactLlm) {
     promptChunks = selectPromptChunksDeterministicFactFallback(
@@ -482,10 +576,12 @@ async function runPipeline({
       retrieval.semanticChunks,
       retrieval.chunksBeforeSingleFieldNarrowing,
       4,
-      8
+      10
     );
   }
-  let retrievalContext = formatContextForPrompt(promptChunks);
+  const promptFormatted = formatContextForEquipmentPrompt(promptChunks, equipment);
+  promptChunks = promptFormatted.chunks;
+  let retrievalContext = prependRetrievalGuidance(message, promptFormatted.text, equipment);
   let sources = extractSources(promptChunks);
   trace.setRetrieval({
     route: routerDecision.route,
@@ -517,7 +613,10 @@ async function runPipeline({
   } else if (decision.action === ACTIONS.ABSTAIN) {
     finalAnswer = STRICT_ABSTAIN;
   } else {
-    const causalContext = routerDecision.route === "REASONING_QA" ? formatContextForPrompt((retrieval.raw.causalChain || []).slice(0, 6)) : "";
+    const causalContext =
+      routerDecision.route === "REASONING_QA"
+        ? formatContextForEquipmentPrompt((retrieval.raw.causalChain || []).slice(0, 6), equipment).text
+        : "";
     const systemPrompt = buildSystemPromptByRoute(
       routerDecision.route,
       equipment,
@@ -605,12 +704,12 @@ async function runPipeline({
         const tempPowerFail = (preCheck.failures || []).some(
           (f) => f.detail === "temperature_answer_contains_power_watts"
         );
-        if (tempPowerFail) {
+        if (tempPowerFail && !equipmentIsSdb151nm(equipment)) {
           const retryComposition = [
             buildLlmAnswerCompositionBlocks(retrievalContext, message, equipment),
             "",
             "ПОВТОР: вопрос про температуру нагрева (°C), не про потребляемую мощность (Вт).",
-            "Ответь только диапазоном +20…+40 °C по опции «Система подогрева» (п. 2.3.3.1); значения выше +40 °C — запрещены.",
+            "Ответь только диапазоном **T окр. +5 °C … +40 °C** по опции «Система подогрева» (п. 1.2.1.1); значения выше +40 °C — запрещены.",
           ].join("\n");
           const retryPrompt = buildSystemPromptByRoute(
             parameterFactLlm ? "PROCEDURAL_QA" : routerDecision.route,
@@ -769,6 +868,11 @@ async function runPipeline({
     }
   }
 
+  finalAnswer = sanitizeLlmAnswerArtifacts(finalAnswer, {
+    route: routerDecision.route,
+    message,
+  });
+
   const answerBeforeGuardrails = finalAnswer;
   const scores = retrieval.scores || {};
   const semanticHint = Math.max(
@@ -784,12 +888,12 @@ async function runPipeline({
     candidateLen: String(answerBeforeGuardrails || "").length,
     semanticHint,
     semanticRescueThreshold: ragConfig.semanticRescueThreshold,
-    deferredPostGate: equipment.id === "sdb1106-nm",
+    deferredPostGate: Boolean(equipmentProfile?.deferGuardrailsToPostGate),
   });
 
   const pipelineIntent = pipelineIntentForValidation(routerDecision, retrieval);
 
-  if (equipment.id === "sdb1106-nm") {
+  if (equipmentProfile?.deferGuardrailsToPostGate) {
     const outboundAnswer = String(finalAnswer || "").trim() || STRICT_ABSTAIN;
     trace.setGuardrails({ skipped: true, reason: "deferred_to_server_post_gate" });
     trace.setAnswerDelivery({

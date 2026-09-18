@@ -1,0 +1,26 @@
+{
+  "items": [
+    {"id":"01-purpose","equipmentId":"sdb702-nm","question":"Для чего предназначен шкаф SDB702NM?","expectedKeywords":["хранения","влаги"]},
+    {"id":"02-specs","equipmentId":"sdb702-nm","question":"Какие габариты, масса и IP у шкафа?","expectedKeywords":["602","1952","772","90","IP55"]},
+    {"id":"03-kit","equipmentId":"sdb702-nm","question":"Что входит в базовую поставку?","expectedKeywords":["7","осушитель","Dry","браслет"]},
+    {"id":"04-indication","equipmentId":"sdb702-nm","question":"Что отображает блок управления и индикации?","expectedKeywords":["влажност","температур"]},
+    {"id":"05-heating","equipmentId":"sdb702-nm","question":"Каковы параметры опции подогрева воздуха?","expectedKeywords":["40","5","температур"]},
+    {"id":"06-nitrogen","equipmentId":"sdb702-nm","question":"Как работают ротаметры опции азота?","expectedKeywords":["Рпост","Ррег"]},
+    {"id":"07-nitrogen-sensor","equipmentId":"sdb702-nm","question":"Какой диапазон концентрации азота задаётся с датчиком?","expectedKeywords":["78","98"]},
+    {"id":"08-loading","equipmentId":"sdb702-nm","question":"Какие ограничения при загрузке полок?","expectedKeywords":["50","мм","50","кг"]},
+    {"id":"09-preparation","equipmentId":"sdb702-nm","question":"Что проверить перед первым включением?","expectedKeywords":["осмотр","напряжен"]},
+    {"id":"10-switch-on","equipmentId":"sdb702-nm","question":"Как включить шкаф по руководству?","expectedKeywords":["вилк","тумблер"]},
+    {"id":"11-rh-menu","equipmentId":"sdb702-nm","question":"Как задать порог влажности в меню?","expectedKeywords":["SET","UP"]},
+    {"id":"12-door","equipmentId":"sdb702-nm","question":"Что происходит с азотом после открытия и закрытия двери?","expectedKeywords":["таймер","азот"]},
+    {"id":"13-regeneration","equipmentId":"sdb702-nm","question":"Можно ли выключать шкаф во время регенерации?","expectedKeywords":["запрещается"]},
+    {"id":"14-emergency","equipmentId":"sdb702-nm","question":"Что делать при запахе гари из шкафа?","expectedKeywords":["питани"]},
+    {"id":"15-maintenance","equipmentId":"sdb702-nm","question":"Какова периодичность технического обслуживания?","expectedKeywords":["36","12","месяц"]},
+    {"id":"16-faults","equipmentId":"sdb702-nm","question":"Влажность не снижается: где в РЭ искать подтверждённые причины?","expectedKeywords":["неисправ","осушител"]},
+    {"id":"17-repair","equipmentId":"sdb702-nm","question":"Кто может ремонтировать электронные блоки после гарантии?","expectedKeywords":["изготовител"]},
+    {"id":"18-storage","equipmentId":"sdb702-nm","question":"Какие условия хранения шкафа на складе?","expectedKeywords":["кислот","щелоч"]},
+    {"id":"19-transport","equipmentId":"sdb702-nm","question":"Как транспортировать шкаф?","expectedKeywords":["вертикальн","упаковк"]},
+    {"id":"20-disposal","equipmentId":"sdb702-nm","question":"Как утилизировать шкаф?","expectedKeywords":["общепромышлен"]},
+    {"id":"21-foreign","equipmentId":"sdb702-nm","question":"Какой вес SDB1106NM?","expectedKeywords":["только","SDB702"],"mustNotContain":["180 кг"]},
+    {"id":"22-unsupported","equipmentId":"sdb702-nm","question":"Какой производитель датчика влажности?","expectedKeywords":["не указан"]}
+  ]
+}

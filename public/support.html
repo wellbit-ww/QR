@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Запрос в поддержку</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/styles.css?v=20260811" />
+  </head>
+  <body class="layout-support">
+    <main class="page page--support">
+      <section class="card card--support">
+        <header class="support-page-header">
+          <a
+            class="support-back-link"
+            id="supportBackLink"
+            href="/"
+          >
+            <span class="support-back-link__icon" aria-hidden="true">←</span>
+            <span class="support-back-link__label">Назад</span>
+          </a>
+          <h1 class="support-page-title">Запрос в поддержку</h1>
+          <div class="equipment-badge" id="supportEquipmentBadge">
+            Загрузка…
+          </div>
+        </header>
+
+        <form
+          class="support-form support-form--page"
+          id="supportForm"
+          enctype="multipart/form-data"
+          novalidate
+        >
+          <label class="support-field">
+            <span class="support-field__label">Название организации</span>
+            <input
+              class="support-field__input"
+              name="organization"
+              type="text"
+              placeholder="Название"
+              required
+            />
+            <span class="support-field__hint" data-support-org-hint hidden></span>
+          </label>
+          <label class="support-field">
+            <span class="support-field__label">Контактное лицо</span>
+            <input
+              class="support-field__input"
+              name="contactName"
+              type="text"
+              placeholder="ФИО"
+              required
+            />
+          </label>
+          <label class="support-field">
+            <span class="support-field__label">Должность</span>
+            <input
+              class="support-field__input"
+              name="position"
+              type="text"
+              placeholder="Должность"
+            />
+          </label>
+          <label class="support-field">
+            <span class="support-field__label">Телефон</span>
+            <input
+              class="support-field__input"
+              name="phone"
+              type="tel"
+              placeholder="+7 (___) ___-__-__"
+              required
+            />
+          </label>
+          <label class="support-field">
+            <span class="support-field__label">Электронная почта</span>
+            <input
+              class="support-field__input"
+              name="email"
+              type="email"
+              placeholder="Электронная почта"
+              required
+            />
+          </label>
+          <label class="support-field">
+            <span class="support-field__label">Модель оборудования</span>
+            <input
+              class="support-field__input"
+              name="equipmentModel"
+              type="text"
+              placeholder="Название модели"
+              required
+            />
+          </label>
+          <label class="support-field" data-support-serial-field>
+            <span class="support-field__label">Серийный номер</span>
+            <div class="support-serial-autocomplete">
+              <input
+                class="support-field__input"
+                name="serialNumber"
+                type="text"
+                placeholder="Номер"
+                autocomplete="off"
+              />
+              <ul
+                class="support-serial-suggestions"
+                data-support-serial-suggestions
+                role="listbox"
+                hidden
+              ></ul>
+            </div>
+            <span class="support-field__hint" data-support-serial-hint hidden></span>
+          </label>
+          <label class="support-field support-field--full">
+            <span class="support-field__label">Ваш вопрос</span>
+            <textarea
+              class="support-field__input support-field__textarea"
+              name="message"
+              rows="5"
+              placeholder="Опишите вашу проблему"
+              required
+            ></textarea>
+          </label>
+          <label class="support-field support-field--full">
+            <span class="support-field__label">Вложения (PDF, DOC, фото)</span>
+            <input
+              class="support-field__file"
+              name="attachments"
+              type="file"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.heic,.heif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp,image/heic,image/heif"
+              multiple
+            />
+            <span class="support-field__hint">PDF, DOC, JPG, PNG, WEBP, HEIC — до 5 файлов, каждый не более 10 МБ</span>
+          </label>
+          <label class="support-consent">
+            <input
+              class="support-consent__checkbox"
+              name="consent"
+              type="checkbox"
+              required
+            />
+            <span class="support-consent__text">
+              Я соглашаюсь на обработку моих персональных данных в соотв. с ФЗ от
+              27.07.2006 №152-ФЗ на условиях и для целей, определенных
+              <a
+                href="https://sovtest-ate.ru/info/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                >политикой конфиденциальности</a
+              >
+            </span>
+          </label>
+          <p class="support-form__error" id="supportFormError" hidden></p>
+          <p class="support-form__success" id="supportFormSuccess" hidden></p>
+          <button type="submit" class="support-submit">
+            <span class="support-submit__text">Отправить</span>
+            <span class="support-submit__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  fill="currentColor"
+                  d="M3.4 11.2 19.6 4.5c.9-.4 1.8.5 1.4 1.4l-6.7 16.2c-.4.9-1.7.8-1.9-.1l-1.5-6-6-1.5c-.9-.2-1-.5-.1-1.3Z"
+                />
+              </svg>
+            </span>
+          </button>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer footer--support"><span class="footer-brand">SOVTEST</span></footer>
+
+    <script src="/cookie-consent.js?v=20260811"></script>
+    <script src="/support-modal.js" defer></script>
+    <script src="/support.js" defer></script>
+  </body>
+</html>
