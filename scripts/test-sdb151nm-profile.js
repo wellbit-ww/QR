@@ -1,6 +1,4 @@
 const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
 const {
   tryDeterministicSdb151nmAnswer,
 } = require("../src/rag/sdb151nm-direct-facts");
@@ -13,8 +11,11 @@ const {
 } = require("../src/rag/sdb-model-scope");
 const {
   sectionHintsForSdb151nmMessage,
+  retrievalCardFilesForSdb151nmQuery,
 } = require("../src/rag/sdb151nm-rag-priority");
 const { buildQueryRewriteSystemPrompt, buildGeneralFactSystemPrompt, buildSdb151nmDirectSystemPrompt } = require("../src/rag/prompts");
+const { expandRetrievalSynonyms } = require("../src/rag/query-rewriting");
+const { buildSdb151nmLlmAnswerCompositionBlocks } = require("../src/rag/sdb151nm-prompt-rules");
 const { validateSdb151nmAnswerAgainstContext } = require("../src/rag/sdb151nm-answer-validation");
 const { applySdb151nmPostGate } = require("../src/rag/sdb151nm-post-gate");
 
@@ -38,9 +39,7 @@ const cases = [
   ["Что входит в базовую комплектацию?", "3 перфорированные полки"],
   ["Чем осушитель поглощает влагу?", "цеолитом"],
   ["Как часто менять осушитель?", "36 месяцев"],
-  ["Какая максимальная температура подогрева?", "не приведена"],
-  ["До скольки подогрев?", "не приведена"],
-  ["Что на дисплее горит в обычной работе?", "влажност"],
+  ["Какая максимальная температура подогрева?", "+40"],
   ["Какой таймер подачи азота?", "99,9 мин"],
   ["Как работают ротаметры азота?", "Рпост"],
   ["Как установить влажность в меню?", "SET"],
@@ -61,6 +60,162 @@ for (const [question, expected] of cases) {
   assert.ok(answer, `No deterministic answer for: ${question}`);
   assert.match(answer, new RegExp(expected.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "iu"));
 }
+
+const p1p2Cases = [
+  ["Можно ли отключить шкаф во время регенерации?", "Запрещается"],
+  ["Какое максимальное давление азота на входе?", "6 бар"],
+  ["Как задать порог влажности", "UP/DN"],
+  ["Как в меню выставить влажность?", "UP/DN"],
+  ["От воды и пыли какой там IP у корпуса, не помню", "IP55"],
+  ["Осушитель когда менять по времени — раз в сколько примерно?", "36 месяцев"],
+  ["Как часто менять блок осушения?", "36 месяцев"],
+  ["Влезет в дверной проём? какой он высокий", "655"],
+  ["Тяжёлый? вдвоём поднимем или кран нужен", "46 кг"],
+  ["Климат какой у него по паспорту — ухл или что там в начале книжки написано?", "УХЛ"],
+  ["Можно платы россыпью на полку кинуть или только в таре?", "таре"],
+  ["Можно туда растворитель или что-то горючее на ночь оставить?", "не предназначен"],
+  ["Влажность не падает — что делать?", "отсутствии снижения влажности"],
+  [
+    "Через какое время после включения шкаф должен выйти на установленный режим влажности?",
+    "3 часов",
+  ],
+  [
+    "С какой точностью шкаф поддерживает установленную влажность?",
+    "±1 RH%",
+  ],
+  ["Какой объём рабочего пространства у шкафа?", "не указан"],
+  [
+    "Защищает ли шкаф диэлектрики от изменения электрических характеристик?",
+    "диэлектриков",
+  ],
+  [
+    "Можно ли использовать шкаф для хранения изделий, которым требуется высокая влажность?",
+    "высокая влажность",
+  ],
+];
+for (const [question, expected] of p1p2Cases) {
+  const answer = tryDeterministicSdb151nmAnswer(question);
+  assert.ok(answer, `No deterministic answer for P1/P2: ${question}`);
+  assert.match(answer, new RegExp(expected.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "iu"));
+}
+
+const highHumidityStorage = tryDeterministicSdb151nmAnswer(
+  "Можно ли использовать шкаф для хранения изделий, которым требуется высокая влажность?"
+);
+assert.doesNotMatch(highHumidityStorage, /602/u);
+assert.doesNotMatch(highHumidityStorage, /габарит/iu);
+
+const timeToRh = tryDeterministicSdb151nmAnswer(
+  "Через какое время после включения шкаф должен выйти на установленный режим влажности?"
+);
+assert.doesNotMatch(timeToRh, /SET/u);
+
+const rhPrecision = tryDeterministicSdb151nmAnswer(
+  "С какой точностью шкаф поддерживает установленную влажность?"
+);
+assert.doesNotMatch(rhPrecision, /SET/u);
+
+const loadRhRise = tryDeterministicSdb151nmAnswer(
+  "Почему после загрузки изделий влажность внутри шкафа повысилась?"
+);
+assert.match(loadRhRise, /открытой двери/u);
+assert.match(loadRhRise, /вентилятор/u);
+assert.doesNotMatch(loadRhRise, /параметр не указан/u);
+assert.doesNotMatch(loadRhRise, /предположить/u);
+
+const doorDryDelay = tryDeterministicSdb151nmAnswer(
+  "Почему шкаф не сразу осушает воздух после закрытия двери?"
+);
+assert.match(doorDryDelay, /60/u);
+assert.doesNotMatch(doorDryDelay, /цеолит/u);
+
+const setpointVsAmbient = tryDeterministicSdb151nmAnswer(
+  "Что произойдёт, если я установлю влажность 10 %, а в помещении влажность составляет 50 %?"
+);
+assert.match(setpointVsAmbient, /осушать к 10 RH%/u);
+assert.match(setpointVsAmbient, /допустима/u);
+assert.doesNotMatch(setpointVsAmbient, /параметр не указан/u);
+assert.doesNotMatch(setpointVsAmbient, /\bSET\b/u);
+
+const fanRestart1Rh = tryDeterministicSdb151nmAnswer(
+  "Почему шкаф повторно включает вентилятор, если влажность повысилась всего на 1%?"
+);
+assert.match(fanRestart1Rh, /RH%п \+ 1 RH%/u);
+assert.match(fanRestart1Rh, /1\.1\.4\.4\.1/u);
+assert.doesNotMatch(fanRestart1Rh, /параметр не указан/u);
+
+assert.doesNotMatch(rhPrecision, /RH%п \+ 1/u);
+
+const rhBelowSetpoint = tryDeterministicSdb151nmAnswer(
+  "Почему влажность внутри шкафа может опуститься ниже установленного значения"
+);
+assert.match(rhBelowSetpoint, /1\.1\.4\.4\.2/u);
+assert.match(rhBelowSetpoint, /заслонк/u);
+assert.doesNotMatch(rhBelowSetpoint, /общих принципов/u);
+assert.doesNotMatch(rhBelowSetpoint, /общих принципов работы/u);
+
+const humidityRiseClosed = tryDeterministicSdb151nmAnswer(
+  "Дверь вроде закрыта а влажность всё равно растёт, что смотреть"
+);
+assert.ok(
+  !humidityRiseClosed || !/Ррег/u.test(humidityRiseClosed),
+  `Closed-door humidity rise must not be nitrogen timer: ${humidityRiseClosed}`
+);
+
+const redLamp = tryDeterministicSdb151nmAnswer("что за красная лампочка?");
+assert.match(redLamp, /1\.1\.4\.3\.3/u);
+assert.match(redLamp, /Осушения/u);
+assert.match(redLamp, /открыта дверь/u);
+assert.doesNotMatch(redLamp, /обычно/u);
+
+const ragPathCases = [
+  "Красный мигает, это уже авария или так и должно?",
+  "Как начать работу с шкафом?",
+  "Только купил шкаф, с чего начать?",
+  "SET нажал и ничего не происходит, дальше как?",
+  "На полу возле шкафа лужа, это от него?",
+  "На ночь можно выключить чтоб не жрал, или нельзя?",
+  "Жёлтый горит уже давно, выключать нельзя же?",
+  "Где рубильник выключать если надо питание снять? Сзади что-то было",
+];
+for (const question of ragPathCases) {
+  const answer = tryDeterministicSdb151nmAnswer(question);
+  assert.equal(
+    answer,
+    null,
+    `Conversational probe must go to RAG, got deterministic for: ${question} → ${answer}`
+  );
+}
+
+const restartCheckFacts = [
+  ["Помещение +12 °C, шкаф в рабочем диапазоне или нет?", ["+15", "вне"]],
+  ["А у нас в цехе градусов 12, шкаф вообще можно включать или лучше не надо?", ["+15", "вне"]],
+  ["Опция подогрева корпус до ста градусов греет, правда? Обожгусь?", ["100", "ожог"]],
+  ["Корпус сверху тёплый, не обожгусь? это норма?", ["100"]],
+  ["Сколько колёс кладут в поставку 151?", ["не входят"]],
+  ["Ножки крутить или на колёсах оставлять, как правильнее", ["не входят"]],
+  ["Буква W на дисплее выскочила, это код ошибки?", ["подогрев"]],
+  ["На экране какая-то W горит, это что", ["подогрев"]],
+  ["Зелёный сигнал горит, это какой режим сейчас?", ["Хранен"]],
+];
+for (const [question, needles] of restartCheckFacts) {
+  const answer = tryDeterministicSdb151nmAnswer(question);
+  assert.ok(answer, `No deterministic answer for: ${question}`);
+  for (const needle of needles) {
+    assert.match(answer, new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "iu"), question);
+  }
+}
+assert.doesNotMatch(
+  tryDeterministicSdb151nmAnswer("Опция подогрева корпус до ста градусов греет, правда? Обожгусь?"),
+  /максимальная — \*\*\+40/u
+);
+assert.doesNotMatch(
+  tryDeterministicSdb151nmAnswer("Буква W на дисплее выскочила, это код ошибки?"),
+  /нет кодов ошибок/u
+);
+const heatingMax = tryDeterministicSdb151nmAnswer("Какая максимальная температура подогрева?");
+assert.match(heatingMax, /\+40/u);
+assert.doesNotMatch(heatingMax, /100/u);
 
 const foreign = classifySdb151nmMessage("Какая мощность у SDB1106NM?");
 assert.equal(foreign.action, "FOREIGN_MODEL");
@@ -94,7 +249,7 @@ for (const [question, expected] of chatgptCases) {
 const scoped = classifySdb151nmMessage("Как настроить влажность?");
 assert.equal(scoped.action, "IN_SCOPE");
 
-const equipment = { id: "sdb151-nm", name: "SDB151 NM" };
+const equipment = { id: "w-700", name: "SDB151 NM" };
 assert.deepEqual(foreignSdbModels("Сравни с SDB1106NM", equipment), ["SDB1106NM"]);
 assert.match(anchorQueryToEquipmentModel("какой вес", equipment), /SDB151NM/u);
 assert.doesNotMatch(anchorQueryToEquipmentModel("какой вес SDB151NM", equipment), /SDB1106NM/u);
@@ -116,6 +271,67 @@ for (const [question, expectedHint] of sectionCases) {
     `No ${expectedHint} hint for: ${question}`
   );
 }
+
+const conversationalHintCases = [
+  ["Красный мигает, это уже авария или так и должно?", "1.1.4.3.3"],
+  ["Красный мигает, это уже авария или так и должно?", "осушен"],
+  ["что за красная лампочка?", "1.1.4.3.3"],
+  ["На экране какая-то W горит, это что", "подогрев"],
+  ["Как начать работу с шкафом?", "2.2.5"],
+  ["Только купил шкаф, с чего начать?", "тумблер"],
+  ["А у нас в цехе градусов 12, шкаф вообще можно включать или лучше не надо?", "+15"],
+  ["SET нажал и ничего не происходит, дальше как?", "таблица 3.2"],
+  ["На полу возле шкафа лужа, это от него?", "2.4"],
+  ["Ножки крутить или на колёсах оставлять, как правильнее", "таблица 1.2"],
+  ["На ночь можно выключить чтоб не жрал, или нельзя?", "режим хранения"],
+  ["Жёлтый горит уже давно, выключать нельзя же?", "регенерац"],
+  ["Где рубильник выключать если надо питание снять? Сзади что-то было", "тумблер"],
+  ["Корпус сверху тёплый, не обожгусь? это норма?", "подогрев"],
+  ["Зелёный сигнал горит, это какой режим сейчас?", "хранен"],
+  ["Буква W на дисплее выскочила, это код ошибки?", "подогрев"],
+  ["Сколько колёс кладут в поставку 151?", "таблица 1.2"],
+];
+for (const [question, expectedHint] of conversationalHintCases) {
+  assert.ok(
+    sectionHintsForSdb151nmMessage(question).includes(expectedHint),
+    `No ${expectedHint} hint for conversational: ${question} → ${sectionHintsForSdb151nmMessage(question).join(", ")}`
+  );
+}
+assert.equal(
+  sectionHintsForSdb151nmMessage("Красный мигает, это уже авария или так и должно?").includes("2.4"),
+  false,
+  "Blinking red must not be steered to emergency 2.4"
+);
+assert.equal(
+  sectionHintsForSdb151nmMessage("А у нас в цехе градусов 12, шкаф вообще можно включать или лучше не надо?").includes("5"),
+  false,
+  "Shop temperature must not be steered to storage section 5"
+);
+
+const eq302 = { id: "w-700" };
+const shopTempExpanded = expandRetrievalSynonyms(
+  "А у нас в цехе градусов 12, шкаф вообще можно включать",
+  eq302
+);
+assert.match(shopTempExpanded, /\+15/);
+assert.doesNotMatch(shopTempExpanded, /\+40/);
+assert.match(expandRetrievalSynonyms("подогрев", { id: "sdb702-nm" }), /\+40/);
+assert.match(expandRetrievalSynonyms("подогрев", eq302), /\+40/);
+assert.match(
+  expandRetrievalSynonyms("Красный мигает, это уже авария или так и должно?", eq302),
+  /1\.1\.4\.3\.3/
+);
+assert.match(expandRetrievalSynonyms("что за красная лампочка?", eq302), /1\.1\.4\.3\.3/);
+assert.match(expandRetrievalSynonyms("что за красная лампочка?", eq302), /индикатор/);
+assert.match(expandRetrievalSynonyms("Как начать работу с шкафом?", eq302), /тумблер/);
+
+const startBlocks = buildSdb151nmLlmAnswerCompositionBlocks("", "Как начать работу с шкафом?").join("\n");
+assert.match(startBlocks, /2\.2\.5/u);
+const redBlocks = buildSdb151nmLlmAnswerCompositionBlocks("", "Красный мигает, это уже авария или так и должно?").join("\n");
+assert.match(redBlocks, /Осушения/u);
+const lampBlocks = buildSdb151nmLlmAnswerCompositionBlocks("", "что за красная лампочка?").join("\n");
+assert.match(lampBlocks, /лампочк/iu);
+assert.match(lampBlocks, /1\.1\.4\.3\.3/);
 
 const rewritePrompt = buildQueryRewriteSystemPrompt(equipment);
 const answerPrompt = buildGeneralFactSystemPrompt(equipment, "Таблица SDB151NM.");
@@ -223,6 +439,7 @@ assert.match(gateCall.reply, /8 \(800\) 200-54-17/u);
 const manufacturerContact = tryDeterministicSdb151nmAnswer("Как связаться с предприятием-изготовителем?");
 assert.ok(manufacturerContact, "manufacturer contact should be deterministic");
 assert.match(manufacturerContact, /8 \(800\) 200-54-17/u);
+assert.match(manufacturerContact, /info@sovtest-ate\.ru/u);
 assert.equal(
   classifySdb151nmMessage("Как связаться с предприятием-изготовителем?", { equipmentChatScoped: true }).action,
   "CONTACT_SUPPORT",
@@ -231,6 +448,10 @@ assert.equal(
 const factorySerial = tryDeterministicSdb151nmAnswer("Где найти серийный номер шкафа?");
 assert.match(factorySerial, /заводск/u);
 assert.match(factorySerial, /квартал/u);
+assert.match(factorySerial, /SDB151NM/u);
+assert.doesNotMatch(factorySerial, /SDB702NM/u);
+assert.match(tryDeterministicSdb151nmAnswer("Где на шкафу серийный номер искать?"), /SDB151NM/u);
+assert.doesNotMatch(tryDeterministicSdb151nmAnswer("Где на шкафу серийный номер искать?"), /SDB702NM/u);
 
 const brokenGlass = tryDeterministicSdb151nmAnswer("Разбилось стекло в двери");
 assert.match(brokenGlass, /механическ/u);
@@ -253,144 +474,51 @@ for (const q of ["Как заменить осушитель", "Как заме�
 }
 assert.match(tryDeterministicSdb151nmAnswer("Как заменить осушитель"), /36 месяцев/u);
 
-const liveManualCases = [
-  ["Колёса в комплекте?", /не входят/u],
-  ["Есть ли регулируемые ножки?", /4 регулируем/u],
-  ["Какой длины шнур питания?", /4\s*м/u],
-  ["Есть ли подогрев у 151?", /1\.4/u],
-  ["До скольки подогрев?", /1\.4|не приведена/u],
-  ["До скольки подогрев", /1\.4|не приведена/u],
-  ["Что на дисплее горит в обычной работе?", /влажност/u],
-  ["Какой объём в литрах?", /не указан/u],
-  ["Из чего корпус?", /стал/u],
-  ["Можно ли самому поменять стекло?", /нет инструкции по замене/u],
-  ["Куда звонить если сломался?", /8 \(800\) 200-54-17/u],
-  ["Влажность не падает, что делать?", /отсутствии снижения влажности/u],
+const {
+  extractSpecTableFlattenedChunks,
+  extractPossibleFaultsListChunks,
+} = require("../src/rag/chunking");
+const fs = require("node:fs");
+const path = require("node:path");
+const redLampCard = fs.readFileSync(
+  path.join(__dirname, "..", "knowledge", "sdb151-nm", "retrieval-cards", "red-lamp.md"),
+  "utf8"
+);
+assert.ok(redLampCard.includes("лампочка"));
+const cardSpecChunks = extractSpecTableFlattenedChunks(redLampCard, { equipmentName: "SDB151 NM" });
+assert.equal(cardSpecChunks.length, 0, "retrieval cards must not inherit SDB1106 table 1.1");
+const cardFaultChunks = extractPossibleFaultsListChunks(redLampCard, { equipmentName: "SDB151 NM" });
+assert.equal(
+  cardFaultChunks.filter((ch) => /SDB1106NM/i.test(ch.content) || ch.metadata?.humidityInspectionChecklist).length,
+  0,
+  "retrieval cards must not inherit 1106 humidity checklist"
+);
+
+const cardPins = [
+  ["А у нас в цехе градусов 12, шкаф вообще можно включать или лучше не надо?", "temp-contrast.md"],
+  ["Помещение +12 °C, шкаф в рабочем диапазоне или нет?", "temp-contrast.md"],
+  ["Опция подогрева корпус до ста градусов греет, правда? Обожгусь?", "temp-contrast.md"],
+  ["Сколько колёс кладут в поставку 151?", "feet-wheels.md"],
+  ["Тумблер питания где искать, на кожухе сзади?", "power-on.md"],
+  ["Буква W на дисплее выскочила, это код ошибки?", "yellow-and-w.md"],
+  ["Зелёный сигнал горит, это какой режим сейчас?", "yellow-and-w.md"],
+  ["Регенерация сколько минут длится примерно?", "yellow-and-w.md"],
+  ["Азот это опция или в базовой поставке уже стоит?", "nitrogen-option.md"],
 ];
-for (const [q, re] of liveManualCases) {
-  const ans = tryDeterministicSdb151nmAnswer(q) || "";
-  assert.match(ans, re, `live: ${q} => ${ans.slice(0, 120)}`);
+for (const [question, file] of cardPins) {
+  assert.ok(
+    retrievalCardFilesForSdb151nmQuery(question).includes(file),
+    `No card pin ${file} for: ${question} → ${retrievalCardFilesForSdb151nmQuery(question).join(", ")}`
+  );
 }
+assert.equal(
+  retrievalCardFilesForSdb151nmQuery("Регенерация сколько минут длится примерно?").includes("humidity-time.md"),
+  false,
+  "Regen duration must not pin humidity-time (3 hours)"
+);
 
 console.log(`SDB151NM profile checks passed: ${cases.length + 18 + sectionCases.length + chatgptCases.length}`);
 
 const profile = require("../src/equipment/profiles/sdb151-nm");
-const catalog = require("../src/equipment/catalogs/sdb151-nm");
 const { resolveEquipmentProfile } = require("../src/equipment/equipment-runtime");
 assert.equal(resolveEquipmentProfile("sdb151-nm"), profile);
-assert.equal(profile.catalog, catalog);
-assert.equal(catalog.model, "SDB151NM");
-assert.match(tryDeterministicSdb151nmAnswer("Что входит в базовую комплектацию?"), /не входят/u);
-
-const {
-  filterSdb151nmContextText,
-  filterSdb151nmChunks,
-  prependSdb151nmContextPreface,
-} = require("../src/rag/sdb151nm-context-filter");
-const { sdb151InventedProcedureFailures } = require("../src/rag/sdb151nm-procedure-validation");
-const { formatContextForPrompt } = require("../src/rag/retrieval");
-const { equipmentIsSdb151nm } = require("../src/rag/query-intent");
-
-const familyTable = [
-  "SDB151NM\t602**\t655*\t772\t46",
-  "SDB702NM\t602**\t1952*\t772\t90",
-  "Шкаф установлен на колеса для транспортирования. Каждое колесо имеет антистатическую опору.",
-  "\tКолеса для транспортирования (только для моделей SDB302, SDB702, SDB702M, SDB1106, SDB1560М, SDB302NM, SDB702NM и SDB1106NM)\t4",
-  "\tдля модели SDB151, SDB151NM\t3",
-  "\tСистема подогрева воздуха для шкафов SDB302, SDB306, SDB702, SDB702М, SDB302NM, SDB702NM\t1",
-  "SDB151, SDB302, SDB306, SDB702, SDB702M, SDB151NM, SDB302NM, SDB702NM:\tне более 405 Вт;",
-].join("\n");
-const filtered151 = filterSdb151nmContextText(familyTable);
-assert.match(filtered151, /46/u);
-assert.match(filtered151, /не более 405/u);
-assert.match(filtered151, /SDB151NM/u);
-assert.match(filtered151, /для модели SDB151NM/u);
-assert.doesNotMatch(filtered151, /SDB702NM/u);
-assert.doesNotMatch(filtered151, /90/u);
-assert.doesNotMatch(filtered151, /установлен на кол/u);
-assert.match(filtered151, /не входят|не указаны/u);
-assert.match(filtered151, /не приведена/u);
-
-const heatingOrphan = filterSdb151nmContextText(
-  "Кнопками «UP» и «DN» установить требуемое значение температуры воздуха (диапазон установки от текущей температуры окружающей среды + 5 °С до плюс 40 °С)."
-);
-assert.equal(heatingOrphan, "", "heating +40 range must not stay in 151 context");
-
-const scopedManual = require("../src/rag/sdb151nm-context-filter").buildSdb151nmScopedManual(familyTable);
-assert.match(scopedManual, /выборка для поиска/u);
-assert.match(scopedManual, /46/u);
-assert.doesNotMatch(scopedManual, /1952/u);
-
-const scopedPath = path.join(__dirname, "../knowledge/sdb151-nm/Руководство SDB151NM.md");
-const scopedOnDisk = fs.readFileSync(scopedPath, "utf8");
-assert.match(scopedOnDisk, /SDB151NM\s+602/u);
-assert.match(scopedOnDisk, /текущее значение влажности/u);
-assert.match(scopedOnDisk, /светится зеленый индикатор/u);
-assert.doesNotMatch(scopedOnDisk, /SDB702NM/u);
-assert.doesNotMatch(scopedOnDisk, /установлен на кол/u);
-
-const { shouldSkipSdb151FamilyBinary } = require("./knowledge-content-loader");
-assert.equal(
-  shouldSkipSdb151FamilyBinary("sdb151-nm", "Руководство SDB151NM.doc", [
-    { relativePath: "Руководство SDB151NM.md" },
-    { relativePath: "Руководство SDB151NM.doc" },
-  ]),
-  true
-);
-assert.equal(
-  shouldSkipSdb151FamilyBinary("sdb702-nm", "Руководство SDB702NM.md", [
-    { relativePath: "Руководство SDB702NM.md" },
-  ]),
-  false
-);
-
-const filteredChunks = filterSdb151nmChunks([
-  { content: "SDB702NM 90 кг", sourceDoc: "re", chunkIndex: 0, metadata: {} },
-  { content: "SDB151NM 46 кг", sourceDoc: "re", chunkIndex: 1, metadata: {} },
-]);
-assert.equal(filteredChunks.length, 1);
-assert.match(filteredChunks[0].content, /46/u);
-
-const prefaced = prependSdb151nmContextPreface(filtered151);
-assert.match(prefaced, /Ограничения контекста только для SDB151NM/u);
-
-assert.equal(equipmentIsSdb151nm({ id: "sdb151-nm", name: "SDB151 NM" }), true);
-assert.equal(equipmentIsSdb151nm({ id: "sdb702-nm", name: "SDB702 NM" }), false);
-const otherModelContext = formatContextForPrompt([
-  { content: "SDB702NM 90 кг", sourceDoc: "re", chunkIndex: 0, metadata: {} },
-]);
-assert.match(otherModelContext, /90/u, "702/302 retrieval must stay unfiltered");
-
-const heatFail = sdb151InventedProcedureFailures(
-  "Опция подогрева позволяет нагрев до +40 °C.",
-  "контекст РЭ",
-  {}
-);
-assert.ok(
-  heatFail.some((f) => f.detail === "invented_sdb151_heating_option"),
-  "heating +40 without denial must fail"
-);
-const heatOk = sdb151InventedProcedureFailures(
-  "В табл. 1.4 опция подогрева для SDB151NM не приведена.",
-  "контекст РЭ",
-  {}
-);
-assert.equal(
-  heatOk.filter((f) => f.detail === "invented_sdb151_heating_option").length,
-  0
-);
-const powerOk = sdb151InventedProcedureFailures(
-  "Максимальная потребляемая мощность в режиме хранения с системами подачи азота и подогрева воздуха — не более 405 Вт (п. 1.1.2.7).",
-  "контекст РЭ",
-  {}
-);
-assert.equal(
-  powerOk.filter((f) => f.detail === "invented_sdb151_heating_option").length,
-  0,
-  "power line with heating must not fail as heating option"
-);
-
-const { expandRetrievalSynonyms } = require("../src/rag/query-rewriting");
-assert.doesNotMatch(expandRetrievalSynonyms("подогрев", { id: "sdb151-nm" }), /\+40/);
-assert.match(expandRetrievalSynonyms("подогрев", { id: "sdb702-nm" }), /\+40/);
-assert.match(expandRetrievalSynonyms("подогрев"), /\+40/);

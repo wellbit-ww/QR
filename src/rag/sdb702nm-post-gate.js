@@ -10,6 +10,7 @@ const { STRICT_ABSTAIN } = require("./prompts");
 
 const ragConfig = getRagConfig();
 const RECOVERY_FAILURE_CODES = new Set([
+  "foreign_model_mention_other_sdb",
   "foreign_model_mention_sdb1106",
   "foreign_model_numeric_leak",
   "invented_procedure_step",

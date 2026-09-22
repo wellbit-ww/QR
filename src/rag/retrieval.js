@@ -5,6 +5,23 @@ const { rerankChunks, computeKeywordOverlapScore } = require("./rerank");
 const { resolveParameter, PARAMETER_REGISTRY, normalizeParameterText } = require("./parameter-registry");
 const { extractStructuredParameters } = require("./parameter-extraction");
 const { retrievalCardFilesForSdb302nmQuery } = require("./sdb302nm-rag-priority");
+const { retrievalCardFilesForSdb702nmQuery } = require("./sdb702nm-rag-priority");
+const { retrievalCardFilesForSdb151nmQuery } = require("./sdb151nm-rag-priority");
+
+const RETRIEVAL_CARD_EQUIPMENT = new Set(["w-700", "sdb702-nm", "sdb151-nm"]);
+
+function retrievalCardFilesForEquipmentQuery(equipmentId, query) {
+  if (equipmentId === "w-700") {
+    return retrievalCardFilesForSdb302nmQuery(query);
+  }
+  if (equipmentId === "sdb702-nm") {
+    return retrievalCardFilesForSdb702nmQuery(query);
+  }
+  if (equipmentId === "sdb151-nm") {
+    return retrievalCardFilesForSdb151nmQuery(query);
+  }
+  return [];
+}
 
 function chunkMatchesSectionHints(chunk, hints) {
   if (!hints || hints.length === 0) {
@@ -473,7 +490,7 @@ async function fetchIndicatorSectionChunks(pool, equipmentId, cap = 4) {
 }
 
 async function fetchSdb302nmRetrievalCardChunks(pool, equipmentId, query, cap = 3) {
-  if (equipmentId !== "w-700") {
+  if (!RETRIEVAL_CARD_EQUIPMENT.has(equipmentId)) {
     return [];
   }
   const take = Math.max(1, Math.min(4, Math.floor(cap)));
@@ -492,7 +509,7 @@ async function fetchSdb302nmRetrievalCardChunks(pool, equipmentId, query, cap = 
       `,
       [equipmentId]
     );
-    const wanted = retrievalCardFilesForSdb302nmQuery(query);
+    const wanted = retrievalCardFilesForEquipmentQuery(equipmentId, query);
     const scored = r.rows.map((row) => {
       const chunk = sanitizeChunk(row);
       const overlap = computeKeywordOverlapScore(query, chunk);
@@ -1329,7 +1346,7 @@ async function retrieveEquipmentContext({
     const p1Rows = await fetchP1GoldenFactsChunks(pool, equipmentId, 10);
     injectedRows = [...p1Rows, ...injectedRows];
   }
-  if (boosters.sdb302RetrievalCards || equipmentId === "w-700") {
+  if (boosters.sdb302RetrievalCards || RETRIEVAL_CARD_EQUIPMENT.has(equipmentId)) {
     const cardRows = await fetchSdb302nmRetrievalCardChunks(pool, equipmentId, originalQuery, 3);
     injectedRows = [...cardRows, ...injectedRows];
   }

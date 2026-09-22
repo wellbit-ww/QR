@@ -11,14 +11,10 @@ const { STRICT_ABSTAIN } = require("./prompts");
 const ragConfig = getRagConfig();
 const RECOVERY_FAILURE_CODES = new Set([
   "foreign_model_mention_other_sdb",
+  "foreign_model_mention_sdb1106",
   "foreign_model_numeric_leak",
-  "unconfirmed_sdb151_model_parameter",
-  "invented_base_delivery_item",
-  "invented_sdb151_base_wheels",
-  "invented_sdb151_heating_option",
   "invented_procedure_step",
   "invented_procedure_steps",
-  "invented_door_opening_procedure",
   "unsupported_spec_in_answer",
 ]);
 
@@ -54,7 +50,7 @@ function applySdb151nmPostGate({
   if (deliveryMethod === "rag_deterministic" || deliveryMethod === "direct_deterministic") {
     return {
       answer: answerText || STRICT_ABSTAIN,
-      guardrails: { action: "ALLOW", passed: true, reason: "trusted_sdb151_deterministic_fact" },
+      guardrails: { action: "ALLOW", passed: true, reason: "trusted_sdb702_deterministic_fact" },
       validation: { ok: true, failures: [], warnings: [] },
       postGateTrace: {
         postGate: "sdb151-nm",
@@ -82,7 +78,7 @@ function applySdb151nmPostGate({
         guardrails: {
           action: "ALLOW",
           passed: true,
-          reason: "sdb151_deterministic_recovery_pre_guardrails",
+          reason: "sdb702_deterministic_recovery_pre_guardrails",
         },
         validation: recovery.validation,
         intent,

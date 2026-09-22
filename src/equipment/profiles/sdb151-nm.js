@@ -1,61 +1,47 @@
-const catalog = require("../catalogs/sdb151-nm");
 const {
-  classifyFromCatalog,
-  tryDeterministicFromCatalog,
-  buildSafetyDeterministicOrPromptFromCatalog,
-  directContextHintsFromCatalog,
-  sectionHintsFromCatalog,
-  buildDirectSystemContentFromCatalog,
-  extractSafetyDocExcerptFromCatalog,
-} = require("../../rag/catalog-engine");
+  classifySdb151nmMessage,
+  buildSafetyDeterministicOrPrompt,
+} = require("../../rag/sdb151nm-chat-gate");
+const {
+  tryDeterministicSdb151nmAnswer,
+  buildSdb151nmDirectSystemContent,
+  extractSafetyDocExcerpt,
+} = require("../../rag/sdb151nm-direct-facts");
 const { applySdb151nmPostGate } = require("../../rag/sdb151nm-post-gate");
 const {
-  filterSdb151nmContextText,
-  prependSdb151nmContextPreface,
-} = require("../../rag/sdb151nm-context-filter");
+  directContextHintsForSdb151nmMessage,
+  sectionHintsForSdb151nmMessage,
+} = require("../../rag/sdb151nm-rag-priority");
 
 const sdb151NmProfile = {
-  id: catalog.id,
-  label: catalog.displayName,
-  catalog,
+  id: "sdb151-nm",
+  label: "SDB151 NM",
   autoDirectWhenNoPostgres: true,
   deferGuardrailsToPostGate: true,
 
   classifyPreGate(message, ctx = {}) {
-    return classifyFromCatalog(catalog, message, { ...ctx, equipmentChatScoped: true });
+    return classifySdb151nmMessage(message, { ...ctx, equipmentChatScoped: true });
   },
 
   tryDeterministicAnswer(message, ctx = {}) {
-    return tryDeterministicFromCatalog(catalog, message, ctx);
+    return tryDeterministicSdb151nmAnswer(message, ctx);
   },
 
-  buildSafetyDeterministicOrPrompt(message, docText) {
-    const result = buildSafetyDeterministicOrPromptFromCatalog(catalog, message, docText);
-    if (result && result.docExcerpt) {
-      result.docExcerpt = filterSdb151nmContextText(result.docExcerpt);
-    }
-    return result;
-  },
+  buildSafetyDeterministicOrPrompt,
 
   directContextHints(message) {
-    return directContextHintsFromCatalog(catalog, message);
+    return directContextHintsForSdb151nmMessage(message);
   },
 
   sectionHints(message) {
-    return sectionHintsFromCatalog(catalog, message);
+    return sectionHintsForSdb151nmMessage(message);
   },
 
   buildDirectSystemContent(systemPrompt, docText) {
-    return buildDirectSystemContentFromCatalog(
-      catalog,
-      systemPrompt,
-      prependSdb151nmContextPreface(filterSdb151nmContextText(docText))
-    );
+    return buildSdb151nmDirectSystemContent(systemPrompt, docText);
   },
 
-  extractSafetyDocExcerpt(docText, message) {
-    return filterSdb151nmContextText(extractSafetyDocExcerptFromCatalog(docText, message));
-  },
+  extractSafetyDocExcerpt,
 
   applyPostGate(params) {
     return applySdb151nmPostGate(params);

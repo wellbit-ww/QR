@@ -6,7 +6,7 @@ const {
 
 const STRICT_NUMERIC_INTENTS = new Set(["SINGLE_FIELD_QUERY", "FACT_QUERY", "QUICK_FACT_QUERY"]);
 
-function isStrictSdb702ValidationIntent(intent = {}) {
+function isStrictSdb302ValidationIntent(intent = {}) {
   return STRICT_NUMERIC_INTENTS.has(intent.intentType || "");
 }
 
@@ -17,7 +17,7 @@ function isStrictSdb702ValidationIntent(intent = {}) {
 function validateSdb151nmAnswerAgainstContext(answer, context, intent = {}) {
   const base = validateAnswerAgainstContext(answer, context, intent, {
     skipGoldenFacts: true,
-    skipCriticalNumericLeakage: !isStrictSdb702ValidationIntent(intent),
+    skipCriticalNumericLeakage: !isStrictSdb302ValidationIntent(intent),
   });
   const extraFailures = [
     ...sdb151ForeignModelLeakFailures(answer, context, intent),
@@ -33,5 +33,5 @@ function validateSdb151nmAnswerAgainstContext(answer, context, intent = {}) {
 
 module.exports = {
   validateSdb151nmAnswerAgainstContext,
-  isStrictSdb702ValidationIntent,
+  isStrictSdb302ValidationIntent,
 };

@@ -26,6 +26,7 @@ const {
   isSdb302nmFanRestart1RhQuery,
   isSdb302nmLoadHumidityRiseQuery,
   isSdb302nmDoorCloseDryDelayQuery,
+  isSdb302nmRhBelowSetpointQuery,
 } = require("./sdb302nm-rag-priority");
 
 const SDB302NM_PRODUCT_MODEL = "SDB302NM";
@@ -126,6 +127,15 @@ function buildSdb302nmLlmAnswerCompositionBlocks(retrievalContext, userMessage =
       "ВНИМАНИЕ — повторный пуск вентилятора при +1 RH% (SDB302NM):",
       "Это не отсутствующий параметр и не «шаг 0,1 %». По п. 1.1.4.4.1: при RH%т = RH%п вентилятор отключается (режим «Хранения»); повторное включение при RH%т = RH%п + 1 RH%.",
       "Не начинай ответ с «параметр не указан». Шаг 0,1 RH% и точность ±1 RH% — другие строки ТТХ, не этот порог.",
+    );
+  }
+
+  if (isSdb302nmRhBelowSetpointQuery(msg)) {
+    blocks.push(
+      "",
+      "ВНИМАНИЕ — RH%т ниже порога в режиме «Хранения» (SDB302NM):",
+      "Ответ только по п. 1.1.4.4.2: при RH%т ниже RH%п на 1 RH% открываются заслонки осушителя, осушитель отключается от объёма до выравнивания; при RH%т = RH%п заслонки закрываются.",
+      "ЗАПРЕЩЕНО: «общие принципы», герметичность/утечки, Wi‑Fi, догадки про датчики без ±1 RH% из ТТХ.",
     );
   }
 

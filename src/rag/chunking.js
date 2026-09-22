@@ -594,7 +594,10 @@ function extractSpecTableFlattenedChunks(fullText, baseMeta = {}) {
   }
 
   const nmRows = out.filter((ch) => /SDB1106NM/i.test(ch.content));
-  if (!nmRows.length && !/sdb302/i.test(String(baseMeta.equipmentName || ""))) {
+  if (
+    !nmRows.length &&
+    !/sdb(?:302|702|151)/i.test(String(baseMeta.equipmentName || ""))
+  ) {
     pushUnique(extractGoldenTable11Chunks(baseMeta));
   }
 
@@ -684,7 +687,7 @@ function extractPossibleFaultsListChunks(fullText, baseMeta = {}) {
     pushChunk(block, { docSection: "section_2_2_2", inspectionSection: "2.2.2" });
   }
 
-  if (!/sdb302/i.test(String(baseMeta.equipmentName || ""))) {
+  if (!/sdb(?:302|702|151)/i.test(String(baseMeta.equipmentName || ""))) {
     pushChunk(
       [
         "При проблемах с влажностью (не падает, не выходит на заданный режим) — перечень проверок по РЭ:",

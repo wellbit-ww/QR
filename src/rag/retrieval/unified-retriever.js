@@ -95,7 +95,8 @@ async function unifiedRetrieve({
               /масс|габарит|ширин|высот|глубин|таблиц[аы]?\s*1\.1|1\.1\.2\.8/i.test(String(query || "")),
         p1GoldenFacts:
           equipmentId === "sdb1106-nm" && shouldInjectP1GoldenFacts(query, routerDecision),
-        sdb302RetrievalCards: equipmentId === "w-700",
+        sdb302RetrievalCards:
+          equipmentId === "w-700" || equipmentId === "sdb702-nm" || equipmentId === "sdb151-nm",
       },
     },
   });

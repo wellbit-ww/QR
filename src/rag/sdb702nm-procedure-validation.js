@@ -13,6 +13,11 @@ const PROCEDURE_INTENTS = new Set([
 const FOREIGN_NUMERIC_LEAKS = [
   { re: /\b46\s*кг\b/i, claim: "46 кг" },
   { re: /\b655\b/i, claim: "655" },
+  { re: /\b70\s*кг\b/i, claim: "70 кг" },
+  { re: /\b500\s*(?:л|l)(?![\p{L}\d])/iu, claim: "500 л" },
+  { re: /\b546\s*(?:л|l)(?![\p{L}\d])/iu, claim: "546 л" },
+  { re: /\b1358\b/i, claim: "1358" },
+    
   { re: /\b180\s*кг\b/i, claim: "180 кг" },
   { re: /\b1028\b/i, claim: "1028" },
   { re: /\b540\s*Вт\b/i, claim: "540 Вт" },
@@ -50,11 +55,11 @@ function sdb702ForeignModelLeakFailures(answerStr, contextStr, intent = {}) {
   const failures = [];
   const query = String(intent.originalQuery || "");
 
-  if (/\bSDB(?:151|1106)(?:\s*NM|-NM|NM)?\b/i.test(a) && !/\bSDB(?:151|1106)/i.test(query)) {
+  if (/\bSDB(?:151|1106|302)(?:\s*NM|-NM|NM)?\b/i.test(a) && !/\bSDB(?:151|1106|302)/i.test(query)) {
     failures.push({
       code: "parameter_leakage",
       severity: "fail",
-      detail: "foreign_model_mention_sdb1106",
+      detail: "foreign_model_mention_other_sdb",
     });
   }
 

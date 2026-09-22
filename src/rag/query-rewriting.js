@@ -9,6 +9,16 @@ const {
   isSdb302nmAmbientTempQuery,
   isSdb302nmEquipment,
 } = require("./sdb302nm-rag-priority");
+const {
+  expandSdb702nmRetrievalSynonyms,
+  isSdb702nmAmbientTempQuery,
+  isSdb702nmEquipment,
+} = require("./sdb702nm-rag-priority");
+const {
+  expandSdb151nmRetrievalSynonyms,
+  isSdb151nmAmbientTempQuery,
+  isSdb151nmEquipment,
+} = require("./sdb151nm-rag-priority");
 
 const CHATTER_ONLY_RE =
   /^(?:спасибо|благодар(?:ю|им)?|понятно|ясно|окей|ок|хорошо|отлично|принято|да|нет|ага|угу|расскажи\s+подробнее|подробнее|ещё\s+раз|еще\s+раз)\s*[.!?…]*$/iu;
@@ -162,12 +172,21 @@ function expandRetrievalSynonyms(query, equipment) {
   if (/желт|зелен|красн|индикатор|мигает|1\.1\.4\.3\.3/i.test(q) && !/неисправ|не\s+работ/i.test(q)) {
     extras.push("1.1.4.3.3", "световой сигнал", "режим хранения", "режим осушения", "режим регенерации");
   }
-  const skip302Heating = isSdb302nmEquipment(equipment) && isSdb302nmAmbientTempQuery(q);
-  if (/температур|подогрев|нагрев/i.test(q) && String(equipment?.id || "") !== "sdb151-nm" && !skip302Heating) {
+  const skipShopTempHeatingBoost =
+    (isSdb302nmEquipment(equipment) && isSdb302nmAmbientTempQuery(q)) ||
+    (isSdb702nmEquipment(equipment) && isSdb702nmAmbientTempQuery(q)) ||
+    (isSdb151nmEquipment(equipment) && isSdb151nmAmbientTempQuery(q));
+  if (/температур|подогрев|нагрев/i.test(q) && String(equipment?.id || "") !== "sdb151-nm" && !skipShopTempHeatingBoost) {
     extras.push("система подогрева", "2.3.3.1", "+40", "плюс 40");
   }
   if (isSdb302nmEquipment(equipment)) {
     extras.push(...expandSdb302nmRetrievalSynonyms(q));
+  }
+  if (isSdb702nmEquipment(equipment)) {
+    extras.push(...expandSdb702nmRetrievalSynonyms(q));
+  }
+  if (isSdb151nmEquipment(equipment)) {
+    extras.push(...expandSdb151nmRetrievalSynonyms(q));
   }
   if (/\bшаг\b/iu.test(q) && !/дискретност/iu.test(q)) {
     extras.push("дискретность", "шаг установки");

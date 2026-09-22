@@ -106,6 +106,29 @@ function isSdb302nmDoorCloseDryDelayQuery(q) {
   );
 }
 
+/** RH%т ниже порога RH%п в режиме «Хранения» — п. 1.1.4.4.2, заслонки осушителя. */
+function isSdb302nmRhBelowSetpointQuery(q) {
+  if (!/влажност|rh%?т|rh%?п/iu.test(q)) {
+    return false;
+  }
+  if (
+    isSdb302nmSetpointVsAmbientQuery(q) ||
+    isSdb302nmFanRestart1RhQuery(q) ||
+    isSdb302nmLoadHumidityRiseQuery(q) ||
+    isSdb302nmDoorCloseDryDelayQuery(q) ||
+    isSdb302nmHumidityWaitQuery(q)
+  ) {
+    return false;
+  }
+  return (
+    /(?:опуст(?:иться|ил|илась|ится)|ниже|меньше).{0,48}(?:установлен|задан|порог|уставк|rh%п)/iu.test(q) ||
+    (/почему/iu.test(q) &&
+      /(?:опуст|ниже|меньше)/iu.test(q) &&
+      /(?:установлен|порог|уставк|задан|значен)/iu.test(q)) ||
+    (/режим[\p{L}]*\s+«?хранен/iu.test(q) && /ниже.{0,40}(?:1\s*rh%|на\s+1)/iu.test(q))
+  );
+}
+
 function isSdb302nmNightOffQuery(q) {
   return /(?:на\s+ночь|выключ.*(?:жрал|хранен)|можно\s+(?:ли\s+)?выключ)/iu.test(q) && !/регенерац/iu.test(q);
 }
@@ -183,6 +206,9 @@ function conversationalHintsForSdb302nmMessage(q) {
   }
   if (isSdb302nmLoadHumidityRiseQuery(q) || isSdb302nmDoorCloseDryDelayQuery(q)) {
     add("1.1.4.4.1", "закрытии двери", "вентилятор осушителя", "ускоренного осушения");
+  }
+  if (isSdb302nmRhBelowSetpointQuery(q)) {
+    add("1.1.4.4.2", "режим «Хранения»", "заслонки осушителя", "RH%п");
   }
   return hints;
 }
@@ -271,6 +297,14 @@ function expandSdb302nmRetrievalSynonyms(query) {
       "при закрытии двери вентилятор осушителя включается",
       "отсчет времени ускоренного осушения начинается заново",
       "60 ± 1 минут",
+    );
+  }
+  if (isSdb302nmRhBelowSetpointQuery(q)) {
+    extras.push(
+      "1.1.4.4.2",
+      "режим «Хранения»",
+      "опуститься ниже установленного порогового значения на 1RH%",
+      "откроются заслонки осушителя",
     );
   }
 
@@ -384,6 +418,9 @@ function retrievalCardFilesForSdb302nmQuery(query) {
   if (isSdb302nmLoadHumidityRiseQuery(q) || isSdb302nmDoorCloseDryDelayQuery(q)) {
     add("door-close-dry.md");
   }
+  if (isSdb302nmRhBelowSetpointQuery(q)) {
+    add("rh-below-setpoint.md", "fan-restart-1rh.md");
+  }
   if (isSdb302nmRegenDurationQuery(q) || isSdb302nmNightOffQuery(q)) {
     add("yellow-and-w.md");
   }
@@ -418,6 +455,7 @@ module.exports = {
   isSdb302nmFanRestart1RhQuery,
   isSdb302nmLoadHumidityRiseQuery,
   isSdb302nmDoorCloseDryDelayQuery,
+  isSdb302nmRhBelowSetpointQuery,
   retrievalCardFilesForSdb302nmQuery,
   expandSdb302nmRetrievalSynonyms,
   directContextHintsForSdb302nmMessage,

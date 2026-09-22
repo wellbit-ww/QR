@@ -5,7 +5,7 @@ const { isUnsupportedSdb702nmSpecQuery, buildUnsupportedSdb702nmSpecReply } = re
 const { isContactSupportQuery } = require("./sdb1106nm-query-variants");
 const { buildPortalContactSupportAnswer } = require("./portal-contact-support-answer");
 
-const EQUIPMENT = { id: "sdb702-nm", name: "SDB702NM" };
+const EQUIPMENT = { id: "w-700", name: "SDB702NM" };
 const CHATTER_RE = /^(?:спасибо|благодар(?:ю|им)?|понятно|ясно|окей|ок|хорошо|отлично|принято|да|нет|ага|угу)\s*[.!?…]*$/iu;
 const GREETING_RE = /^(?:привет|здравствуй(?:те)?|добрый\s+(?:день|вечер|утро)|hello|hi)\s*[!?.…]*$/iu;
 const OFF_TOPIC_RE =

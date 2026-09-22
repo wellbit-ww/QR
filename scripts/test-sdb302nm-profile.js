@@ -146,6 +146,14 @@ assert.doesNotMatch(fanRestart1Rh, /параметр не указан/u);
 
 assert.doesNotMatch(rhPrecision, /RH%п \+ 1/u);
 
+const rhBelowSetpoint = tryDeterministicSdb302nmAnswer(
+  "Почему влажность внутри шкафа может опуститься ниже установленного значения"
+);
+assert.match(rhBelowSetpoint, /1\.1\.4\.4\.2/u);
+assert.match(rhBelowSetpoint, /заслонк/u);
+assert.doesNotMatch(rhBelowSetpoint, /общих принципов/u);
+assert.doesNotMatch(rhBelowSetpoint, /общих принципов работы/u);
+
 const humidityRiseClosed = tryDeterministicSdb302nmAnswer(
   "Дверь вроде закрыта а влажность всё равно растёт, что смотреть"
 );

@@ -19,6 +19,7 @@ const {
   isSdb302nmFanRestart1RhQuery,
   isSdb302nmLoadHumidityRiseQuery,
   isSdb302nmDoorCloseDryDelayQuery,
+  isSdb302nmRhBelowSetpointQuery,
 } = require("./sdb302nm-rag-priority");
 
 const ANSWER_W_SYMBOL =
@@ -39,6 +40,8 @@ const ANSWER_SETPOINT_VS_AMBIENT =
   "SDB302NM **осушает** и **не повышает** влажность выше окружающей (п. **1.1.1**). Уставка **10 RH%** при **50 RH%** в помещении **допустима** (для 0–30 RH% — не более RH%окр.ср. − 10). Шкаф будет **осушать к 10 RH%**: при RH%т > RH%п включается вентилятор осушителя на **60 ± 1 мин** (п. **1.1.4.4.1**).";
 const ANSWER_FAN_RESTART_1RH =
   "Это штатный порог п. **1.1.4.4.1**, не сбой. Когда **RH%т = RH%п**, вентилятор осушителя **отключается**, шкаф переходит в «Хранение». **Повторное включение** — при **RH%т = RH%п + 1 RH%**. Рост на 1 % как раз условие повторного пуска. Шаг меню **0,1 RH%** и точность **±1 RH%** — другие строки ТТХ, не этот гистерезис.";
+const ANSWER_RH_BELOW_SETPOINT =
+  "По п. **1.1.4.4.2** РЭ **SDB302NM** в режиме **«Хранения»**, если **RH%т** опускается **ниже порога RH%п на 1 RH%**, **открываются заслонки осушителя** — осушитель временно **отключается от рабочего объёма**, пока текущая и установленная влажность **не сравняются**; при **RH%т = RH%п** заслонки **закрываются** (на LCD — символ открытых заслонок). Это **штатная** поддержка RH, не неисправность. Отдельно: **точность поддержания ±1 RH%** (табл. 1.1).";
 
 function isSdb302nmShopAmbientQuery(text) {
   if (/подогрев|корпус|обожг|ожог/iu.test(text)) {
@@ -102,6 +105,11 @@ const FACTS = [
     test: /вентилятор/iu,
     skip: (text) => !isSdb302nmFanRestart1RhQuery(text),
     answer: ANSWER_FAN_RESTART_1RH,
+  },
+  {
+    test: /влажност/iu,
+    skip: (text) => !isSdb302nmRhBelowSetpointQuery(text),
+    answer: ANSWER_RH_BELOW_SETPOINT,
   },
   {
     test: /(?:(?:высок|повышен|больш)[\p{L}]*\s+влажност|влажност[\p{L}]*\s+(?:высок|повышен)|хранен[\p{L}]*.*высок[\p{L}]*\s+влажност)/iu,
@@ -545,6 +553,9 @@ function tryDeterministicSdb302nmAnswer(message, options = {}) {
   if (isSdb302nmFanRestart1RhQuery(text)) {
     return ANSWER_FAN_RESTART_1RH;
   }
+  if (isSdb302nmRhBelowSetpointQuery(text)) {
+    return ANSWER_RH_BELOW_SETPOINT;
+  }
   if (/диэлектрик/iu.test(text)) {
     const dielectric = pickFact((fact) => /Да\. По п\./u.test(fact.answer) && /диэлектриков/u.test(fact.answer));
     if (dielectric) {
@@ -554,7 +565,7 @@ function tryDeterministicSdb302nmAnswer(message, options = {}) {
   if (
     /влажност/iu.test(text) &&
     /(?:высок|повышен|больш)[\p{L}]*\s+влажност/iu.test(text) &&
-    !/(?:диапазон|шаг|точност|порог|меню|\bSET\b|не\s+падает|не\s+сниж|почему|загруз)/iu.test(text)
+    !/(?:диапазон|шаг|точност|порог|меню|\bSET\b|не\s+падает|не\s+сниж|почему|загруз|опуст|ниже\s+установлен)/iu.test(text)
   ) {
     const highHumidity = pickFact((fact) => /нужна высокая влажность/u.test(fact.answer));
     if (highHumidity) {
