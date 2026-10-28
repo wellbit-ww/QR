@@ -9,6 +9,7 @@ const {
   equipmentIsSdb702nm,
   equipmentIsSdb302nm,
   equipmentIsSdb151nm,
+  equipmentIsSdb1560m,
   equipmentIsSdb1106nm,
 } = require("../query-intent");
 const {
@@ -29,6 +30,12 @@ const {
   buildSdb151nmLlmAnswerCompositionBlocks,
   buildSdb151nmDirectSystemPrompt,
 } = require("../sdb151nm-prompt-rules");
+const {
+  SDB1560NM_EXPERT_ROLE,
+  SDB1560NM_GROUNDING_RULES,
+  buildSdb1560mLlmAnswerCompositionBlocks,
+  buildSdb1560mDirectSystemPrompt,
+} = require("../sdb1560m-prompt-rules");
 const {
   isEmergencySmokeQuery,
   isRegenerationShutdownQuery,
@@ -85,6 +92,9 @@ function buildEquipmentExpertRole(equipment) {
   }
   if (/sdb151/i.test(model)) {
     return SDB151NM_EXPERT_ROLE;
+  }
+  if (/sdb1560/i.test(model)) {
+    return SDB1560NM_EXPERT_ROLE;
   }
   return [
     `Ты — сервисный инженер по шкафу ${model}. Пользователь уже обслуживается этой моделью; не проси уточнить артикул.`,
@@ -359,6 +369,8 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
         ? "Пример: «Масса шкафа SDB151NM составляет 46 кг.»"
         : equipmentIsSdb702nm(equipment)
         ? "Пример: «Масса шкафа SDB702NM составляет 90 кг.»"
+        : equipmentIsSdb1560m(equipment)
+        ? "Пример: «Масса шкафа SDB1560NM составляет 260 кг.»"
         : `Пример: «Масса шкафа ${SDB1106NM_PRODUCT_MODEL} в базовой комплектации составляет 180 кг.»`,
     );
   }
@@ -478,6 +490,8 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
     blocks.push(...buildSdb302nmLlmAnswerCompositionBlocks(ctx, msg));
   } else if (equipmentIsSdb702nm(equipment)) {
     blocks.push(...buildSdb702nmLlmAnswerCompositionBlocks(ctx, msg));
+  } else if (equipmentIsSdb1560m(equipment)) {
+    blocks.push(...buildSdb1560mLlmAnswerCompositionBlocks(ctx, msg));
   }
 
   return blocks.length ? blocks.join("\n") : "";
@@ -488,6 +502,7 @@ function baseGroundingPrompt(equipment, context, extraBlocks = "") {
   const isSdb702nm = /sdb702/i.test(equipmentModelName(equipment));
   const isSdb302nm = /sdb302/i.test(equipmentModelName(equipment));
   const isSdb151nm = /sdb151/i.test(equipmentModelName(equipment));
+  const isSdb1560m = /sdb1560/i.test(equipmentModelName(equipment));
   const modelFilterBlock =
     shouldApplySdb1106nmModelContextFilter("", context, equipment) ?
       modelContextFilterPromptLines(equipment).join("\n")
@@ -525,6 +540,7 @@ function baseGroundingPrompt(equipment, context, extraBlocks = "") {
   const sdb702nmRules = isSdb702nm ? SDB702NM_GROUNDING_RULES : [];
   const sdb302nmRules = isSdb302nm ? SDB302NM_GROUNDING_RULES : [];
   const sdb151nmRules = isSdb151nm ? SDB151NM_GROUNDING_RULES : [];
+  const sdb1560mRules = isSdb1560m ? SDB1560NM_GROUNDING_RULES : [];
 
   return [
     ...buildEquipmentExpertRole(equipment),
@@ -534,6 +550,7 @@ function baseGroundingPrompt(equipment, context, extraBlocks = "") {
     ...sdb702nmRules,
     ...sdb302nmRules,
     ...sdb151nmRules,
+    ...sdb1560mRules,
     equipmentHeader(equipment),
     extraBlocks ? String(extraBlocks).trim() : "",
     "Контекст из retrieved RAG chunks:",
@@ -716,6 +733,7 @@ module.exports = {
   buildSdb702nmDirectSystemPrompt,
   buildSdb302nmDirectSystemPrompt,
   buildSdb151nmDirectSystemPrompt,
+  buildSdb1560mDirectSystemPrompt,
   buildLlmAnswerCompositionBlocks,
   buildQueryRewriteSystemPrompt,
   buildQueryRewriteUserMessage,

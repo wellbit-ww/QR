@@ -53,12 +53,17 @@ const { buildReasoningMessages } = require("./src/rag/synthesis/reasoning-synthe
 const { validateGrounding } = require("./src/rag/synthesis/grounding-validation");
 const { routeQuery } = require("./src/rag/router/query-router");
 const { runPipeline } = require("./src/rag/pipeline/run-pipeline");
+const {
+  shouldUseHonestRag,
+  shouldAutoDirectWhenNoPostgres,
+} = require("./src/rag/honest-rag-mode");
+const { applyHonestRagPostGate } = require("./src/rag/honest-rag-post-gate");
 const { classifySdb1106nmMessage, buildSafetyDeterministicOrPrompt } = require("./src/rag/sdb1106nm-chat-gate");
 const {
   applySdb1106nmPostGate,
   resolveDeliveryMethodFromLlmTrace,
 } = require("./src/rag/sdb1106nm-post-gate");
-const { STRICT_ABSTAIN, buildSdb1106nmDirectSystemPrompt, buildSdb702nmDirectSystemPrompt, buildSdb302nmDirectSystemPrompt, buildSdb151nmDirectSystemPrompt, buildSafetyGroundedSystemPrompt } = require("./src/rag/prompts");
+const { STRICT_ABSTAIN, buildSdb1106nmDirectSystemPrompt, buildSdb702nmDirectSystemPrompt, buildSdb302nmDirectSystemPrompt, buildSdb151nmDirectSystemPrompt, buildSdb1560mDirectSystemPrompt, buildSafetyGroundedSystemPrompt } = require("./src/rag/prompts");
 const {
   getAuthConfig,
   isProductionRuntime,
@@ -187,7 +192,7 @@ const PORT = resolveListenPort();
 
 /**
  * HTTP server socket limits for long RAG + Ollama (often 8–120s+ per request).
- * - HTTP_SERVER_TIMEOUT_MS: incoming connection idle/socket timeout (ms). Default 180000 (3 min), minimum 60000.
+ * - HTTP_SERVER_TIMEOUT_MS: incoming connection idle/socket timeout (ms). Default 360000 (6 min), minimum 60000.
  *   Set to "0" to disable server.timeout (Node: no socket idle cap).
  * - CHAT_REQUEST_SOCKET_MS: per-request req/res/socket timeout for POST /api/chat only. Same default; "0" = clear.
  */
@@ -196,7 +201,7 @@ function resolveHttpServerTimeouts() {
   if (raw === "0") {
     return { socketMs: 0, keepAliveMs: 125_000, headersMs: 130_000 };
   }
-  const socketMs = Math.max(60_000, Number(raw || 180_000));
+  const socketMs = Math.max(60_000, Number(raw || 360_000));
   return {
     socketMs,
     keepAliveMs: socketMs + 5_000,
@@ -209,7 +214,7 @@ function resolveChatRequestSocketMs() {
   if (raw === "0") {
     return 0;
   }
-  return Math.max(60_000, Number(raw || 180_000));
+  return Math.max(60_000, Number(raw || 360_000));
 }
 
 function shouldExposeDebugChatFields() {
@@ -684,8 +689,9 @@ function toEquipmentSummary(equipment) {
 
 function getChatCapabilities(equipment) {
   const ragAvailable = Boolean(ragConfig.postgresUrl);
+  const profile = resolveEquipmentProfile(equipment?.id);
   const autoDirectForEquipment =
-    Boolean(resolveEquipmentProfile(equipment?.id)?.autoDirectWhenNoPostgres) && !ragAvailable;
+    shouldAutoDirectWhenNoPostgres(profile, equipment?.id) && !ragAvailable;
   let defaultPath = "direct";
   if (ragAvailable && !autoDirectForEquipment) {
     defaultPath = "rag";
@@ -2222,6 +2228,8 @@ async function getDirectContextForEquipment(equipment) {
     systemPrompt = buildSdb302nmDirectSystemPrompt(equipment, { manualLoaded });
   } else if (equipment.id === "sdb151-nm") {
     systemPrompt = buildSdb151nmDirectSystemPrompt(equipment, { manualLoaded });
+  } else if (equipment.id === "sdb1560m") {
+    systemPrompt = buildSdb1560mDirectSystemPrompt(equipment, { manualLoaded });
   } else {
     systemPrompt = `Ты — квалифицированный технический специалист по оборудованию ${equipment.name}.
 Твоя задача — отвечать на вопросы пользователя на основе предоставленного документа.
@@ -2281,9 +2289,11 @@ app.post("/api/chat", chatLimiter, async (req, res) => {
   const chatCapabilities = getChatCapabilities(equipment);
   const equipmentProfile = resolveEquipmentProfile(equipment.id);
   const directContextRequested = !IS_PRODUCTION && Boolean(directContextMode);
+  const honestRag = shouldUseHonestRag(equipment.id);
   const useDirectContext =
-    directContextRequested ||
-    (Boolean(equipmentProfile?.autoDirectWhenNoPostgres) && !ragConfig.postgresUrl);
+    !honestRag &&
+    (directContextRequested ||
+      (shouldAutoDirectWhenNoPostgres(equipmentProfile, equipment.id) && !ragConfig.postgresUrl));
 
   logInfo("Chat request received.", {
     equipmentId: equipment?.id || equipmentId || null,
@@ -2568,6 +2578,12 @@ app.post("/api/chat", chatLimiter, async (req, res) => {
   }
 
   try {
+    if (honestRag) {
+      logInfo("Honest RAG path: runPipeline + applyHonestRagPostGate (no Direct Context / legacy TTX deterministic).", {
+        equipmentId: equipment.id,
+      });
+    }
+
     const routerDecision = await routeQuery({
       query: trimmedMessage,
       history: normalizedHistory,
@@ -2588,28 +2604,35 @@ app.post("/api/chat", chatLimiter, async (req, res) => {
     let finalRetrieval = result.retrieval;
     let finalRagTrace = result.ragTrace;
 
-    if (equipmentProfile?.applyPostGate) {
+    if (honestRag || equipmentProfile?.applyPostGate) {
       const semanticHint = Math.max(
         Number(result.retrieval?.topScore) || 0,
         Number(result.retrieval?.fusionScore) || 0,
         Number(result.retrieval?.lexicalScore) || 0,
       );
-      const postGate = equipmentProfile.applyPostGate({
+      const deliveryMethod =
+        result.ragTrace?.mode === "RAG_DETERMINISTIC" ||
+        result.ragTrace?.mode === "SAFETY_DETERMINISTIC"
+          ? "rag_deterministic"
+          : resolveDeliveryMethodFromLlmTrace(result.ragTrace?.llm);
+      const postGateParams = {
         answer: result.answer,
         context: result.retrievalContext || "",
         message: trimmedMessage,
         equipment,
-        deliveryMethod:
-          result.ragTrace?.mode === "RAG_DETERMINISTIC" ||
-          result.ragTrace?.mode === "SAFETY_DETERMINISTIC"
-            ? "rag_deterministic"
-            : resolveDeliveryMethodFromLlmTrace(result.ragTrace?.llm),
+        deliveryMethod,
         semanticSimilarity: semanticHint,
         gateAction: equipmentGate?.action,
         routerDecision: result.ragTrace?.router,
         retrieval: result.retrieval,
         history: normalizedHistory,
-      });
+      };
+      const postGate = honestRag
+        ? applyHonestRagPostGate({
+            ...postGateParams,
+            validationProfile: equipment.id === "sdb1560m" ? "sdb1560" : "sdb1560",
+          })
+        : equipmentProfile.applyPostGate(postGateParams);
       finalAnswer = postGate.answer;
       finalRetrieval = {
         ...result.retrieval,

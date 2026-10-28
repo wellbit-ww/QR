@@ -1,8 +1,18 @@
 const SDB_MODEL_RE = /\bSDB\s*(\d{3,4})(?:\s*[-\s]?\s*NM)?\b/giu;
 
 function canonicalSdbModel(value) {
-  const compact = String(value || "").toUpperCase().replace(/[\s-]/g, "");
-  const match = compact.match(/^SDB(\d{3,4})(?:NM)?$/);
+  const raw = String(value || "").trim();
+  const compact = raw.toUpperCase().replace(/[\s-]/g, "");
+  let match = compact.match(/^SDB(\d{3,4})(?:NM)?$/);
+  if (!match) {
+    match = compact.match(/^SDB(\d{3,4})M$/);
+  }
+  if (!match && /^sdb(\d{3,4})m?$/i.test(raw)) {
+    const idMatch = raw.match(/^sdb(\d{3,4})m?$/i);
+    if (idMatch) {
+      return `SDB${idMatch[1]}NM`;
+    }
+  }
   return match ? `SDB${match[1]}NM` : "";
 }
 

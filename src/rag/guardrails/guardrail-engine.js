@@ -2,6 +2,8 @@ const { validateAnswerAgainstContext } = require("../answer-validation");
 const { validateSdb702nmAnswerAgainstContext } = require("../sdb702nm-answer-validation");
 const { validateSdb302nmAnswerAgainstContext } = require("../sdb302nm-answer-validation");
 const { validateSdb151nmAnswerAgainstContext } = require("../sdb151nm-answer-validation");
+const { validateSdb1560mAnswerAgainstContext } = require("../sdb1560m-answer-validation");
+const { shouldUseHonestRag, isNumericTtxRetrievalQuery } = require("../honest-rag-mode");
 const { validateGrounding } = require("../synthesis/grounding-validation");
 const {
   goldenNumericMismatchFailures,
@@ -60,6 +62,17 @@ function validateForProfile(answer, retrievalContext, intent, hints = {}) {
   }
   if (hints.validationProfile === "sdb151") {
     return validateSdb151nmAnswerAgainstContext(answer, retrievalContext, intent || {});
+  }
+  if (hints.validationProfile === "sdb1560") {
+    return validateSdb1560mAnswerAgainstContext(answer, retrievalContext, intent || {});
+  }
+  const equipmentId = hints.equipmentId || intent?.equipmentId;
+  if (
+    shouldUseHonestRag(equipmentId) &&
+    equipmentId === "sdb1560m" &&
+    isNumericTtxRetrievalQuery(hints.originalQuery || intent?.originalQuery, intent)
+  ) {
+    return validateSdb1560mAnswerAgainstContext(answer, retrievalContext, intent || {});
   }
   return validateAnswerAgainstContext(answer, retrievalContext, intent || {});
 }
@@ -255,8 +268,11 @@ function runGuardrails({ answer, retrievalContext, intent, hints = {} }) {
     softFailed;
 
   if (semanticRescue) {
+    const skipGoldenRescueBlock =
+      hints.validationProfile === "sdb1560" ||
+      (hints.honestRag && hints.skipGoldenFacts);
     const goldenFail = (base.failures || []).some((f) => f.code === "golden_numeric_mismatch");
-    if (goldenFail) {
+    if (goldenFail && !skipGoldenRescueBlock) {
       ragWarn("guardrails.block_semantic_rescue", { reason: "golden_numeric_mismatch", deliveryMethod });
       return abstainShape("golden_numeric_mismatch", hallucination, base, grounding, { deliveryMethod });
     }

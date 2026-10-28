@@ -31,6 +31,8 @@ const {
 } = require("../troubleshooting-scope");
 const { validateAnswerAgainstContext } = require("../answer-validation");
 const { resolveEquipmentProfile } = require("../../equipment/equipment-runtime");
+const { shouldDeferGuardrailsToPostGate, shouldUseHonestRag } = require("../honest-rag-mode");
+const { tryHonestContextualNumericFact } = require("../honest-contextual-extract");
 const {
   tryDeterministicSdb1106nmAnswer,
   directContextHintsForMessage,
@@ -873,6 +875,27 @@ async function runPipeline({
     message,
   });
 
+  if (shouldUseHonestRag(equipment.id)) {
+    const extracted = tryHonestContextualNumericFact({
+      equipmentId: equipment.id,
+      message,
+      intent: retrieval.intent,
+      promptChunks,
+      retrievalContext,
+      parameterFactLlm,
+      priorAnswer: finalAnswer,
+    });
+    if (extracted) {
+      finalAnswer = extracted;
+      trace.setLlm({
+        ...(trace.llm || {}),
+        mode: "CONTEXTUAL_FACT_FALLBACK",
+        deterministicParseFallback: true,
+        honestContextExtract: true,
+      });
+    }
+  }
+
   const answerBeforeGuardrails = finalAnswer;
   const scores = retrieval.scores || {};
   const semanticHint = Math.max(
@@ -888,13 +911,33 @@ async function runPipeline({
     candidateLen: String(answerBeforeGuardrails || "").length,
     semanticHint,
     semanticRescueThreshold: ragConfig.semanticRescueThreshold,
-    deferredPostGate: Boolean(equipmentProfile?.deferGuardrailsToPostGate),
+    deferredPostGate: shouldDeferGuardrailsToPostGate(equipmentProfile, equipment.id),
   });
 
   const pipelineIntent = pipelineIntentForValidation(routerDecision, retrieval);
 
-  if (equipmentProfile?.deferGuardrailsToPostGate) {
-    const outboundAnswer = String(finalAnswer || "").trim() || STRICT_ABSTAIN;
+  if (shouldDeferGuardrailsToPostGate(equipmentProfile, equipment.id)) {
+    let outboundAnswer = String(finalAnswer || "").trim() || STRICT_ABSTAIN;
+    if (shouldUseHonestRag(equipment.id)) {
+      const extracted = tryHonestContextualNumericFact({
+        equipmentId: equipment.id,
+        message,
+        intent: retrieval.intent,
+        promptChunks,
+        retrievalContext,
+        parameterFactLlm,
+        priorAnswer: outboundAnswer,
+      });
+      if (extracted) {
+        outboundAnswer = extracted;
+        trace.setLlm({
+          ...(trace.llm || {}),
+          mode: "CONTEXTUAL_FACT_FALLBACK",
+          deterministicParseFallback: true,
+          honestContextExtract: true,
+        });
+      }
+    }
     trace.setGuardrails({ skipped: true, reason: "deferred_to_server_post_gate" });
     trace.setAnswerDelivery({
       method: deliveryMethod,

@@ -1,0 +1,5 @@
+cd C:\Users\SOVAI\Documents\Work\QR
+docker compose up -d
+Start-Sleep -Seconds 8
+docker cp .\backups\equipment_rag.dump equipment-rag-postgres:/tmp/equipment_rag.dump
+docker exec -it equipment-rag-postgres pg_restore -U rag -d equipment_rag --clean --if-exists /tmp/equipment_rag.dump

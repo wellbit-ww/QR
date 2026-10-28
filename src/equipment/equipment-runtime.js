@@ -5,6 +5,7 @@
 const sdb1106nmProfile = require("./profiles/sdb1106-nm");
 const sdb702nmProfile = require("./profiles/sdb702-nm");
 const sdb151nmProfile = require("./profiles/sdb151-nm");
+const sdb1560mProfile = require("./profiles/sdb1560m");
 const w700Profile = require("./profiles/w-700");
 
 /** Public URL/label aliases → catalog id (Postgres / knowledge keep the canonical id). */
@@ -31,6 +32,7 @@ const PROFILES = Object.freeze({
   [sdb1106nmProfile.id]: sdb1106nmProfile,
   [sdb702nmProfile.id]: sdb702nmProfile,
   [sdb151nmProfile.id]: sdb151nmProfile,
+  [sdb1560mProfile.id]: sdb1560mProfile,
   [w700Profile.id]: w700Profile,
 });
 

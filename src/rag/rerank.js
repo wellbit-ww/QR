@@ -42,6 +42,10 @@ function hasFocusSignal(text, focusParameter) {
       return /(?:в|вольт|напряжен|питани)/iu.test(s);
     case "humidity":
       return /влажност|rh%/i.test(s);
+    case "kit_shelf_count":
+      return /полок|комплект\s+поставки|таблиц[аы]?\s*1\.2/i.test(s);
+    case "load":
+      return /нагрузк|кг|полк/i.test(s);
     default:
       return false;
   }
@@ -548,7 +552,7 @@ function desiccantMaterialQueryBoost(chunk, queryText) {
   return docSignals ? 0.12 : 0;
 }
 
-function retrievalCardBoost(chunk, queryText) {
+function retrievalCardBoost(chunk, queryText, intent, opts = {}) {
   const meta = chunk?.metadata || {};
   const fromCard =
     meta.retrievalCard === true || /retrieval-cards/i.test(String(chunk?.sourceDoc || ""));
@@ -556,10 +560,46 @@ function retrievalCardBoost(chunk, queryText) {
     return 0;
   }
   const overlap = computeKeywordOverlapScore(queryText, chunk);
+  const numericTtx = Boolean(opts.numericTtx);
+  if (numericTtx) {
+    if (overlap < 0.12) {
+      return -0.18;
+    }
+    return -0.38;
+  }
   if (overlap < 0.2) {
     return 0;
   }
   return 0.08 + Math.min(0.1, overlap * 0.12);
+}
+
+function honestManualSpecBoost(chunk, intent, opts = {}) {
+  if (!opts.honestRag || !opts.numericTtx) {
+    return 0;
+  }
+  const src = String(chunk?.sourceDoc || "");
+  if (/retrieval-cards/i.test(src)) {
+    return 0;
+  }
+  if (/golden-facts/i.test(src)) {
+    return -0.12;
+  }
+  const text = `${chunk.content || ""} ${chunk.section || ""}`;
+  const fromPdf = /\.pdf/i.test(src) || /SDB1560NM/i.test(src) || /Руководство/i.test(src);
+  const blockType = resolveBlockType(chunk);
+  let boost = 0;
+  if (fromPdf && (blockType === BLOCK_TYPES.TABLE_BLOCK || blockType === BLOCK_TYPES.SPEC_BLOCK)) {
+    boost += 0.24;
+  } else if (fromPdf) {
+    boost += 0.14;
+  }
+  if (/таблиц[аы]?\s*1\.2|комплект\s+поставки|полок/i.test(text)) {
+    boost += 0.12;
+  }
+  if (chunk.sdb1560KitSupplyInjected || chunk.table11FlattenInjected) {
+    boost += 0.08;
+  }
+  return Math.min(boost, 0.4);
 }
 
 function modelAliasBoost(chunk, aliases, intentType) {
@@ -681,7 +721,14 @@ function rerankChunks(chunks, intent, opts = {}) {
     pushAdj("nitrogen_consistency", nitrogenConsistencyScore(chunk, hints));
     pushAdj("model_alias", modelAliasBoost(chunk, aliases, intentType));
     pushAdj("desiccant_material_query", desiccantMaterialQueryBoost(chunk, queryText));
-    pushAdj("retrieval_card", retrievalCardBoost(chunk, queryText));
+    pushAdj(
+      "retrieval_card",
+      retrievalCardBoost(chunk, queryText, intent, {
+        numericTtx: opts.numericTtx,
+        honestRag: opts.honestRag,
+      }),
+    );
+    pushAdj("honest_manual_spec", honestManualSpecBoost(chunk, intent, opts));
 
     const rerankScore = Math.max(0, Math.min(1, composed));
 

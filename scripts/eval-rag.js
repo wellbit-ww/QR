@@ -93,15 +93,23 @@ async function loadEvalDataset() {
   return parsed.items;
 }
 
+function normalizeEvalMatchText(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/\u00a0/g, " ")
+    .replace(/(\d)[\s\u202f]+(?=\d)/g, "$1");
+}
+
 function scoreRow(answer, expectedKeywords) {
-  const text = String(answer || "").toLowerCase();
+  const text = normalizeEvalMatchText(answer);
   if (!expectedKeywords.length) {
     return 1;
   }
 
   let hits = 0;
   for (const keyword of expectedKeywords) {
-    if (text.includes(String(keyword).toLowerCase())) {
+    const k = normalizeEvalMatchText(String(keyword));
+    if (text.includes(k)) {
       hits += 1;
     }
   }
@@ -360,7 +368,10 @@ async function main() {
 
   console.log("RAG eval report");
   console.log(`Questions: ${rows.length}`);
+  const forbiddenRowsFailed = rows.filter((row) => !row.forbiddenPassed).length;
+  const forbiddenRowsOk = rows.length - forbiddenRowsFailed;
   console.log(`Average keyword score: ${avgScore.toFixed(2)}`);
+  console.log(`forbiddenOk rows: ${forbiddenRowsOk}/${rows.length} (forbidden hit tokens: ${forbiddenViolations})`);
   console.log(`Average sources per answer: ${avgSources.toFixed(2)}`);
   console.log(`Unsupported checklist items: ${totalUnsupported}`);
   console.log(`Unsafe recommendations: ${totalUnsafeRecommendations}`);
@@ -404,6 +415,8 @@ async function main() {
           avgSources,
           containsViolations,
           forbiddenViolations,
+          forbiddenRowsOk,
+          forbiddenRowsFailed,
           parameterKeyViolations,
         },
         rows,

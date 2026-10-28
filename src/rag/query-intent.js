@@ -76,6 +76,11 @@ const FOCUS_PARAMETER_LABELS = Object.freeze({
   grounding_resistance: "сопротивление заземляющего контура",
   nitrogen: "азот",
   temperature: "температура",
+  kit_shelf_count: "количество полок в комплекте",
+  internal_volume: "внутренний объём",
+  full_volume: "полный объём",
+  power_storage: "мощность в режиме хранения",
+  power_regen: "мощность в режиме регенерации",
 });
 
 const { isMaintenanceQuery } = require("./maintenance-scope");
@@ -106,6 +111,14 @@ const SDB302NM_CONTEXT_FILTER_RULES = Object.freeze([
   "Используй только факты, относящиеся к SDB302NM (или к объединённой строке, где SDB302NM явно перечислена).",
   "В серийных таблицах игнорируй значения SDB151, SDB151NM, SDB306, SDB702M, SDB702NM, SDB1106, SDB1106NM и SDB1560M.",
   "Не упоминай другие модели SDB в ответе и не подставляй их габариты, массу, мощности, комплектацию или сроки.",
+]);
+
+const SDB1560M_CONTEXT_FILTER_RULES = Object.freeze([
+  "ФИЛЬТР МОДЕЛИ (обязательно для SDB1560NM / SDB1560M):",
+  "Используй только факты, относящиеся к SDB1560NM (или к объединённой строке группы SDB1106/SDB1560, где указаны параметры 1560).",
+  "В серийных таблицах игнорируй значения SDB151, SDB302, SDB302NM, SDB306, SDB702, SDB702NM, SDB1106NM (если строка не про 1560) и прочие модели.",
+  "Не упоминай другие модели SDB в ответе и не подставляй их габариты, массу, мощности, комплектацию или сроки.",
+  "Целевая модель — только SDB1560 M.",
 ]);
 
 const SDB151NM_CONTEXT_FILTER_RULES = Object.freeze([
@@ -143,11 +156,22 @@ function equipmentIsSdb151nm(equipment) {
   return id.includes("sdb151") || name.includes("sdb151");
 }
 
+function equipmentIsSdb1560m(equipment) {
+  const id = String(equipment?.id || "").toLowerCase();
+  const name = String(equipment?.name || "").toLowerCase();
+  return id.includes("sdb1560") || name.includes("sdb1560");
+}
+
 /**
  * Нужен ли жёсткий фильтр «только SDB1106NM» для промпта/ответа.
  */
 function shouldApplySdb1106nmModelContextFilter(query, retrievalContext, equipment = null) {
-  if (equipmentIsSdb702nm(equipment) || equipmentIsSdb302nm(equipment) || equipmentIsSdb151nm(equipment)) {
+  if (
+    equipmentIsSdb702nm(equipment) ||
+    equipmentIsSdb302nm(equipment) ||
+    equipmentIsSdb151nm(equipment) ||
+    equipmentIsSdb1560m(equipment)
+  ) {
     return true;
   }
   if (equipmentIsSdb1106nm(equipment)) {
@@ -167,6 +191,9 @@ function shouldApplySdb1106nmModelContextFilter(query, retrievalContext, equipme
 function modelContextFilterPromptLines(equipment = null) {
   if (equipmentIsSdb151nm(equipment)) {
     return [...SDB151NM_CONTEXT_FILTER_RULES];
+  }
+  if (equipmentIsSdb1560m(equipment)) {
+    return [...SDB1560M_CONTEXT_FILTER_RULES];
   }
   if (equipmentIsSdb302nm(equipment)) {
     return [...SDB302NM_CONTEXT_FILTER_RULES];
@@ -422,14 +449,26 @@ function detectFocusParameter(message) {
   if (/температур|градус|°\s*[сc]/i.test(m)) {
     return "temperature";
   }
+  if (/(?:сколько\s+полок|количеств\w*\s+полок|полок\s+в\s+комплект|комплект\w*\s+полок)/iu.test(m)) {
+    return "kit_shelf_count";
+  }
+  if (/(?:внутренн[\p{L}]*\s+объ[её]м|объ[её]м\s+внутр|сколько\s+литр)/iu.test(m)) {
+    return "internal_volume";
+  }
+  if (/полн[\p{L}]*\s+объ[её]м/iu.test(m)) {
+    return "full_volume";
+  }
+  if (/мощност.*хранен|ватт.*хранен|режиме\s+хранен/i.test(m)) {
+    return "power_storage";
+  }
+  if (/мощност.*регенерац|ватт.*регенерац/i.test(m)) {
+    return "power_regen";
+  }
   if (/нагрузк|полк/i.test(m)) {
     if (/конвекц|между\s+полк|расстояни.*полк|полк.*расстояни/i.test(m) && !/\bкг\b|нагрузк|выдерж|лимит|масс/i.test(m)) {
       return null;
     }
     return "load";
-  }
-  if (/масс|вес|сколько\s+весит|каков\s+вес|какая\s+масса/i.test(m)) {
-    return "dimensions";
   }
   if (/габарит|размер|ширин|высот|глубин/i.test(m)) {
     return "dimensions";
@@ -698,6 +737,7 @@ module.exports = {
   equipmentIsSdb702nm,
   equipmentIsSdb302nm,
   equipmentIsSdb151nm,
+  equipmentIsSdb1560m,
   llmGenerationOptionsForIntent,
   ZERO_TEMP_LLM_OPTIONS,
 };

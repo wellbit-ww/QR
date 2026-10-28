@@ -101,6 +101,8 @@ function summarizeRagTrace(ragTrace) {
     gateAction: ragTrace.gateAction ?? null,
     gateReason: ragTrace.gateReason ?? null,
     serverPostGate: ragTrace.serverPostGate ?? null,
+    postGate: ragTrace.postGate ?? null,
+    honestMode: ragTrace.honestMode ?? null,
     warnings: ragTrace.warnings ?? null,
     guardrails: ragTrace.guardrails ?? null,
     router: ragTrace.router

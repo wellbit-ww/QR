@@ -427,6 +427,55 @@ h1 {
   height: min(40vh, 340px);
 }
 
+.equipment-image-frame--sdb1560m {
+  min-height: min(48vh, 400px);
+  max-height: min(52vh, 440px);
+  padding: 10px 8px;
+}
+
+.equipment-image-frame--sdb1560m .equipment-image {
+  width: auto;
+  max-width: 100%;
+  height: min(46vh, 400px);
+  max-height: calc(100% - 4px);
+  object-fit: contain;
+  object-position: center center;
+}
+
+.card--detail .equipment-image-frame--sdb1560m {
+  min-height: min(50vh, 420px);
+  max-height: min(54vh, 460px);
+  padding: 6px 4px;
+}
+
+.card--detail .equipment-image-frame--sdb1560m .equipment-image {
+  width: auto;
+  max-width: 100%;
+  height: min(48vh, 420px);
+  max-height: none;
+  margin-left: auto;
+  margin-right: auto;
+  object-position: 54% center;
+  transform: scale(1.22) translateX(14px);
+  transform-origin: center center;
+}
+
+.card--catalog-item .equipment-image-frame--sdb1560m {
+  min-height: min(44vh, 360px);
+  max-height: min(46vh, 380px);
+  padding: 4px 2px;
+}
+
+.card--catalog-item .equipment-image-frame--sdb1560m .equipment-image {
+  width: auto;
+  max-width: 100%;
+  height: min(40vh, 340px);
+  max-height: none;
+  object-position: 54% center;
+  transform: scale(1.2) translateX(14px);
+  transform-origin: center center;
+}
+
 .card--detail h1 {
   margin-bottom: 14px;
   font-size: clamp(1.35rem, 3.2vw, 2rem);
@@ -1311,6 +1360,34 @@ h1 {
     height: min(34vh, 220px);
     max-width: 96%;
     transform: scale(1.08);
+  }
+
+  .card--catalog-item .equipment-image-frame--sdb1560m {
+    min-height: min(38vh, 250px);
+    max-height: min(42vh, 280px);
+    padding: 4px 2px;
+  }
+
+  .card--catalog-item .equipment-image-frame--sdb1560m .equipment-image {
+    height: min(36vh, 230px);
+    max-height: min(36vh, 230px);
+    object-position: 54% center;
+    transform: scale(1.14) translateX(10px);
+    transform-origin: center center;
+  }
+
+  .card--detail .equipment-image-frame--sdb1560m {
+    min-height: min(42vh, 280px);
+    max-height: min(46vh, 300px);
+    padding: 6px 4px;
+  }
+
+  .card--detail .equipment-image-frame--sdb1560m .equipment-image {
+    height: min(40vh, 260px);
+    max-height: none;
+    object-position: 54% center;
+    transform: scale(1.16) translateX(10px);
+    transform-origin: center center;
   }
 
   .card--catalog-item .equipment-card-title {

@@ -14,6 +14,7 @@
  *   node scripts/create-portal-user.js --login acme01 --reset-password --password "New1!" 
  *   node scripts/create-portal-user.js --login acme01 --deactivate
  *   node scripts/create-portal-user.js --login acme01 --add-equipment w-700
+ *   node scripts/create-portal-user.js --login acme01 --add-equipment sdb1560m
  *
  * Журнал событий аккаунтов без plaintext-паролей (не в git): data/portal-accounts.jsonl
  * Переопределение: PORTAL_ACCOUNTS_LOG=C:\path\to\file.jsonl

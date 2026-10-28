@@ -1,0 +1,149 @@
+{
+  "phase": 0,
+  "purpose": "baseline before RAG_HONEST_EQUIPMENT (legacy deterministic + post-gate)",
+  "baseUrl": "http://127.0.0.1:3000",
+  "capturedAt": "2026-10-28T06:34:29.676Z",
+  "httpNote": {
+    "error": "fetch failed",
+    "hint": "Long RAG calls may drop HTTP socket; pipeline traces above are primary baseline."
+  },
+  "cases": [
+    {
+      "id": "baseline-deterministic-ttx",
+      "label": "Сегодня часто deterministic (ТТХ)",
+      "question": "Сколько полок в комплекте?",
+      "captureMethod": "local_runPipeline",
+      "capturedAt": "2026-10-28T06:34:29.676Z",
+      "equipmentId": "sdb1560m",
+      "answerPreview": "В шкафу SDB1560NM предусмотрено **2 полки**.",
+      "answer": "В шкафу SDB1560NM предусмотрено **2 полки**.",
+      "chatMode": null,
+      "ragTrace": {
+        "router": {
+          "intent": "SINGLE_FIELD_QUERY",
+          "route": "UNKNOWN",
+          "focusParameter": null,
+          "symptom": null,
+          "confidence": 0.78,
+          "retrievalMode": "hybrid_wide",
+          "symptoms": [],
+          "parameterResolved": null,
+          "originalQuery": "Сколько полок в комплекте?"
+        },
+        "retrieval": {},
+        "decision": {},
+        "llm": {
+          "used": false,
+          "mode": "RAG_DETERMINISTIC",
+          "deterministic": true
+        },
+        "guardrails": {},
+        "scores": {},
+        "answerDelivery": null,
+        "latency": {
+          "totalMs": 42
+        },
+        "mode": "RAG_DETERMINISTIC",
+        "deterministicUsed": true,
+        "used": false
+      },
+      "routerDecision": {
+        "route": "UNKNOWN",
+        "intent": "SINGLE_FIELD_QUERY"
+      },
+      "sourcesCount": 0
+    },
+    {
+      "id": "baseline-procedure-rag",
+      "label": "Процедура через RAG/LLM",
+      "question": "Как начать работу с шкафом?",
+      "captureMethod": "local_runPipeline",
+      "capturedAt": "2026-10-28T06:34:29.676Z",
+      "equipmentId": "sdb1560m",
+      "answerPreview": "Чтобы начать работу с шкафом SDB1560NM, следуйте следующим шагам:\n\n1. Подключите шкаф к электрической сети и включите его.\n2. Нажмите на кнопку \"SET\" на панели управления, чтобы войти в меню настроек.\n3. Используйте кнопки \"UP\" и \"DN\" для выбора необходимого значения температуры или влажности.\n4. Для подтверждения завершения установки нажмите кнопку \"SET\" еще раз.\n5. Установите порог влажности, ес",
+      "answer": "Чтобы начать работу с шкафом SDB1560NM, следуйте следующим шагам:\n\n1. Подключите шкаф к электрической сети и включите его.\n2. Нажмите на кнопку \"SET\" на панели управления, чтобы войти в меню настроек.\n3. Используйте кнопки \"UP\" и \"DN\" для выбора необходимого значения температуры или влажности.\n4. Для подтверждения завершения установки нажмите кнопку \"SET\" еще раз.\n5. Установите порог влажности, если необходимо, используя кнопки \"UP\" и \"DN\" для выбора необходимого значения.\n6. Нажмите кнопку \"SET\" еще раз, чтобы подтвердить завершение установки порога влажности.\n\nПосле выполнения этих шагов шкаф будет готов к использованию.",
+      "chatMode": null,
+      "ragTrace": {
+        "router": {
+          "intent": "GETTING_STARTED_QUERY",
+          "route": "PROCEDURAL_QA",
+          "focusParameter": null,
+          "symptom": null,
+          "confidence": 0.84,
+          "retrievalMode": "procedural_focused",
+          "symptoms": [],
+          "parameterResolved": null,
+          "originalQuery": "Как начать работу с шкафом?"
+        },
+        "retrieval": {
+          "route": "PROCEDURAL_QA",
+          "bestMode": "procedural_boosted",
+          "chunks": 15,
+          "promptChunks": 8,
+          "topScore": 1.9,
+          "minSimilarityScore": 0.28,
+          "originalUserQuery": "Как начать работу с шкафом?",
+          "standaloneRetrievalQuery": "Как начать работу с шкафом сухого хранения SDB1560 M 2.2.5 включение шкафа тумблер питания на кожухе осушителя заземлённая розетка 220 В 50 Гц",
+          "queryRewriteSource": "llm",
+          "queryRewritten": true,
+          "queryRewriteModel": "qwen2.5:32b-instruct"
+        },
+        "decision": {
+          "action": "LLM_GENERATE",
+          "reason": "route_allows_grounded_generation",
+          "llmAllowed": true,
+          "retrievalPassed": true
+        },
+        "llm": {
+          "used": true,
+          "model": "llama3.1:8b",
+          "mode": "LLM_GENERATE"
+        },
+        "guardrails": {
+          "skipped": true,
+          "reason": "deferred_to_server_post_gate"
+        },
+        "scores": {
+          "topScore": 1.9,
+          "lexicalScore": 1.9,
+          "fusionScore": 1.9,
+          "vectorTopSimilarity": 0.785355142270382,
+          "minSimilarityScore": 0.28
+        },
+        "answerDelivery": {
+          "method": "standard",
+          "deferredPostGate": true,
+          "outboundLen": 630
+        },
+        "latency": {
+          "totalMs": 340459
+        }
+      },
+      "routerDecision": {
+        "route": "PROCEDURAL_QA",
+        "intent": "GETTING_STARTED_QUERY"
+      },
+      "sourcesCount": 0
+    },
+    {
+      "id": "baseline-unsupported-abstain",
+      "label": "Нет в мануале / unsupported",
+      "question": "Поддерживает ли шкаф Wi-Fi?",
+      "captureMethod": "local_classifyPreGate",
+      "capturedAt": "2026-10-28T06:34:29.676Z",
+      "equipmentId": "sdb1560m",
+      "answerPreview": "В документации на данную модель этот параметр не указан.",
+      "answer": "В документации на данную модель этот параметр не указан.",
+      "chatMode": {
+        "mode": "SCOPE_GATE"
+      },
+      "ragTrace": {
+        "used": false,
+        "mode": "SCOPE_GATE",
+        "gateAction": "UNSUPPORTED_SPEC",
+        "gateReason": "unsupported_parameter"
+      },
+      "sourcesCount": 0
+    }
+  ]
+}

@@ -3,6 +3,7 @@ const { validateAnswerAgainstContext } = require("../answer-validation");
 const { validateSdb702nmAnswerAgainstContext } = require("../sdb702nm-answer-validation");
 const { validateSdb302nmAnswerAgainstContext } = require("../sdb302nm-answer-validation");
 const { validateSdb151nmAnswerAgainstContext } = require("../sdb151nm-answer-validation");
+const { validateSdb1560mAnswerAgainstContext } = require("../sdb1560m-answer-validation");
 
 const REPAIR_RE =
   /(?:разобрать|ремонт|заменить|починить|вскрыть|снять\s+крышк|перепаять|проверить\s+мультиметр|подать\s+напряжение)/iu;
@@ -15,6 +16,8 @@ function validateGrounding(answer, context, options = {}, hints = {}) {
     base = validateSdb302nmAnswerAgainstContext(answer, context, options);
   } else if (hints.validationProfile === "sdb151") {
     base = validateSdb151nmAnswerAgainstContext(answer, context, options);
+  } else if (hints.validationProfile === "sdb1560") {
+    base = validateSdb1560mAnswerAgainstContext(answer, context, options);
   } else {
     base = validateAnswerAgainstContext(answer, context, options);
   }

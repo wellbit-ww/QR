@@ -2,6 +2,7 @@ const SDB702NM = "SDB702NM";
 const SDB1106NM = "SDB1106NM";
 const SDB151NM = "SDB151NM";
 const SDB302NM = "SDB302NM";
+const SDB1560NM = "SDB1560NM";
 
 /** Запрос про серийный/заводской номер оборудования (не телефон компании Совтест). */
 function isEquipmentSerialNumberQuery(message) {
@@ -58,6 +59,9 @@ function normalizeModelName(modelName) {
     .toUpperCase();
   if (/1106/.test(name)) {
     return SDB1106NM;
+  }
+  if (/1560/.test(name)) {
+    return SDB1560NM;
   }
   if (/302/.test(name)) {
     return SDB302NM;

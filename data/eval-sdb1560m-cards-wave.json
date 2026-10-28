@@ -1,0 +1,897 @@
+{
+  "items": [
+    {
+      "id": "live-start",
+      "equipmentId": "sdb1560m",
+      "category": "session",
+      "question": "Как начать работу с шкафом?",
+      "expectedKeywords": [
+        "тумблер",
+        "220"
+      ],
+      "mustNotContain": [
+        "SDB1106",
+        "SDB1560NM",
+        "180 кг"
+      ]
+    },
+    {
+      "id": "live-shelves",
+      "equipmentId": "sdb1560m",
+      "category": "session",
+      "question": "Сколько полок в комплекте",
+      "expectedKeywords": [
+        "2"
+      ],
+      "mustNotContain": [
+        "5 полок",
+        "7 полок"
+      ]
+    },
+    {
+      "id": "live-wheels",
+      "equipmentId": "sdb1560m",
+      "category": "session",
+      "question": "Идут ли колесики в комплекте",
+      "expectedKeywords": [
+        "колес"
+      ],
+      "mustNotContain": [
+        "не указан"
+      ]
+    },
+    {
+      "id": "live-set-rh",
+      "equipmentId": "sdb1560m",
+      "category": "session",
+      "question": "Как задать порог влажности",
+      "expectedKeywords": [
+        "SET",
+        "UP"
+      ],
+      "mustNotContain": [
+        "1–50"
+      ]
+    },
+    {
+      "id": "live-rh-spike",
+      "equipmentId": "sdb1560m",
+      "category": "session",
+      "question": "Что делать есть влажность очень быстро растет",
+      "expectedKeywords": [
+        "2.2.2",
+        "уплотнител",
+        "3.2"
+      ],
+      "mustNotContain": [
+        "SDB1106NM",
+        "180 кг"
+      ]
+    },
+    {
+      "id": "spec-volume",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Какой внутренний объём?",
+      "expectedKeywords": [
+        "896"
+      ],
+      "mustNotContain": [
+        "546",
+        "500",
+        "1028"
+      ]
+    },
+    {
+      "id": "spec-full-volume",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Какой полный объём шкафа?",
+      "expectedKeywords": [
+        "2070"
+      ],
+      "mustNotContain": [
+        "1896",
+        "546",
+        "500"
+      ]
+    },
+    {
+      "id": "spec-dims",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Какие габариты?",
+      "expectedKeywords": [
+        "1202",
+        "1693",
+        "1028"
+      ],
+      "mustNotContain": [
+        "1204",
+        "1952",
+        "772",
+        "SDB1106"
+      ]
+    },
+    {
+      "id": "spec-mass",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Сколько весит шкаф?",
+      "expectedKeywords": [
+        "260"
+      ],
+      "mustNotContain": [
+        "90",
+        "180",
+        "1204"
+      ]
+    },
+    {
+      "id": "spec-doors",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Сколько дверей?",
+      "expectedKeywords": [
+        "4"
+      ],
+      "mustNotContain": [
+        "2 двери",
+        "3 двери"
+      ]
+    },
+    {
+      "id": "spec-power-storage",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Сколько ватт в режиме хранения?",
+      "expectedKeywords": [
+        "8"
+      ],
+      "mustNotContain": [
+        "810"
+      ]
+    },
+    {
+      "id": "spec-power-dry",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Сколько потребляет при осушении без опций?",
+      "expectedKeywords": [
+        "40"
+      ],
+      "mustNotContain": [
+        "20",
+        "540"
+      ]
+    },
+    {
+      "id": "spec-power-regen",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Какая мощность при регенерации?",
+      "expectedKeywords": [
+        "540"
+      ],
+      "mustNotContain": [
+        "8 Вт",
+        "810",
+        "40 Вт"
+      ]
+    },
+    {
+      "id": "spec-rh-range",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Какой диапазон поддержания влажности?",
+      "expectedKeywords": [
+        "0",
+        "80"
+      ],
+      "mustNotContain": [
+        "1–50"
+      ]
+    },
+    {
+      "id": "spec-ip",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Какой класс защиты?",
+      "expectedKeywords": [
+        "IP55"
+      ],
+      "mustNotContain": [
+        "IP65"
+      ]
+    },
+    {
+      "id": "spec-shelf-load",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Какая нагрузка на стандартную полку?",
+      "expectedKeywords": [
+        "100"
+      ],
+      "mustNotContain": [
+        "50 кг",
+        "180 кг"
+      ]
+    },
+    {
+      "id": "proc-power-on",
+      "equipmentId": "sdb1560m",
+      "category": "procedure",
+      "question": "Как включить шкаф?",
+      "expectedKeywords": [
+        "тумблер",
+        "220"
+      ],
+      "mustNotContain": [
+        "SDB1106"
+      ]
+    },
+    {
+      "id": "proc-open-door",
+      "equipmentId": "sdb1560m",
+      "category": "procedure",
+      "question": "Как открыть дверь?",
+      "expectedKeywords": [
+        "сигнал"
+      ],
+      "mustNotContain": [
+        "выключите питание"
+      ]
+    },
+    {
+      "id": "proc-modes",
+      "equipmentId": "sdb1560m",
+      "category": "procedure",
+      "question": "Какие режимы работы предусмотрены?",
+      "expectedKeywords": [
+        "Хранения",
+        "Осушения",
+        "Регенерации"
+      ]
+    },
+    {
+      "id": "proc-display",
+      "equipmentId": "sdb1560m",
+      "category": "procedure",
+      "question": "Что показывает дисплей?",
+      "expectedKeywords": [
+        "влажност"
+      ],
+      "mustNotContain": [
+        "SDB1106NM"
+      ]
+    },
+    {
+      "id": "proc-heat-set",
+      "equipmentId": "sdb1560m",
+      "category": "procedure",
+      "question": "Как установить температуру подогрева?",
+      "expectedKeywords": [
+        "40"
+      ],
+      "mustNotContain": [
+        "не указан"
+      ]
+    },
+    {
+      "id": "proc-regen-off",
+      "equipmentId": "sdb1560m",
+      "category": "safety",
+      "question": "Можно ли отключить шкаф во время регенерации?",
+      "expectedKeywords": [
+        "запрещается"
+      ],
+      "mustNotContain": [
+        "можно выключить"
+      ]
+    },
+    {
+      "id": "proc-smoke",
+      "equipmentId": "sdb1560m",
+      "category": "safety",
+      "question": "Из шкафа идёт дым, что делать?",
+      "expectedKeywords": [
+        "отключ",
+        "питан"
+      ],
+      "mustNotContain": [
+        "таблица 3.2"
+      ]
+    },
+    {
+      "id": "proc-self-repair",
+      "equipmentId": "sdb1560m",
+      "category": "safety",
+      "question": "Можно ли самому чинить электронику шкафа?",
+      "expectedKeywords": [
+        "изготовител"
+      ]
+    },
+    {
+      "id": "trouble-rh-not-drop",
+      "equipmentId": "sdb1560m",
+      "category": "troubleshooting",
+      "question": "Влажность не падает — что делать?",
+      "expectedKeywords": [
+        "3.1.4"
+      ],
+      "mustNotContain": [
+        "SDB1106NM"
+      ]
+    },
+    {
+      "id": "trouble-rh-90",
+      "equipmentId": "sdb1560m",
+      "category": "troubleshooting",
+      "question": "Влажность скакнула до 90%, что проверять?",
+      "expectedKeywords": [
+        "двер",
+        "уплотнител"
+      ],
+      "mustNotContain": [
+        "перепад напряжения"
+      ]
+    },
+    {
+      "id": "opt-n2",
+      "equipmentId": "sdb1560m",
+      "category": "options",
+      "question": "Какое максимальное давление азота на входе?",
+      "expectedKeywords": [
+        "6"
+      ],
+      "mustNotContain": [
+        "10 бар",
+        "SDB1106"
+      ]
+    },
+    {
+      "id": "opt-heat-max",
+      "equipmentId": "sdb1560m",
+      "category": "options",
+      "question": "Какая максимальная температура подогрева?",
+      "expectedKeywords": [
+        "40"
+      ]
+    },
+    {
+      "id": "maint-dryer",
+      "equipmentId": "sdb1560m",
+      "category": "maintenance",
+      "question": "Как часто менять блок осушения?",
+      "expectedKeywords": [
+        "36"
+      ]
+    },
+    {
+      "id": "unsupported-wifi",
+      "equipmentId": "sdb1560m",
+      "category": "unsupported",
+      "question": "Есть ли Wi-Fi?",
+      "expectedKeywords": [
+        "не указан"
+      ]
+    },
+    {
+      "id": "unsupported-mqtt",
+      "equipmentId": "sdb1560m",
+      "category": "unsupported",
+      "question": "Можно ли подключить шкаф к MQTT?",
+      "expectedKeywords": [
+        "не указан"
+      ]
+    },
+    {
+      "id": "offtopic-python",
+      "equipmentId": "sdb1560m",
+      "category": "unsupported",
+      "question": "Напиши скрипт на Python.",
+      "expectedKeywords": [
+        "SDB1560"
+      ]
+    },
+    {
+      "id": "informal-bought",
+      "equipmentId": "sdb1560m",
+      "category": "informal",
+      "question": "Только купил шкаф, с чего начать?",
+      "expectedKeywords": [
+        "220"
+      ],
+      "mustNotContain": [
+        "SDB1106NM"
+      ]
+    },
+    {
+      "id": "informal-beep",
+      "equipmentId": "sdb1560m",
+      "category": "informal",
+      "question": "Почему пищит когда дверь открыта?",
+      "expectedKeywords": [
+        "сигнал"
+      ],
+      "mustNotContain": [
+        "выключите питание"
+      ]
+    },
+    {
+      "id": "informal-set-rh",
+      "equipmentId": "sdb1560m",
+      "category": "informal",
+      "question": "Как в меню выставить влажность?",
+      "expectedKeywords": [
+        "SET"
+      ],
+      "mustNotContain": [
+        "1–50"
+      ]
+    },
+    {
+      "id": "purpose",
+      "equipmentId": "sdb1560m",
+      "category": "general",
+      "question": "Для чего предназначен шкаф?",
+      "expectedKeywords": [
+        "хранен",
+        "влаг"
+      ]
+    },
+    {
+      "id": "maker",
+      "equipmentId": "sdb1560m",
+      "category": "general",
+      "question": "Кто производитель?",
+      "expectedKeywords": [
+        "Совтест"
+      ]
+    },
+    {
+      "id": "transport",
+      "equipmentId": "sdb1560m",
+      "category": "general",
+      "question": "Как перевозить шкаф?",
+      "expectedKeywords": [
+        "вертикальн"
+      ]
+    },
+    {
+      "id": "talk-cold-shop",
+      "equipmentId": "sdb1560m",
+      "question": "А у нас в цехе градусов 12, шкаф вообще можно включать или лучше не надо?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-shelves-box",
+      "equipmentId": "sdb1560m",
+      "question": "Сколько полок в коробке с завода кладут? Не про нагрузку, а просто сколько штук.",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-heat-max",
+      "equipmentId": "sdb1560m",
+      "question": "Подогрев если есть — до скольки градусов крутить можно максимум?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-ip",
+      "equipmentId": "sdb1560m",
+      "question": "От воды и пыли какой там IP у корпуса, не помню",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-solvent",
+      "equipmentId": "sdb1560m",
+      "question": "Можно туда растворитель или что-то горючее на ночь оставить?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-switch",
+      "equipmentId": "sdb1560m",
+      "question": "Где рубильник выключать если надо питание снять? Сзади что-то было",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-zeolite",
+      "equipmentId": "sdb1560m",
+      "question": "Чем там внутри влагу вытягивают — какой-то гранулят или что?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-dryer-swap",
+      "equipmentId": "sdb1560m",
+      "question": "Осушитель когда менять по времени — раз в сколько примерно?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-n2-bar",
+      "equipmentId": "sdb1560m",
+      "question": "Азот подключаем — сколько бар максимум можно подать, не порвёт?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-idle-watts",
+      "equipmentId": "sdb1560m",
+      "question": "В простом режиме хранения без всяких опций сколько он жрёт по электричеству?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-climate",
+      "equipmentId": "sdb1560m",
+      "question": "Климат какой у него по паспорту — ухл или что там в начале книжки написано?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-red-blink",
+      "equipmentId": "sdb1560m",
+      "question": "Красный мигает, это уже авария или так и должно?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-rh60",
+      "equipmentId": "sdb1560m",
+      "question": "Влажность 60 показывает, это много? Что делать",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-not-drying",
+      "equipmentId": "sdb1560m",
+      "question": "Не сушит вообще, уже час стоит, влажность как была так и есть",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-door-wont-latch",
+      "equipmentId": "sdb1560m",
+      "question": "Дверь не дожимается, писк не прекращается",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-service-phone",
+      "equipmentId": "sdb1560m",
+      "question": "Куда звонить если сломался, есть телефон сервиса?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-plug",
+      "equipmentId": "sdb1560m",
+      "question": "Розетка обычная 220 подойдёт или спецпитание надо?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-height",
+      "equipmentId": "sdb1560m",
+      "question": "Влезет в дверной проём? какой он высокий",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-heavy",
+      "equipmentId": "sdb1560m",
+      "question": "Тяжёлый? вдвоём поднимем или кран нужен",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-boards-loose",
+      "equipmentId": "sdb1560m",
+      "question": "Можно платы россыпью на полку кинуть или только в таре?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-phone-app",
+      "equipmentId": "sdb1560m",
+      "question": "С телефона можно смотреть влажность? приложение есть?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-yellow-long",
+      "equipmentId": "sdb1560m",
+      "question": "Жёлтый горит уже давно, выключать нельзя же?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-after-door",
+      "equipmentId": "sdb1560m",
+      "question": "Дверь открыл на минуту — влажность прыгнула, это поломка?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-temp-button",
+      "equipmentId": "sdb1560m",
+      "question": "Как на циферблате температуру глянуть, там одна влажность",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-set-stuck",
+      "equipmentId": "sdb1560m",
+      "question": "SET нажал и ничего не происходит, дальше как?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-burn-smell",
+      "equipmentId": "sdb1560m",
+      "question": "Пахнет горелым слегка, продолжать можно?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-water-floor",
+      "equipmentId": "sdb1560m",
+      "question": "На полу возле шкафа лужа, это от него?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-how-long-dry",
+      "equipmentId": "sdb1560m",
+      "question": "Сколько ждать пока высохнет после включения, часами что ли?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-ethernet-must",
+      "equipmentId": "sdb1560m",
+      "question": "Ethernet обязательно тыкать или можно без компа работать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-off-night",
+      "equipmentId": "sdb1560m",
+      "question": "На ночь можно выключить чтоб не жрал, или нельзя?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-rh-up-closed",
+      "equipmentId": "sdb1560m",
+      "question": "Дверь вроде закрыта а влажность всё равно растёт, что смотреть",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-symbol-w",
+      "equipmentId": "sdb1560m",
+      "question": "На экране какая-то W горит, это что",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-n2-included",
+      "equipmentId": "sdb1560m",
+      "question": "Азот в комплекте идёт или отдельно докупать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-hot-case",
+      "equipmentId": "sdb1560m",
+      "question": "Корпус сверху тёплый, не обожгусь? это норма?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "talk-feet-or-wheels",
+      "equipmentId": "sdb1560m",
+      "question": "Ножки крутить или на колёсах оставлять, как правильнее",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-red-lamp",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Что за красная лампочка?",
+      "expectedKeywords": [
+        "осушен",
+        "двер"
+      ],
+      "mustNotContain": [
+        "обычно ошибка",
+        "обычно означает аварию",
+        "SDB1106"
+      ]
+    },
+    {
+      "id": "n50-red-ember",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Красный огонёк горит, это уже поломка или так и надо?",
+      "expectedKeywords": [
+        "осушен"
+      ],
+      "mustNotContain": [
+        "SDB1106"
+      ]
+    },
+    {
+      "id": "n50-red-solid",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Красный горит постоянно, не мигает — дверь что ли открыта?",
+      "expectedKeywords": [
+        "двер"
+      ]
+    },
+    {
+      "id": "n50-green-mode",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Зелёный сигнал горит, это какой режим сейчас?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-yellow-lunch",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Жёлтый горит, можно на обед вырубить шкаф?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-w-again",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Буква W на дисплее выскочила, это код ошибки?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-feet-kit",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Ножки в комплекте вообще есть или только колёса?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-wheels-count",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Сколько колёс кладут в поставку?",
+      "expectedKeywords": [
+        "4"
+      ]
+    },
+    {
+      "id": "n50-shop-15",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Цех ровно +15, это уже можно включать или ещё рано?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-shop-12-again",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Помещение +12 °C, шкаф в рабочем диапазоне или нет?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-ambient-range",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Какая температура окружающего воздуха для эксплуатации, не подогрева?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-set-menu-how",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "SET нажал — дальше какие кнопки, чтобы влажность задать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-set-dead",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Панель как мёртвая, SET не реагирует совсем, сам кнопку разбирать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-n2-option",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Азот это опция или в базовой поставке уже стоит?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-n2-tube",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Какой диаметр трубки на азот и какой расход?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-hot-100",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Опция подогрева корпус до ста градусов греет, правда? Обожгусь?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-no-cooling",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Там есть контур охлаждения водой? Протекает вроде",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-ethernet-first",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Чтобы просто включить и сушить, Ethernet обязательно первым делом?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-tumbler-where",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Тумблер питания где искать, на кожухе сзади?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-rh60-set",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "На экране 60 RH, это сразу авария или смотреть что в SET стоит?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-wait-3h",
+      "equipmentId": "sdb1560m",
+      "category": "cards",
+      "question": "Час уже сушит и влажность не упала — это отказ или ещё рано паниковать?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-volume-liters",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Сколько литров рабочий объём, не полный?",
+      "expectedKeywords": [
+        "896"
+      ],
+      "mustNotContain": [
+        "546",
+        "500"
+      ]
+    },
+    {
+      "id": "n50-full-vs-inner",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Полный объём и внутренний — это разные цифры? Какие?",
+      "expectedKeywords": [
+        "2070",
+        "896"
+      ]
+    },
+    {
+      "id": "n50-width",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Какая ширина шкафа в миллиметрах?",
+      "expectedKeywords": [
+        "1202"
+      ],
+      "mustNotContain": [
+        "1202"
+      ]
+    },
+    {
+      "id": "n50-depth",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Глубина какая, в проём по глубине влезет?",
+      "expectedKeywords": [
+        "1028"
+      ],
+      "mustNotContain": [
+        "1028"
+      ]
+    },
+    {
+      "id": "n50-mains-hz",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Сеть 50 герц подойдёт? Напряжение какое?",
+      "expectedKeywords": []
+    },
+    {
+      "id": "n50-rh-step",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "С каким шагом влажность в меню ставится?",
+      "expectedKeywords": []
+    }
+  ]
+}

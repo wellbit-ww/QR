@@ -1,0 +1,560 @@
+{
+  "generatedAt": "2026-10-28T08:58:30.719Z",
+  "channel": "UI-equivalent (/chat?equipment=sdb1560m + same /api/chat as browser)",
+  "browserSpotCheck": {
+    "n": 1,
+    "pass": true,
+    "answer": "2 полки (manual browser 2026-10-28)"
+  },
+  "passCount": 8,
+  "total": 8,
+  "results": [
+    {
+      "n": 1,
+      "question": "Сколько полок в комплекте?",
+      "pass": true,
+      "answerOneLine": "В шкафу SDB1560NM предусмотрено **2 полки**.",
+      "durationMs": 1236,
+      "ragTrace": {
+        "router": {
+          "intent": "SINGLE_FIELD_QUERY",
+          "route": "UNKNOWN",
+          "focusParameter": "kit_shelf_count",
+          "symptom": null,
+          "confidence": 0.78,
+          "retrievalMode": "hybrid_wide",
+          "symptoms": [],
+          "parameterResolved": null,
+          "originalQuery": "Сколько полок в комплекте?"
+        },
+        "retrieval": {
+          "route": "UNKNOWN",
+          "bestMode": "hybrid_wide",
+          "chunks": 15,
+          "promptChunks": 10,
+          "topScore": 0.945,
+          "minSimilarityScore": 0.28,
+          "originalUserQuery": "Сколько полок в комплекте?",
+          "standaloneRetrievalQuery": "Количество полок в шкафе SDB1560 M таблица 1.2 комплект поставки перфорированные полки SDB1560",
+          "queryRewriteSource": "llm",
+          "queryRewritten": true,
+          "queryRewriteModel": "qwen2.5:32b-instruct"
+        },
+        "decision": {
+          "action": "LLM_GENERATE",
+          "reason": "single_field_parameter_llm_from_context",
+          "llmAllowed": true,
+          "retrievalPassed": true
+        },
+        "llm": {
+          "used": true,
+          "model": "qwen2.5:32b-instruct",
+          "mode": "CONTEXTUAL_FACT_FALLBACK",
+          "deterministicParseFallback": true,
+          "honestContextExtract": true
+        },
+        "guardrails": {
+          "skipped": true,
+          "reason": "deferred_to_server_post_gate"
+        },
+        "scores": {
+          "topScore": 0.945,
+          "lexicalScore": 0.7,
+          "fusionScore": 0.945,
+          "vectorTopSimilarity": 0.6483268334963807,
+          "minSimilarityScore": 0.28
+        },
+        "answerDelivery": {
+          "method": "contextual_fact_fallback",
+          "deferredPostGate": true,
+          "outboundLen": 44
+        },
+        "latency": {
+          "totalMs": 1122
+        },
+        "postGate": "honest_rag",
+        "honestMode": true,
+        "postGateApplied": true,
+        "guardrailsAction": "ALLOW",
+        "guardrailReason": "guardrails_passed",
+        "semanticRescue": false,
+        "validationOk": true,
+        "validationFailureCodes": [],
+        "skippedDeterministicRecovery": true,
+        "serverPostGate": true
+      },
+      "uiPath": "/chat?equipment=sdb1560m"
+    },
+    {
+      "n": 2,
+      "question": "Какой внутренний объём?",
+      "pass": true,
+      "answerOneLine": "**Внутренний объём** SDB1560NM — **1 896 л**.",
+      "durationMs": 1314,
+      "ragTrace": {
+        "router": {
+          "intent": "SINGLE_FIELD_QUERY",
+          "route": "UNKNOWN",
+          "focusParameter": "internal_volume",
+          "symptom": null,
+          "confidence": 0.78,
+          "retrievalMode": "hybrid_wide",
+          "symptoms": [],
+          "parameterResolved": null,
+          "originalQuery": "Какой внутренний объём?"
+        },
+        "retrieval": {
+          "route": "UNKNOWN",
+          "bestMode": "hybrid_wide",
+          "chunks": 15,
+          "promptChunks": 10,
+          "topScore": 1.2,
+          "minSimilarityScore": 0.28,
+          "originalUserQuery": "Какой внутренний объём?",
+          "standaloneRetrievalQuery": "Внутренний объём шкафа SDB1560 M",
+          "queryRewriteSource": "llm",
+          "queryRewritten": true,
+          "queryRewriteModel": "qwen2.5:32b-instruct"
+        },
+        "decision": {
+          "action": "LLM_GENERATE",
+          "reason": "single_field_parameter_llm_from_context",
+          "llmAllowed": true,
+          "retrievalPassed": true
+        },
+        "llm": {
+          "used": true,
+          "model": "qwen2.5:32b-instruct",
+          "mode": "CONTEXTUAL_FACT_FALLBACK",
+          "deterministicParseFallback": true,
+          "honestContextExtract": true
+        },
+        "guardrails": {
+          "skipped": true,
+          "reason": "deferred_to_server_post_gate"
+        },
+        "scores": {
+          "topScore": 1.2,
+          "lexicalScore": 1.2,
+          "fusionScore": 1.2,
+          "vectorTopSimilarity": 0.721441726168974,
+          "minSimilarityScore": 0.28
+        },
+        "answerDelivery": {
+          "method": "contextual_fact_fallback",
+          "deferredPostGate": true,
+          "outboundLen": 45
+        },
+        "latency": {
+          "totalMs": 1188
+        },
+        "postGate": "honest_rag",
+        "honestMode": true,
+        "postGateApplied": true,
+        "guardrailsAction": "ALLOW",
+        "guardrailReason": "guardrails_passed",
+        "semanticRescue": false,
+        "validationOk": true,
+        "validationFailureCodes": [],
+        "skippedDeterministicRecovery": true,
+        "serverPostGate": true
+      },
+      "uiPath": "/chat?equipment=sdb1560m"
+    },
+    {
+      "n": 3,
+      "question": "Как начать работу с шкафом?",
+      "pass": true,
+      "answerOneLine": "Для начала работы с шкафом SDB1560NM необходимо выполнить следующие шаги: 1. Проверить комплектность шкафа. 2. Убедиться, что напряжение сети переменного тока с",
+      "durationMs": 4126,
+      "ragTrace": {
+        "router": {
+          "intent": "GETTING_STARTED_QUERY",
+          "route": "PROCEDURAL_QA",
+          "focusParameter": null,
+          "symptom": null,
+          "confidence": 0.84,
+          "retrievalMode": "procedural_focused",
+          "symptoms": [],
+          "parameterResolved": null,
+          "originalQuery": "Как начать работу с шкафом?"
+        },
+        "retrieval": {
+          "route": "PROCEDURAL_QA",
+          "bestMode": "procedural_boosted",
+          "chunks": 15,
+          "promptChunks": 8,
+          "topScore": 2.2,
+          "minSimilarityScore": 0.28,
+          "originalUserQuery": "Как начать работу с шкафом?",
+          "standaloneRetrievalQuery": "Как начать работу с шкафом SDB1560 M 2.2.5 включение шкафа тумблер питания на кожухе осушителя заземлённая розетка 220 В 50 Гц",
+          "queryRewriteSource": "llm",
+          "queryRewritten": true,
+          "queryRewriteModel": "qwen2.5:32b-instruct"
+        },
+        "decision": {
+          "action": "LLM_GENERATE",
+          "reason": "route_allows_grounded_generation",
+          "llmAllowed": true,
+          "retrievalPassed": true
+        },
+        "llm": {
+          "used": true,
+          "model": "qwen2.5:32b-instruct",
+          "mode": "LLM_GENERATE"
+        },
+        "guardrails": {
+          "skipped": true,
+          "reason": "deferred_to_server_post_gate"
+        },
+        "scores": {
+          "topScore": 2.2,
+          "lexicalScore": 2.2,
+          "fusionScore": 2.2,
+          "vectorTopSimilarity": 0.7957898013215916,
+          "minSimilarityScore": 0.28
+        },
+        "answerDelivery": {
+          "method": "standard",
+          "deferredPostGate": true,
+          "outboundLen": 545
+        },
+        "latency": {
+          "totalMs": 4088
+        },
+        "postGate": "honest_rag",
+        "honestMode": true,
+        "postGateApplied": true,
+        "guardrailsAction": "ALLOW",
+        "guardrailReason": "guardrails_passed",
+        "semanticRescue": false,
+        "validationOk": true,
+        "validationFailureCodes": [],
+        "skippedDeterministicRecovery": true,
+        "serverPostGate": true
+      },
+      "uiPath": "/chat?equipment=sdb1560m"
+    },
+    {
+      "n": 4,
+      "question": "Влажность не снижается что делать",
+      "pass": true,
+      "answerOneLine": "Что проверить (перечень возможных неисправностей, п. 2.2.2, табл. 3.2): 1. Проверить состояние резинового (магнитного) уплотнителя дверей на отсутствие поврежде",
+      "durationMs": 2960,
+      "ragTrace": {
+        "router": {
+          "intent": "TROUBLESHOOTING_QUERY",
+          "route": "TROUBLESHOOTING_QA",
+          "focusParameter": "humidity",
+          "symptom": "humidity",
+          "confidence": 0.87,
+          "retrievalMode": "troubleshooting_focused",
+          "symptoms": [
+            "humidity"
+          ],
+          "parameterResolved": {
+            "parameterKey": "humidity_range",
+            "confidence": 0.64,
+            "matchedAlias": "влажность"
+          },
+          "originalQuery": "Влажность не снижается что делать",
+          "sectionHints": [
+            "Симптом:",
+            "Неисправность",
+            "3.2",
+            "типовые",
+            "2.2.2",
+            "2.2.2.2",
+            "2.2.2.3",
+            "2.2.2.1",
+            "уплотнител",
+            "осушител",
+            "кожух"
+          ]
+        },
+        "retrieval": {
+          "route": "TROUBLESHOOTING_QA",
+          "bestMode": "troubleshooting_symptom_boosted",
+          "chunks": 15,
+          "promptChunks": 10,
+          "topScore": 1.98,
+          "minSimilarityScore": 0.28,
+          "originalUserQuery": "Влажность не снижается что делать",
+          "standaloneRetrievalQuery": "Влажность не снижается что делать шкаф SDB1560 M превышение времени выхода на режим герметичность фильтр уплотнитель резиновый уплотнитель плотность закрытия замков осушитель осушающий модуль кожух осушителя перечень возможных неисправностей 2.2.2.2 2.2.2.3 не выходит на заданный режим влажности типовые неисправности таблица 3.2 не более 180 минут выход на установленное значение влажности с момента включения",
+          "queryRewriteSource": "llm",
+          "queryRewritten": true,
+          "queryRewriteModel": "qwen2.5:32b-instruct"
+        },
+        "decision": {
+          "action": "LLM_GENERATE",
+          "reason": "route_allows_grounded_generation",
+          "llmAllowed": true,
+          "retrievalPassed": true
+        },
+        "llm": {
+          "used": true,
+          "model": "qwen2.5:32b-instruct",
+          "mode": "CONTEXTUAL_FACT_LLM",
+          "deterministicTroubleshootingFallback": true,
+          "fallbackSymptom": "humidity"
+        },
+        "guardrails": {
+          "skipped": true,
+          "reason": "deferred_to_server_post_gate"
+        },
+        "scores": {
+          "topScore": 1.98,
+          "lexicalScore": 0.8,
+          "fusionScore": 1.98,
+          "vectorTopSimilarity": 0.7805547946856858,
+          "minSimilarityScore": 0.28
+        },
+        "answerDelivery": {
+          "method": "troubleshooting_fallback",
+          "deferredPostGate": true,
+          "outboundLen": 847
+        },
+        "latency": {
+          "totalMs": 2928
+        },
+        "postGate": "honest_rag",
+        "honestMode": true,
+        "postGateApplied": true,
+        "guardrailsAction": "ALLOW",
+        "guardrailReason": "hallucination_heuristic_soft_warning",
+        "semanticRescue": false,
+        "validationOk": true,
+        "validationFailureCodes": [],
+        "skippedDeterministicRecovery": true,
+        "serverPostGate": true
+      },
+      "uiPath": "/chat?equipment=sdb1560m"
+    },
+    {
+      "n": 5,
+      "question": "Красный индикатор мигает что это",
+      "pass": true,
+      "answerOneLine": "Мигающий красный индикатор на шкафе SDB1560NM указывает на штатный режим «Осушения». Это нормальная индикация и не является кодом ошибки.",
+      "durationMs": 2426,
+      "ragTrace": {
+        "router": {
+          "intent": "TROUBLESHOOTING_QUERY",
+          "route": "TROUBLESHOOTING_QA",
+          "focusParameter": null,
+          "symptom": null,
+          "confidence": 0.9,
+          "retrievalMode": "troubleshooting_focused",
+          "indicatorNormalMode": "door_open",
+          "indicatorNormalLabel": "открыта дверь (красный индикатор — норма)",
+          "sectionHints": [
+            "1.1.4.3.3",
+            "двер",
+            "красн",
+            "индикатор"
+          ],
+          "symptoms": [],
+          "parameterResolved": null,
+          "originalQuery": "Красный индикатор мигает что это"
+        },
+        "retrieval": {
+          "route": "TROUBLESHOOTING_QA",
+          "bestMode": "troubleshooting_symptom_boosted",
+          "chunks": 15,
+          "promptChunks": 8,
+          "topScore": 2.2,
+          "minSimilarityScore": 0.28,
+          "originalUserQuery": "Красный индикатор мигает что это",
+          "standaloneRetrievalQuery": "Красный индикатор мигает шкаф сухого хранения SDB1560 M 1.1.4.3.3 световой сигнал режим хранения режим осушения режим регенерации красный индикатор открыта дверь мигающий красный",
+          "queryRewriteSource": "llm",
+          "queryRewritten": true,
+          "queryRewriteModel": "qwen2.5:32b-instruct"
+        },
+        "decision": {
+          "action": "LLM_GENERATE",
+          "reason": "route_allows_grounded_generation",
+          "llmAllowed": true,
+          "retrievalPassed": true
+        },
+        "llm": {
+          "used": true,
+          "model": "qwen2.5:32b-instruct",
+          "mode": "LLM_GENERATE"
+        },
+        "guardrails": {
+          "skipped": true,
+          "reason": "deferred_to_server_post_gate"
+        },
+        "scores": {
+          "topScore": 2.2,
+          "lexicalScore": 2,
+          "fusionScore": 2.2,
+          "vectorTopSimilarity": 0.7413149542792103,
+          "minSimilarityScore": 0.28
+        },
+        "answerDelivery": {
+          "method": "standard",
+          "deferredPostGate": true,
+          "outboundLen": 137
+        },
+        "latency": {
+          "totalMs": 2069
+        },
+        "postGate": "honest_rag",
+        "honestMode": true,
+        "postGateApplied": true,
+        "guardrailsAction": "ALLOW",
+        "guardrailReason": "guardrails_passed",
+        "semanticRescue": false,
+        "validationOk": true,
+        "validationFailureCodes": [],
+        "skippedDeterministicRecovery": true,
+        "serverPostGate": true
+      },
+      "uiPath": "/chat?equipment=sdb1560m"
+    },
+    {
+      "n": 6,
+      "question": "Кто производитель датчика влажности",
+      "pass": true,
+      "answerOneLine": "В документации на данную модель этот параметр не указан.",
+      "durationMs": 1587,
+      "ragTrace": {
+        "router": {
+          "intent": "FACT_QUERY",
+          "route": "REASONING_QA",
+          "focusParameter": "humidity",
+          "symptom": "humidity",
+          "confidence": 0.78,
+          "retrievalMode": "reasoning_causal",
+          "symptoms": [
+            "humidity"
+          ],
+          "parameterResolved": {
+            "parameterKey": "humidity_range",
+            "confidence": 0.52,
+            "matchedAlias": "humidity"
+          },
+          "originalQuery": "Кто производитель датчика влажности"
+        },
+        "retrieval": {
+          "route": "REASONING_QA",
+          "bestMode": "reasoning_causal_multihop",
+          "chunks": 20,
+          "promptChunks": 10,
+          "topScore": 2.2,
+          "minSimilarityScore": 0.28,
+          "originalUserQuery": "Кто производитель датчика влажности",
+          "standaloneRetrievalQuery": "Производитель датчика влажности шкафа SDB1560 M не более 180 минут выход на установленное значение влажности с момента включения",
+          "queryRewriteSource": "llm",
+          "queryRewritten": true,
+          "queryRewriteModel": "qwen2.5:32b-instruct"
+        },
+        "decision": {
+          "action": "LLM_GENERATE",
+          "reason": "route_allows_grounded_generation",
+          "llmAllowed": true,
+          "retrievalPassed": true
+        },
+        "llm": {
+          "used": true,
+          "model": "qwen2.5:32b-instruct",
+          "mode": "CONTEXTUAL_FACT_LLM"
+        },
+        "guardrails": {
+          "skipped": true,
+          "reason": "deferred_to_server_post_gate"
+        },
+        "scores": {
+          "topScore": 2.2,
+          "lexicalScore": 2.2,
+          "fusionScore": 2.2,
+          "vectorTopSimilarity": 0.738061255639308,
+          "minSimilarityScore": 0.28
+        },
+        "answerDelivery": {
+          "method": "contextual_fact_fallback",
+          "deferredPostGate": true,
+          "outboundLen": 56
+        },
+        "latency": {
+          "totalMs": 1476
+        },
+        "postGate": "honest_rag",
+        "honestMode": true,
+        "postGateApplied": true,
+        "guardrailsAction": "ALLOW",
+        "guardrailReason": "guardrails_passed",
+        "semanticRescue": false,
+        "validationOk": true,
+        "validationFailureCodes": [],
+        "skippedDeterministicRecovery": true,
+        "serverPostGate": true
+      },
+      "uiPath": "/chat?equipment=sdb1560m"
+    },
+    {
+      "n": 7,
+      "question": "Из шкафа идёт дым, что делать?",
+      "pass": true,
+      "answerOneLine": "При появлении **дыма**, запаха **гари** или других признаков аварии SDB1560NM (п. **2.4**): **немедленно отключите питание** (вилку из розетки или тумблер «ВЫКЛ",
+      "durationMs": 19,
+      "ragTrace": {
+        "router": {
+          "intent": "SAFETY_QUERY",
+          "route": "SAFETY_QA",
+          "focusParameter": null,
+          "symptom": "emergency",
+          "confidence": 0.94,
+          "retrievalMode": "emergency_section_24",
+          "safetyAnswerMode": "grounded_text",
+          "sectionHints": [
+            "2.4",
+            "экстремальн",
+            "действия"
+          ],
+          "symptoms": [],
+          "parameterResolved": null,
+          "originalQuery": "Из шкафа идёт дым, что делать?"
+        },
+        "retrieval": {},
+        "decision": {},
+        "llm": {
+          "used": false,
+          "mode": "SAFETY_DETERMINISTIC",
+          "deterministic": true
+        },
+        "guardrails": {},
+        "scores": {},
+        "answerDelivery": null,
+        "latency": {
+          "totalMs": 0
+        },
+        "mode": "SAFETY_DETERMINISTIC",
+        "deterministicUsed": true,
+        "used": false,
+        "postGate": "honest_rag",
+        "honestMode": true,
+        "guardrailsAction": "ALLOW",
+        "validationOk": true,
+        "deterministicTrusted": true,
+        "skippedDeterministicRecovery": true,
+        "serverPostGate": true
+      },
+      "uiPath": "/chat?equipment=sdb1560m"
+    },
+    {
+      "n": 8,
+      "question": "Сколько полок в SDB702?",
+      "pass": true,
+      "answerOneLine": "Я специализируюсь только на модели SDB1560 M. Могу подсказать параметры и эксплуатацию именно этого устройства.",
+      "durationMs": 13,
+      "ragTrace": {
+        "used": false,
+        "mode": "SCOPE_GATE",
+        "gateAction": "FOREIGN_MODEL",
+        "gateReason": "foreign_sdb_model"
+      },
+      "uiPath": "/chat?equipment=sdb1560m"
+    }
+  ]
+}

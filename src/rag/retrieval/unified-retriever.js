@@ -3,6 +3,11 @@ const { isRegenerationShutdownQuery } = require("../safety-query-scope");
 const { retrieveEquipmentContext } = require("../retrieval");
 const { applySpecializedRetrievalStrategy } = require("../retrieval-strategies");
 const { shouldInjectTable11, shouldInjectP1GoldenFacts } = require("../sdb1106nm-golden-facts");
+const {
+  isSdb1560mKitShelfCountQuery,
+  isSdb1560mHumiditySetQuery,
+} = require("../sdb1560m-rag-priority");
+const { isHonestNumericSpecOnlyQuery } = require("../honest-rag-mode");
 
 function buildIntentForRetrieval(routerDecision, query) {
   const route = routerDecision?.route || "UNKNOWN";
@@ -90,13 +95,31 @@ async function unifiedRetrieve({
               routerDecision?.focusParameter === "dimensions" ||
               routerDecision?.focusParameter === "load" ||
               /масс|габарит|ширин|высот|глубин|таблиц[аы]?\s*1\.1|1\.1\.2\.8|\bвес\b/i.test(String(query || ""))
+            : equipmentId === "sdb1560m"
+            ? routerDecision?.focusParameter === "kit_shelf_count" ||
+              routerDecision?.focusParameter === "dimensions" ||
+              routerDecision?.focusParameter === "load" ||
+              isSdb1560mKitShelfCountQuery(query) ||
+              /масс|габарит|таблиц[аы]?\s*1\.[12]/i.test(String(query || ""))
             : routerDecision?.focusParameter === "dimensions" ||
               routerDecision?.focusParameter === "load" ||
               /масс|габарит|ширин|высот|глубин|таблиц[аы]?\s*1\.1|1\.1\.2\.8/i.test(String(query || "")),
+        sdb1560KitSupply:
+          equipmentId === "sdb1560m" &&
+          (routerDecision?.focusParameter === "kit_shelf_count" || isSdb1560mKitShelfCountQuery(query)),
+        sdb1560SpecTable:
+          equipmentId === "sdb1560m" &&
+          isHonestNumericSpecOnlyQuery(query, intent),
+        sdb1560HumidityUi:
+          equipmentId === "sdb1560m" &&
+          (isSdb1560mHumiditySetQuery(query) || routerDecision?.focusParameter === "humidity"),
         p1GoldenFacts:
           equipmentId === "sdb1106-nm" && shouldInjectP1GoldenFacts(query, routerDecision),
         sdb302RetrievalCards:
-          equipmentId === "w-700" || equipmentId === "sdb702-nm" || equipmentId === "sdb151-nm",
+          equipmentId === "w-700" ||
+          equipmentId === "sdb702-nm" ||
+          equipmentId === "sdb151-nm" ||
+          equipmentId === "sdb1560m",
       },
     },
   });

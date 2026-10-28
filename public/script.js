@@ -179,6 +179,10 @@ function renderEquipmentImage(equipment) {
     return `<div class="equipment-image-frame equipment-image-frame--w-700">${imageHtml}</div>`;
   }
 
+  if (equipmentId === "sdb1560m") {
+    return `<div class="equipment-image-frame equipment-image-frame--sdb1560m">${imageHtml}</div>`;
+  }
+
   return imageHtml;
 }
 

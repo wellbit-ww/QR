@@ -7,8 +7,17 @@ const { extractStructuredParameters } = require("./parameter-extraction");
 const { retrievalCardFilesForSdb302nmQuery } = require("./sdb302nm-rag-priority");
 const { retrievalCardFilesForSdb702nmQuery } = require("./sdb702nm-rag-priority");
 const { retrievalCardFilesForSdb151nmQuery } = require("./sdb151nm-rag-priority");
+const {
+  retrievalCardFilesForSdb1560mQuery,
+  isSdb1560mKitShelfCountQuery,
+} = require("./sdb1560m-rag-priority");
+const {
+  shouldUseHonestRag,
+  isNumericTtxRetrievalQuery,
+  shouldSkipRetrievalCardsForHonest1560,
+} = require("./honest-rag-mode");
 
-const RETRIEVAL_CARD_EQUIPMENT = new Set(["w-700", "sdb702-nm", "sdb151-nm"]);
+const RETRIEVAL_CARD_EQUIPMENT = new Set(["w-700", "sdb702-nm", "sdb151-nm", "sdb1560m"]);
 
 function retrievalCardFilesForEquipmentQuery(equipmentId, query) {
   if (equipmentId === "w-700") {
@@ -19,6 +28,9 @@ function retrievalCardFilesForEquipmentQuery(equipmentId, query) {
   }
   if (equipmentId === "sdb151-nm") {
     return retrievalCardFilesForSdb151nmQuery(query);
+  }
+  if (equipmentId === "sdb1560m") {
+    return retrievalCardFilesForSdb1560mQuery(query);
   }
   return [];
 }
@@ -557,6 +569,108 @@ async function fetchP1GoldenFactsChunks(pool, equipmentId, cap = 10) {
       ...sanitizeChunk(row),
       p1GoldenFactsInjected: true,
       score: Math.max(Number(row.score) || 0, 0.91),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchSdb1560SpecTableChunks(pool, equipmentId, cap = 10) {
+  if (equipmentId !== "sdb1560m") {
+    return [];
+  }
+  const lim = Math.max(1, Math.min(14, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.945::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND source_doc NOT ILIKE '%retrieval-cards%'
+          AND (
+            source_doc ILIKE '%golden-facts-sdb1560%'
+            OR content ~* 'таблиц[аы]?\\s*1\\.1'
+            OR (content ~* 'SDB1560' AND content ~* '1202')
+            OR (content ~* 'SDB1560' AND content ~* '1896')
+            OR (content ~* 'технические\\s+характеристики' AND content ~* '1\\.1')
+          )
+        ORDER BY
+          CASE WHEN content ~* 'таблиц[аы]?\\s*1\\.1' THEN 0 ELSE 1 END,
+          chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim],
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      sdb1560SpecTableInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.945),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchSdb1560HumidityUiChunks(pool, equipmentId, cap = 6) {
+  if (equipmentId !== "sdb1560m") {
+    return [];
+  }
+  const lim = Math.max(1, Math.min(8, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.92::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            content ~* '\\bSET\\b'
+            OR content ~* 'UP/DN'
+            OR content ~* '00\\.0.?99\\.9'
+            OR source_doc ILIKE '%set-menu%'
+          )
+        ORDER BY chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim],
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      sdb1560HumidityUiInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.92),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchSdb1560KitSupplyChunks(pool, equipmentId, cap = 8) {
+  if (equipmentId !== "sdb1560m") {
+    return [];
+  }
+  const lim = Math.max(1, Math.min(12, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.94::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND (
+            content ~* 'таблиц[аы]?\\s*1\\.2'
+            OR content ~* 'комплект\\s+поставки'
+            OR (content ~* 'полок' AND content ~* 'SDB1560')
+          )
+          AND source_doc NOT ILIKE '%retrieval-cards%'
+        ORDER BY
+          CASE WHEN content ~* 'таблиц[аы]?\\s*1\\.2' THEN 0 ELSE 1 END,
+          chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim],
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      sdb1560KitSupplyInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.94),
     }));
   } catch (_e) {
     return [];
@@ -1294,7 +1408,16 @@ async function retrieveEquipmentContext({
 
   const rerankApplied =
     Boolean(config.ragRerankEnabled) && Boolean(intent && intent.intentType);
-  let ranked = rerankApplied ? rerankChunks(chunks, intent, { query: originalQuery }) : chunks;
+  const honestRag = shouldUseHonestRag(equipmentId);
+  const numericTtx = isNumericTtxRetrievalQuery(originalQuery, intent);
+  let ranked = rerankApplied
+    ? rerankChunks(chunks, intent, {
+        query: originalQuery,
+        equipmentId,
+        honestRag,
+        numericTtx,
+      })
+    : chunks;
 
   const telemetryCandidates = ranked.slice(0, Math.min(40, ranked.length)).map((ch) => ({
     sourceDoc: ch.sourceDoc,
@@ -1346,7 +1469,22 @@ async function retrieveEquipmentContext({
     const p1Rows = await fetchP1GoldenFactsChunks(pool, equipmentId, 10);
     injectedRows = [...p1Rows, ...injectedRows];
   }
-  if (boosters.sdb302RetrievalCards || RETRIEVAL_CARD_EQUIPMENT.has(equipmentId)) {
+  if (boosters.sdb1560KitSupply || (equipmentId === "sdb1560m" && isSdb1560mKitShelfCountQuery(originalQuery))) {
+    const kitRows = await fetchSdb1560KitSupplyChunks(pool, equipmentId, 8);
+    injectedRows = [...kitRows, ...injectedRows];
+  }
+  if (boosters.sdb1560SpecTable) {
+    const specRows = await fetchSdb1560SpecTableChunks(pool, equipmentId, 10);
+    injectedRows = [...specRows, ...injectedRows];
+  }
+  if (boosters.sdb1560HumidityUi) {
+    const uiRows = await fetchSdb1560HumidityUiChunks(pool, equipmentId, 6);
+    injectedRows = [...uiRows, ...injectedRows];
+  }
+  const injectRetrievalCards =
+    (boosters.sdb302RetrievalCards || RETRIEVAL_CARD_EQUIPMENT.has(equipmentId)) &&
+    !shouldSkipRetrievalCardsForHonest1560(equipmentId, originalQuery, intent, honestRag);
+  if (injectRetrievalCards) {
     const cardRows = await fetchSdb302nmRetrievalCardChunks(pool, equipmentId, originalQuery, 3);
     injectedRows = [...cardRows, ...injectedRows];
   }
