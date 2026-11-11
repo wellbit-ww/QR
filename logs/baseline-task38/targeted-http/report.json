@@ -1,0 +1,494 @@
+{
+  "manifest": {
+    "capturedAt": "2026-11-06T08:40:19.010Z",
+    "schemaVersion": "1.0-eval-contour",
+    "evalRunnerLibVersion": "1.7-task33",
+    "git": {
+      "commit": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+      "branch": "backup/sova-portal",
+      "dirty": true,
+      "dirtyLineCount": 151,
+      "interpretResultsAsHeadOnly": false,
+      "note": "Working tree dirty — results may include uncommitted changes not in commit"
+    },
+    "dataset": {
+      "path": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\scripts\\eval\\sdb1560m-generalization-v1.json",
+      "sha256": "c83ace6d1b08f6030970c02ff3010437ca0c116624ea3d47f5d2048d2062af20",
+      "partition": "all"
+    },
+    "run": {
+      "mode": "http",
+      "noProvision": true,
+      "allowHttp": true,
+      "dryRun": false,
+      "authMode": "missing_credentials"
+    },
+    "serverEnvFingerprint": {
+      "RAG_HONEST_EQUIPMENT": "unknown",
+      "RAG_PURE": "unknown",
+      "SOVA_QUERY_REWRITE": "unknown",
+      "OLLAMA_MODEL": "unknown",
+      "EMBEDDING_MODEL": "unknown",
+      "EVAL_BASE_URL": "unknown",
+      "EVAL_LOGIN": "missing",
+      "EVAL_PASSWORD": "missing"
+    },
+    "indexFingerprint": {
+      "value": "unknown",
+      "method": "not probed (no DB read by default)"
+    },
+    "skipReasons": [],
+    "secretsPolicy": "passwords and .env contents are never stored"
+  },
+  "caseResults": [
+    {
+      "case": {
+        "id": "gen.num.dim-tolerance",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "С какой погрешностью указаны габариты в Таблице 1.1?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "5",
+            "sourceHint": "PDF table 1.1 note p.7",
+            "unit": "mm"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.num.pwr-dry-opt810",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальная мощность в режиме осушения с опциями азота и подогрева для SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "810",
+            "sourceHint": "PDF p.6 п.1.1.2.7г",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "415",
+            "reason": "wrong model or value"
+          },
+          {
+            "pattern": "40",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.kit.feet-height",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Максимальная высота регулируемых ножек?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "50",
+            "sourceHint": "PDF table 1.2 p.10",
+            "unit": "mm"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.opt.n2-timer-max",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Верхний предел установки времени подачи азота без датчика (мин)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "99[,.]9",
+            "sourceHint": "PDF p.25 п.1.2.2.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.opt.n2-sensor-max",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальный порог концентрации азота с датчиком?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "98",
+            "sourceHint": "PDF p.25 п.1.2.2.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.multi.dry-regen-power",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальная мощность в осушении и в регенерации для SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "40",
+            "sourceHint": "PDF p.6",
+            "unit": "W"
+          },
+          {
+            "claimPattern": "540",
+            "sourceHint": "PDF p.6",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "20",
+            "reason": "small cabinet dry power"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.multi.ambient-temp-rh",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Допустимые температура и RH окружающего воздуха при эксплуатации?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "15",
+            "sourceHint": "PDF p.7"
+          },
+          {
+            "claimPattern": "35",
+            "sourceHint": "PDF p.7"
+          },
+          {
+            "claimPattern": "80",
+            "sourceHint": "PDF p.7"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.multi.n2-flow-range",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Диапазон расхода азота для опции (л/мин)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "3",
+            "sourceHint": "PDF p.25"
+          },
+          {
+            "claimPattern": "30",
+            "sourceHint": "PDF p.25"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.note.height-signal",
+        "equipmentId": "sdb1560m",
+        "category": "paraphrase",
+        "message": "Учитывается ли светосигнальная колонна «Светофор» в высоте из Таблицы 1.1?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "без\\s+учета|не\\s+учитыва",
+            "sourceHint": "PDF table 1.1 note p.7"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.rh.rule-above30",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Для уставки от 30 RH% и выше — не более RH окружающей минус сколько?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "20",
+            "sourceHint": "PDF p.4–5 ВНИМАНИЕ п.2"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    }
+  ],
+  "metrics": {
+    "answer_factual_accuracy": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "value": null,
+      "zeroDenominatorBehavior": "value is null; do not report as 100%",
+      "note": "Deterministic number/text heuristic on answer text — not semantic factual accuracy or PDF grounding"
+    },
+    "cross_model_leakage_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "value": null,
+      "note": "numerator = cases where forbidden pattern matched answer"
+    },
+    "regression_pass_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "includedCaseIds": [],
+      "value": null,
+      "note": "pass only when all required layers for the case passed; not_evaluable excluded from denominator"
+    },
+    "retrieval_recall_at_k": {
+      "value": null,
+      "reason": "not computed: requires chunk-level recall evidence"
+    },
+    "grounded_claim_rate": {
+      "value": null,
+      "reason": "not computed unless chunk texts present in payload"
+    },
+    "correct_abstention_rate": {
+      "value": null,
+      "reason": "not aggregated: abstention scoring only per-case when allowedAbstainPatterns set"
+    },
+    "answerable_abstention_rate": {
+      "value": null,
+      "reason": "not computed: requires chunk grounding for answerable context"
+    }
+  },
+  "summary": {
+    "total": 10,
+    "pass": 0,
+    "fail": 0,
+    "blocked": 0,
+    "infrastructure_error": 10,
+    "not_run": 0,
+    "not_evaluable": 0
+  },
+  "diagnosticsByCaseId": {}
+}

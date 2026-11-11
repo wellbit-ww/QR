@@ -6,7 +6,11 @@ const FAULT_MARKERS_RE =
   /не\s+работ|неисправ|ошибк|сбой|пищит|аварийн|опасно|что\s+делать|сломал|поломк|не\s+включ|не\s+запуска/i;
 
 function hasIndicatorTopic(text) {
-  return /индикатор|индикац|световой\s+сигнал|светодиод|ламп[аы]|сигнализац/i.test(String(text || ""));
+  const t = String(text || "");
+  return (
+    /индикатор|индикац|световой\s+сигнал|светодиод|ламп[аы]|сигнализац/i.test(t) ||
+    /красн[\p{L}]*\s+мига|мига[\p{L}]*\s+красн|красн.*(?:норм|авари|долж)/iu.test(t)
+  );
 }
 
 function hasFaultMarkers(text) {
@@ -28,6 +32,14 @@ function resolveNormalIndicatorMode(query) {
   const green = /зелен[а-яё]*|green/i.test(q);
   const red = /красн[а-яё]*|red/i.test(q);
   const blinking = /мига|мигающ/i.test(q);
+
+  if (red && blinking && !yellow) {
+    return {
+      mode: "drying",
+      sectionHints: ["1.1.4.3.3", "осушен", "зелен", "красн", "мига", "индикатор"],
+      labelRu: "режим «Осушения» (зелёный + мигающий красный — норма)",
+    };
+  }
 
   if (yellow && !/зелен.*красн|красн.*зелен/i.test(q)) {
     return {

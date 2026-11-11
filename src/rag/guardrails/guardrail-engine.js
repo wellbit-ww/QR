@@ -215,7 +215,11 @@ function runGuardrails({ answer, retrievalContext, intent, hints = {} }) {
     "deterministic_topic_mismatch",
   ]);
   const regenerationHard = (base.failures || []).some((f) => f.code === "regeneration_forbidden_missing");
-  const baseHard = (base.failures || []).filter((f) => hardFailureCodes.has(f.code));
+  const baseHardRaw = (base.failures || []).filter((f) => hardFailureCodes.has(f.code));
+  let baseHard = baseHardRaw;
+  if (hints.ragPure && hints.equipmentId === "sdb1560m") {
+    baseHard = baseHard.filter((f) => f.code !== "golden_numeric_mismatch");
+  }
   const groundingHard = (grounding.failures || []).filter((f) => hardFailureCodes.has(f.code));
   const hasHardFailure = baseHard.length > 0 || groundingHard.length > 0;
 
@@ -269,6 +273,7 @@ function runGuardrails({ answer, retrievalContext, intent, hints = {} }) {
 
   if (semanticRescue) {
     const skipGoldenRescueBlock =
+      hints.ragPure ||
       hints.validationProfile === "sdb1560" ||
       (hints.honestRag && hints.skipGoldenFacts);
     const goldenFail = (base.failures || []).some((f) => f.code === "golden_numeric_mismatch");

@@ -1,0 +1,1262 @@
+{
+  "schemaVersion": "1.0-eval-contour",
+  "equipmentId": "sdb1560m",
+  "suiteMeta": {
+    "name": "sdb1560m-eval-suite-expanded-v2",
+    "description": "Expanded verified/blocked/routing suite; Task 23 fixes eval-only defects (mass retrieval regex, RH accuracy pattern, N2 99.9 min). Parent: expanded-v1 SHA 0ea1ccf790ec5dfb8f2caaa9aeb5e665a00cf55d2a07228b258aab78c69d8b36.",
+    "parentSuite": "docs/reports/sdb1560m-eval-suite-draft-v1.json",
+    "blockedFactIds": [
+      "F-SHELF-KIT",
+      "F-DESICC-KIT",
+      "F-DOORS-COUNT",
+      "F-VOL-INT",
+      "F-VOL-FULL",
+      "F-PWR-DRY-OPT"
+    ],
+    "references": [
+      "docs/reports/sdb1560m-facts-and-eval-audit.md",
+      "docs/reports/sdb1560m-task21-rag-quality-audit.md",
+      "knowledge/sdb1560m/golden-facts-sdb1560m.md",
+      "public/manuals/SDB1560NM.pdf"
+    ]
+  },
+  "cases": [
+    {
+      "id": "exp.num.mass.direct",
+      "category": "numeric_spec",
+      "message": "Какой вес шкафа SDB1560M?",
+      "factIds": [
+        "F-MASS"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "260",
+          "unit": "kg",
+          "factId": "F-MASS",
+          "sourceHint": "PDF table 1.1 p.7"
+        }
+      ],
+      "forbiddenClaims": [
+        {
+          "pattern": "180",
+          "reason": "SDB1106NM mass row",
+          "leakageModel": "sdb1106-nm"
+        }
+      ],
+      "retrievalExpectations": {
+        "mustIncludeSourceDocPatterns": [
+          "SDB1560NM\\.pdf|Руководство\\s+SDB1560"
+        ],
+        "mustNotRelyOnSourceAlone": true
+      },
+      "notes": "Same intent as num.mass.verified; deterministic+HTTP ref",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy",
+          "cross_model_leakage_rate",
+          "regression_pass_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.dims.table11",
+      "category": "numeric_spec",
+      "message": "Какие габариты SDB1560M?",
+      "factIds": [
+        "F-DIMS"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "1202",
+          "factId": "F-DIMS"
+        },
+        {
+          "claimPattern": "1693",
+          "factId": "F-DIMS"
+        },
+        {
+          "claimPattern": "1028",
+          "factId": "F-DIMS"
+        }
+      ],
+      "forbiddenClaims": [
+        {
+          "pattern": "772",
+          "reason": "Other model depth from table 1.1"
+        }
+      ],
+      "notes": "PDF table 1.1 p.7 SDB1560M row",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.ip55",
+      "category": "numeric_spec",
+      "message": "Какой класс защиты IP у шкафа?",
+      "factIds": [
+        "F-IP"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "IP\\\\s*55|IP55",
+          "factId": "F-IP"
+        }
+      ],
+      "notes": "PDF p.7 para 1.1.2.11",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.pwr-storage-8",
+      "category": "numeric_spec",
+      "message": "Сколько ватт в режиме хранения?",
+      "factIds": [
+        "F-PWR-STOR"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "8",
+          "unit": "W",
+          "factId": "F-PWR-STOR"
+        }
+      ],
+      "notes": "PDF p.5 1.1.2.7a",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.pwr-dry-base-40",
+      "category": "numeric_spec",
+      "message": "Мощность в режиме осушения без опций?",
+      "factIds": [
+        "F-PWR-DRY"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "40",
+          "unit": "W",
+          "factId": "F-PWR-DRY"
+        }
+      ],
+      "forbiddenClaims": [
+        {
+          "pattern": "415",
+          "reason": "151-702 group with options"
+        },
+        {
+          "pattern": "810",
+          "reason": "with-options line for 1560"
+        }
+      ],
+      "notes": "PDF p.6 1.1.2.7v",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy",
+          "cross_model_leakage_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.pwr-regen-540",
+      "category": "numeric_spec",
+      "message": "Максимальная мощность при регенерации?",
+      "factIds": [
+        "F-PWR-REG"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "540",
+          "unit": "W",
+          "factId": "F-PWR-REG"
+        }
+      ],
+      "notes": "PDF p.6 1.1.2.7d",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.mains-220",
+      "category": "numeric_spec",
+      "message": "Какое напряжение питания шкафа?",
+      "factIds": [
+        "F-MAINS"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "220",
+          "factId": "F-MAINS"
+        }
+      ],
+      "notes": "PDF p.5 1.1.2.6; unit V implicit in question",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.rh-range",
+      "category": "numeric_spec",
+      "message": "Какой диапазон влажности поддерживает шкаф?",
+      "factIds": [
+        "F-RH-RANGE"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "0",
+          "factId": "F-RH-RANGE"
+        },
+        {
+          "claimPattern": "80",
+          "factId": "F-RH-RANGE"
+        }
+      ],
+      "notes": "PDF p.4 1.1.2.1; checker bounded numbers only",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.rh-step",
+      "category": "numeric_spec",
+      "message": "С каким шагом можно выставить влажность?",
+      "factIds": [
+        "F-RH-STEP"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "0[,.]1|0\\\\.1",
+          "factId": "F-RH-STEP"
+        }
+      ],
+      "notes": "PDF p.4 1.1.2.2",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.rh-accuracy",
+      "category": "numeric_spec",
+      "message": "Какая точность поддержания влажности?",
+      "factIds": [
+        "F-RH-ACC"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "±\\s*1\\s*RH|±\\s*1\\s*%\\s*RH|1\\s*RH\\s*%",
+          "factId": "F-RH-ACC"
+        }
+      ],
+      "notes": "PDF p.4 1.1.2.3",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.warmup-180",
+      "category": "numeric_spec",
+      "message": "Через сколько минут выходит на режим после включения?",
+      "factIds": [
+        "F-WARMUP"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "180|3\\\\s*ч",
+          "factId": "F-WARMUP"
+        }
+      ],
+      "notes": "PDF p.4 1.1.2.4",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.shelf-load-100",
+      "category": "numeric_spec",
+      "message": "Какая максимальная нагрузка на стандартную полку?",
+      "factIds": [
+        "F-SHELF-LOAD"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "100",
+          "unit": "kg",
+          "factId": "F-SHELF-LOAD"
+        }
+      ],
+      "notes": "PDF section 2.1 / table 1.4",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.n2-timer-99",
+      "category": "numeric_spec",
+      "message": "Какой максимум у таймера подачи азота без датчика?",
+      "factIds": [
+        "F-N2-TIMER"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "99.9",
+          "factId": "F-N2-TIMER",
+          "unit": "min"
+        }
+      ],
+      "notes": "PDF p.25 / menu; golden 99,9 min — explicit decimal required",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.wheels-kit-4",
+      "category": "kit_completeness",
+      "message": "Сколько колёс в комплекте для SDB1560M?",
+      "factIds": [
+        "F-WHEELS-KIT"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "4",
+          "factId": "F-WHEELS-KIT"
+        }
+      ],
+      "forbiddenClaims": [
+        {
+          "pattern": "4\\\\s*двер",
+          "reason": "Confuse doors with wheels"
+        }
+      ],
+      "notes": "PDF table 1.2 item 2 p.10 — wheels not doors",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.feet-kit-4",
+      "category": "kit_completeness",
+      "message": "Сколько регулируемых ножек в комплекте?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "4",
+          "factId": "F-FEET-KIT"
+        }
+      ],
+      "notes": "PDF table 1.2 item 3 p.10",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.multi.mass-and-width",
+      "category": "numeric_spec",
+      "message": "Масса и ширина шкафа SDB1560M?",
+      "factIds": [
+        "F-MASS",
+        "F-DIMS"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "260",
+          "unit": "kg",
+          "factId": "F-MASS"
+        },
+        {
+          "claimPattern": "1202",
+          "factId": "F-DIMS"
+        }
+      ],
+      "notes": "Multi-fact; model token + kg checker regression risk",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.para.mass-heavy",
+      "category": "paraphrase",
+      "message": "Тяжёлый? вдвоём поднимем?",
+      "factIds": [
+        "F-MASS"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "260",
+          "factId": "F-MASS"
+        }
+      ],
+      "notes": "Colloquial; suite lacks unit:kg — asymmetry vs direct mass",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.para.dims-typo",
+      "category": "paraphrase",
+      "message": "габариты шкафа 1560?",
+      "factIds": [
+        "F-DIMS"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "1202",
+          "factId": "F-DIMS"
+        }
+      ],
+      "notes": "Omitted model name",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.para.ip-bryzgi",
+      "category": "paraphrase",
+      "message": "От брызг защищён? Какой IP?",
+      "factIds": [
+        "F-IP"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "IP\\\\s*55|IP55",
+          "factId": "F-IP"
+        }
+      ],
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.para.dry-no-options",
+      "category": "paraphrase",
+      "message": "Сколько жрёт при осушении если без азота и подогрева?",
+      "factIds": [
+        "F-PWR-DRY"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "40",
+          "unit": "W",
+          "factId": "F-PWR-DRY"
+        }
+      ],
+      "forbiddenClaims": [
+        {
+          "pattern": "810",
+          "reason": "with-options"
+        }
+      ],
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.para.warmup-plain",
+      "category": "paraphrase",
+      "message": "Долго выходит на влажность после включения?",
+      "factIds": [
+        "F-WARMUP"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "180|3\\\\s*ч",
+          "factId": "F-WARMUP"
+        }
+      ],
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.mode.regen-no-shutdown",
+      "category": "operating_mode",
+      "message": "Можно выключить шкаф при регенерации?",
+      "factIds": [
+        "F-SMOKE-REGEN"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "Запрещается|запрещ",
+          "factId": "F-SMOKE-REGEN"
+        }
+      ],
+      "notes": "Safety norm PDF 2.4",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy",
+          "regression_pass_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.env.temp-range",
+      "category": "numeric_spec",
+      "message": "При какой температуре помещения можно эксплуатировать шкаф?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "15",
+          "factId": "F-ENV-TEMP"
+        },
+        {
+          "claimPattern": "35",
+          "factId": "F-ENV-TEMP"
+        }
+      ],
+      "notes": "PDF p.7 1.1.2.12 +15..+35 C",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.env.rh-ambient-max",
+      "category": "numeric_spec",
+      "message": "Какая максимальная относительная влажность окружающего воздуха допускается?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "80",
+          "factId": "F-ENV-RH"
+        }
+      ],
+      "notes": "PDF p.7 1.1.2.12 not more 80%",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.maint.desicc-36mo",
+      "category": "maintenance",
+      "message": "Как часто менять блок осушения?",
+      "factIds": [
+        "F-MAINT-DES"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "36",
+          "unit": "months",
+          "factId": "F-MAINT-DES"
+        }
+      ],
+      "notes": "PDF p.35 table 3.1",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.alarm.beep-open-door",
+      "category": "alarm_troubleshooting",
+      "message": "Пищит при открытой двери — это норма?",
+      "factIds": [
+        "F-BEEP-DOOR"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "звук|сигнал|штатн|норм|1\\\\.1\\\\.4\\\\.3\\\\.4",
+          "factId": "F-BEEP-DOOR"
+        }
+      ],
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.alarm.red-lamp",
+      "category": "alarm_troubleshooting",
+      "message": "Красная лампа мигает — что означает?",
+      "factIds": [
+        "F-RED-LAMP"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "Осушен|1\\\\.1\\\\.4\\\\.3",
+          "factId": "F-RED-LAMP"
+        }
+      ],
+      "notes": "Card red-lamp + PDF 1.1.4.3.3",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.alarm.rh-rise-loading",
+      "category": "alarm_troubleshooting",
+      "message": "После загрузки влажность выросла — это нормально?",
+      "factIds": [
+        "F-RH-RISE-DOOR"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "1\\\\.1\\\\.4\\\\.4\\\\.1|вентилятор|открыт",
+          "factId": "F-RH-RISE-DOOR"
+        }
+      ],
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.alarm.w-display",
+      "category": "alarm_troubleshooting",
+      "message": "На дисплее W — это ошибка?",
+      "factIds": [
+        "F-W-DISPLAY"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "подогрев|W",
+          "factId": "F-W-DISPLAY"
+        }
+      ],
+      "notes": "Option heating symbol; card yellow-and-w",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.block.shelf-count-c1",
+      "category": "kit_completeness",
+      "message": "Сколько полок в комплекте?",
+      "factIds": [
+        "F-SHELF-KIT"
+      ],
+      "resolutionStatus": "blocked_pending_source_resolution",
+      "expectedOutcome": {
+        "mode": "either_abstain_or_answer_if_grounded"
+      },
+      "forbiddenClaims": [
+        {
+          "pattern": "\\\\b18\\\\b",
+          "leakageModel": "sdb1106-nm"
+        },
+        {
+          "pattern": "4\\\\s*двер",
+          "reason": "doors vs shelves"
+        }
+      ],
+      "notes": "C1 PDF 4 vs golden 2 — no requiredFacts until resolved",
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate",
+          "answerable_abstention_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.block.desicc-count-c2",
+      "category": "kit_completeness",
+      "message": "Сколько осушителей в базовой поставке?",
+      "factIds": [
+        "F-DESICC-KIT"
+      ],
+      "resolutionStatus": "blocked_pending_source_resolution",
+      "expectedOutcome": {
+        "mode": "either_abstain_or_answer_if_grounded"
+      },
+      "notes": "C2 PDF 2 vs golden 1",
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.block.doors-count",
+      "category": "kit_completeness",
+      "message": "Сколько дверей у SDB1560M?",
+      "factIds": [
+        "F-DOORS-COUNT"
+      ],
+      "resolutionStatus": "blocked_pending_source_resolution",
+      "expectedOutcome": {
+        "mode": "either_abstain_or_answer_if_grounded"
+      },
+      "notes": "Golden 4 doors unverified in PDF text",
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.block.vol-internal-c4",
+      "category": "numeric_spec",
+      "message": "Внутренний объём в литрах?",
+      "factIds": [
+        "F-VOL-INT"
+      ],
+      "resolutionStatus": "blocked_pending_source_resolution",
+      "expectedOutcome": {
+        "mode": "either_abstain_or_answer_if_grounded"
+      },
+      "forbiddenClaims": [
+        {
+          "pattern": "1028",
+          "reason": "depth mm not volume"
+        }
+      ],
+      "notes": "C4 golden 1896 not in PDF text layer",
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.block.vol-full-c4",
+      "category": "numeric_spec",
+      "message": "Какой полный объём шкафа?",
+      "factIds": [
+        "F-VOL-FULL"
+      ],
+      "resolutionStatus": "blocked_pending_source_resolution",
+      "expectedOutcome": {
+        "mode": "either_abstain_or_answer_if_grounded"
+      },
+      "notes": "C4 golden 2070 unverified in PDF text",
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.block.dry-power-with-opt-c3",
+      "category": "numeric_spec",
+      "message": "Мощность осушения с азотом и подогревом?",
+      "factIds": [
+        "F-PWR-DRY-OPT"
+      ],
+      "resolutionStatus": "blocked_pending_source_resolution",
+      "expectedOutcome": {
+        "mode": "either_abstain_or_answer_if_grounded"
+      },
+      "forbiddenClaims": [
+        {
+          "pattern": "415",
+          "reason": "golden vs PDF 810 conflict"
+        }
+      ],
+      "notes": "C3 until owner resolves",
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.unsup.wifi",
+      "category": "unsupported_by_manual",
+      "message": "Поддерживает ли шкаф Wi-Fi?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_abstain",
+        "abstainReason": "golden unsupported list"
+      },
+      "requiredFacts": [],
+      "abstentionRules": {
+        "allowedAbstainPatterns": [
+          "Информация отсутствует в документации\\\\.",
+          "не\\\\s+указан|отсутств"
+        ]
+      },
+      "scoring": {
+        "countsToward": [
+          "correct_abstention_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.unsup.mqtt",
+      "category": "unsupported_by_manual",
+      "message": "Есть MQTT API?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_abstain"
+      },
+      "requiredFacts": [],
+      "abstentionRules": {
+        "allowedAbstainPatterns": [
+          "Информация отсутствует в документации\\\\.",
+          "не\\\\s+указан|отсутств|Modbus|MQTT"
+        ]
+      },
+      "scoring": {
+        "countsToward": [
+          "correct_abstention_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.unsup.sensor-vendor",
+      "category": "unsupported_by_manual",
+      "message": "Кто производитель встроенного датчика влажности?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_abstain"
+      },
+      "requiredFacts": [],
+      "notes": "Draft unsupported.sensor-vendor",
+      "scoring": {
+        "countsToward": [
+          "correct_abstention_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.unsup.mobile-app",
+      "category": "unsupported_by_manual",
+      "message": "Есть мобильное приложение для управления?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_abstain"
+      },
+      "requiredFacts": [],
+      "scoring": {
+        "countsToward": [
+          "correct_abstention_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.unsup.default-ip",
+      "category": "unsupported_by_manual",
+      "message": "Какой IP-адрес шкафа по умолчанию?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_abstain"
+      },
+      "requiredFacts": [],
+      "notes": "Ethernet software mentioned but not default IP",
+      "scoring": {
+        "countsToward": [
+          "correct_abstention_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.foreign.sdb1106-mass",
+      "category": "foreign_model",
+      "message": "А у SDB1106NM какая масса?",
+      "resolutionStatus": "informational_only",
+      "expectedOutcome": {
+        "mode": "must_abstain",
+        "abstainReason": "Foreign model in 1560 chat"
+      },
+      "forbiddenClaims": [
+        {
+          "pattern": "260",
+          "reason": "1560 mass in wrong context"
+        }
+      ],
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.foreign.sdb1106-power",
+      "category": "foreign_model",
+      "message": "Сколько ватт SDB1106NM при осушении?",
+      "resolutionStatus": "informational_only",
+      "expectedOutcome": {
+        "mode": "must_abstain"
+      },
+      "forbiddenClaims": [
+        {
+          "pattern": "40",
+          "reason": "1560 dry power applied to foreign Q"
+        }
+      ],
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.route.off-topic-code",
+      "category": "foreign_model",
+      "message": "Напиши программу на Python для шкафа",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_abstain"
+      },
+      "requiredFacts": [],
+      "notes": "Chat gate OFF_TOPIC in scoped chat — routing not scored by runner HTTP alone",
+      "scoring": {
+        "countsToward": []
+      }
+    },
+    {
+      "id": "exp.route.off-topic-cooking",
+      "category": "foreign_model",
+      "message": "Как сварить борщ?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_abstain"
+      },
+      "requiredFacts": [],
+      "scoring": {
+        "countsToward": []
+      }
+    },
+    {
+      "id": "exp.route.wattsan-laser",
+      "category": "foreign_model",
+      "message": "Где купить Wattsan sdb1560 для лазерной резки?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_abstain"
+      },
+      "requiredFacts": [],
+      "scoring": {
+        "countsToward": []
+      }
+    },
+    {
+      "id": "exp.leak.shelf-18",
+      "category": "kit_completeness",
+      "message": "Сколько перфорированных полок у SDB1560M?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "forbiddenClaims": [
+        {
+          "pattern": "\\\\b18\\\\b",
+          "leakageModel": "sdb1106-nm"
+        }
+      ],
+      "notes": "Negative leakage until C1 resolved",
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.leak.mass-180",
+      "category": "numeric_spec",
+      "message": "Какая масса SDB1560M?",
+      "factIds": [
+        "F-MASS"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "260",
+          "unit": "kg",
+          "factId": "F-MASS"
+        }
+      ],
+      "forbiddenClaims": [
+        {
+          "pattern": "180",
+          "leakageModel": "sdb1106-nm"
+        }
+      ],
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate",
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.leak.depth-as-volume",
+      "category": "numeric_spec",
+      "message": "Сколько литров внутри?",
+      "factIds": [
+        "F-VOL-INT"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "forbiddenClaims": [
+        {
+          "pattern": "1028",
+          "reason": "table 1.1 depth mm"
+        }
+      ],
+      "notes": "Until C4 resolved factual pass blocked elsewhere",
+      "scoring": {
+        "countsToward": [
+          "cross_model_leakage_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.dialog.shelf-broken",
+      "category": "dialog_followup",
+      "message": "Сломал одну, что делать?",
+      "history": [
+        {
+          "role": "user",
+          "content": "Сколько полок в комплекте?"
+        },
+        {
+          "role": "assistant",
+          "content": "В комплекте 2 полки."
+        }
+      ],
+      "factIds": [
+        "F-SHELF-KIT"
+      ],
+      "resolutionStatus": "blocked_pending_source_resolution",
+      "expectedOutcome": {
+        "mode": "either_abstain_or_answer_if_grounded"
+      },
+      "notes": "Follow-up routing",
+      "scoring": {
+        "countsToward": [
+          "regression_pass_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.ctx.poisoned-shelves",
+      "category": "contradictory_context",
+      "message": "Сколько полок?",
+      "history": [
+        {
+          "role": "assistant",
+          "content": "В комплекте 4 перфорированные полки и 4 двери."
+        }
+      ],
+      "resolutionStatus": "blocked_pending_source_resolution",
+      "expectedOutcome": {
+        "mode": "either_abstain_or_answer_if_grounded"
+      },
+      "notes": "Prefer RE over poisoned history when grounding enabled",
+      "scoring": {
+        "countsToward": [
+          "grounded_claim_rate"
+        ]
+      }
+    },
+    {
+      "id": "exp.identity.manual-name",
+      "category": "paraphrase",
+      "message": "Как в руководстве называется модель шкафа?",
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "SDB1560",
+          "factId": "F-IDENTITY"
+        }
+      ],
+      "notes": "Manual uses SDB1560M/NM; portal id sdb1560m",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    },
+    {
+      "id": "exp.num.pwr-storage-with-opt-810",
+      "category": "numeric_spec",
+      "message": "Мощность в режиме хранения с азотом и подогревом?",
+      "factIds": [
+        "F-PWR-STOR-OPT"
+      ],
+      "resolutionStatus": "ready",
+      "expectedOutcome": {
+        "mode": "must_answer"
+      },
+      "requiredFacts": [
+        {
+          "claimPattern": "810",
+          "unit": "W",
+          "factId": "F-PWR-STOR-OPT"
+        }
+      ],
+      "forbiddenClaims": [
+        {
+          "pattern": "8",
+          "reason": "base storage only — checker may need careful phrasing"
+        }
+      ],
+      "notes": "PDF p.5 1.1.2.7b SDB1560M 810W; conflict with bare 8W if both asserted",
+      "scoring": {
+        "countsToward": [
+          "answer_factual_accuracy"
+        ]
+      }
+    }
+  ]
+}

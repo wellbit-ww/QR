@@ -3,6 +3,11 @@ const { runGuardrails } = require("./guardrails/guardrail-engine");
 const { validateSdb1560mAnswerAgainstContext } = require("./sdb1560m-answer-validation");
 const { tryDeterministicSdb1560mAnswer } = require("./sdb1560m-direct-facts");
 const {
+  answerAssertsUnverifiedVolumeLiters,
+  buildUnsupportedSdb1560mSpecReply,
+  isUnverifiedVolumeLiterQuery,
+} = require("./sdb1560m-unsupported-spec");
+const {
   buildValidationIntent,
   resolveAbstainAnswer,
 } = require("./sdb1106nm-post-gate");
@@ -47,6 +52,19 @@ function applySdb1560mPostGate({
   history = [],
 }) {
   const answerText = String(answer || "").trim();
+  if (isUnverifiedVolumeLiterQuery(message) && answerAssertsUnverifiedVolumeLiters(answerText)) {
+    return {
+      answer: buildUnsupportedSdb1560mSpecReply(),
+      guardrails: { action: "ALLOW", passed: true, reason: "unverified_volume_liter_blocked" },
+      validation: { ok: true, failures: [], warnings: [] },
+      postGateTrace: {
+        postGate: "sdb1560m",
+        unverifiedVolumeLiterBlocked: true,
+        guardrailsAction: "ALLOW",
+        validationOk: true,
+      },
+    };
+  }
   if (deliveryMethod === "rag_deterministic" || deliveryMethod === "direct_deterministic") {
     return {
       answer: answerText || STRICT_ABSTAIN,

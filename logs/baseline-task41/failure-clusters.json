@@ -1,0 +1,442 @@
+{
+  "schemaVersion": "task41-failure-clusters-v1",
+  "generatedAt": "2026-11-09T08:49:58.297Z",
+  "baseline": {
+    "task": 40,
+    "report": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\logs\\baseline-task40\\task28-generalization-http\\report.json",
+    "summary": {
+      "total": 110,
+      "pass": 70,
+      "fail": 36,
+      "blocked": 0,
+      "infrastructure_error": 0,
+      "not_run": 0,
+      "not_evaluable": 4
+    },
+    "failureCount": 36,
+    "notEvaluableCount": 4
+  },
+  "primaryClassificationCounts": {
+    "C": 3,
+    "A": 3,
+    "E": 8,
+    "D": 13,
+    "G": 6,
+    "H": 1,
+    "F": 6
+  },
+  "classificationLabels": {
+    "A": "Retrieval failure",
+    "B": "Routing failure",
+    "C": "Contextual extraction failure",
+    "D": "Synthesis failure",
+    "E": "Grounding failure",
+    "F": "Abstention failure",
+    "G": "Evaluation/dataset defect",
+    "H": "Mixed/undetermined"
+  },
+  "failures": [
+    {
+      "caseId": "gen.num.pwr-regen",
+      "primary": "C",
+      "secondary": "extract_applied_factual_miss",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.num.rh-range-high",
+      "primary": "A",
+      "secondary": "wrong_model_chunk_pollution",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.num.rh-accuracy",
+      "primary": "C",
+      "secondary": "extract_applied_factual_miss",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.env.pressure-kpa-min",
+      "primary": "E",
+      "secondary": "grounding_and_factual",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.env.pressure-kpa-max",
+      "primary": "E",
+      "secondary": "grounding_and_factual",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.num.ral",
+      "primary": "E",
+      "secondary": "grounding_and_factual",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.kit.wheels",
+      "primary": "D",
+      "secondary": "spurious_abstain_despite_evidence",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "kit_completeness"
+    },
+    {
+      "caseId": "gen.kit.shelves-perf",
+      "primary": "C",
+      "secondary": "extract_applied_factual_miss",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "kit_completeness"
+    },
+    {
+      "caseId": "gen.kit.power-cord",
+      "primary": "D",
+      "secondary": "facts_in_context_answer_wrong",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "kit_completeness"
+    },
+    {
+      "caseId": "gen.opt.feeder-basket-min",
+      "primary": "D",
+      "secondary": "facts_in_context_answer_wrong",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "kit_completeness"
+    },
+    {
+      "caseId": "gen.opt.feeder-basket-max",
+      "primary": "D",
+      "secondary": "facts_in_context_answer_wrong",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "kit_completeness"
+    },
+    {
+      "caseId": "gen.maint.dust-months",
+      "primary": "D",
+      "secondary": "spurious_abstain_despite_evidence",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "maintenance"
+    },
+    {
+      "caseId": "gen.maint.power-cable",
+      "primary": "D",
+      "secondary": "spurious_abstain_despite_evidence",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "maintenance"
+    },
+    {
+      "caseId": "gen.proc.sound-door",
+      "primary": "D",
+      "secondary": "spurious_abstain_despite_evidence",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "alarm_troubleshooting"
+    },
+    {
+      "caseId": "gen.proc.door-fan-off",
+      "primary": "D",
+      "secondary": "spurious_abstain_despite_evidence",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "alarm_troubleshooting"
+    },
+    {
+      "caseId": "gen.multi.mass-depth",
+      "primary": "D",
+      "secondary": "spurious_abstain_despite_evidence",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.para.storage-w",
+      "primary": "D",
+      "secondary": "spurious_abstain_despite_evidence",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.para.desiccant-qty",
+      "primary": "D",
+      "secondary": "facts_in_context_answer_wrong",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "paraphrase"
+    },
+    {
+      "caseId": "gen.para.36m",
+      "primary": "D",
+      "secondary": "spurious_abstain_despite_evidence",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "paraphrase"
+    },
+    {
+      "caseId": "gen.disc.storage-vs-dry",
+      "primary": "G",
+      "secondary": "manual_audit_override",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.disc.810-storage-vs-dry",
+      "primary": "G",
+      "secondary": "manual_audit_override",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.foreign.mass-1106",
+      "primary": "H",
+      "secondary": "required_fact_not_retrieved",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "foreign_model"
+    },
+    {
+      "caseId": "gen.unsup.bluetooth",
+      "primary": "F",
+      "secondary": "incorrect_abstention_wording",
+      "confidence": "high",
+      "failingLayer": "abstention",
+      "category": "unsupported_by_manual"
+    },
+    {
+      "caseId": "gen.unsup.sdb151-mass-for-1560",
+      "primary": "F",
+      "secondary": "incorrect_abstention_wording",
+      "confidence": "high",
+      "failingLayer": "abstention",
+      "category": "unsupported_by_manual"
+    },
+    {
+      "caseId": "gen.unsup.warehouse-humidity-setpoint",
+      "primary": "F",
+      "secondary": "incorrect_abstention_wording",
+      "confidence": "high",
+      "failingLayer": "abstention",
+      "category": "unsupported_by_manual"
+    },
+    {
+      "caseId": "gen.insuf.n2-without-option",
+      "primary": "F",
+      "secondary": "incorrect_abstention_wording",
+      "confidence": "high",
+      "failingLayer": "abstention",
+      "category": "unsupported_by_manual"
+    },
+    {
+      "caseId": "gen.std.esd",
+      "primary": "A",
+      "secondary": "wrong_model_chunk_pollution",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.spare.lock-excluded",
+      "primary": "D",
+      "secondary": "spurious_abstain_despite_evidence",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "kit_completeness"
+    },
+    {
+      "caseId": "gen.rh.rule-below30",
+      "primary": "E",
+      "secondary": "grounding_and_factual",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.env.pressure-mmhg-min",
+      "primary": "E",
+      "secondary": "grounding_and_factual",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.env.pressure-mmhg-max",
+      "primary": "E",
+      "secondary": "grounding_and_factual",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "numeric_spec"
+    },
+    {
+      "caseId": "gen.ind.green-only-storage",
+      "primary": "A",
+      "secondary": "wrong_model_chunk_pollution",
+      "confidence": "high",
+      "failingLayer": "factual",
+      "category": "paraphrase"
+    },
+    {
+      "caseId": "gen.unsup.blockchain",
+      "primary": "F",
+      "secondary": "incorrect_abstention_wording",
+      "confidence": "high",
+      "failingLayer": "abstention",
+      "category": "unsupported_by_manual"
+    },
+    {
+      "caseId": "gen.unsup.serial-format",
+      "primary": "F",
+      "secondary": "incorrect_abstention_wording",
+      "confidence": "high",
+      "failingLayer": "abstention",
+      "category": "unsupported_by_manual"
+    },
+    {
+      "caseId": "gen.proc.open-door-symbol",
+      "primary": "E",
+      "secondary": "grounding_and_factual",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "operating_mode"
+    },
+    {
+      "caseId": "gen.proc.fan-symbol",
+      "primary": "E",
+      "secondary": "grounding_and_factual",
+      "confidence": "medium",
+      "failingLayer": "factual",
+      "category": "operating_mode"
+    }
+  ],
+  "clusters": {
+    "cross_model_ttx_chunks": {
+      "title": "Wrong-model TTX row chunks (SDB1106NM) in prompt top ranks",
+      "caseIds": [
+        "gen.num.rh-range-high",
+        "gen.maint.power-cable",
+        "gen.proc.sound-door",
+        "gen.multi.mass-depth",
+        "gen.std.esd",
+        "gen.rh.rule-below30",
+        "gen.ind.green-only-storage"
+      ],
+      "count": 7
+    },
+    "spurious_abstain": {
+      "title": "Spurious abstain on must_answer despite grounded context",
+      "caseIds": [
+        "gen.kit.wheels",
+        "gen.maint.dust-months",
+        "gen.maint.power-cable",
+        "gen.proc.sound-door",
+        "gen.proc.door-fan-off",
+        "gen.multi.mass-depth",
+        "gen.para.storage-w",
+        "gen.para.36m",
+        "gen.spare.lock-excluded"
+      ],
+      "count": 9
+    },
+    "must_abstain_hallucination": {
+      "title": "Unsupported-spec queries answered substantively",
+      "caseIds": [
+        "gen.unsup.bluetooth",
+        "gen.unsup.sdb151-mass-for-1560",
+        "gen.unsup.warehouse-humidity-setpoint",
+        "gen.insuf.n2-without-option",
+        "gen.unsup.blockchain",
+        "gen.unsup.serial-format"
+      ],
+      "count": 6
+    },
+    "multi_fact_partial": {
+      "title": "Multi-fact questions missing one or more required assertions",
+      "caseIds": [
+        "gen.multi.mass-depth"
+      ],
+      "count": 1
+    },
+    "evaluator_comparative_power": {
+      "title": "Comparative storage vs dry power — evaluator W contradiction heuristic",
+      "caseIds": [
+        "gen.disc.storage-vs-dry",
+        "gen.disc.810-storage-vs-dry"
+      ],
+      "count": 2
+    },
+    "procedure_symbol_indicator": {
+      "title": "Procedure / indicator / symbol paraphrase",
+      "caseIds": [
+        "gen.proc.sound-door",
+        "gen.proc.door-fan-off",
+        "gen.ind.green-only-storage",
+        "gen.proc.open-door-symbol",
+        "gen.proc.fan-symbol"
+      ],
+      "count": 5
+    },
+    "environmental_spec": {
+      "title": "Environmental limits (pressure, RAL, ESD, RH range)",
+      "caseIds": [
+        "gen.num.rh-range-high",
+        "gen.env.pressure-kpa-min",
+        "gen.env.pressure-kpa-max",
+        "gen.num.ral",
+        "gen.std.esd",
+        "gen.env.pressure-mmhg-min",
+        "gen.env.pressure-mmhg-max"
+      ],
+      "count": 7
+    }
+  },
+  "unclusteredFailIds": [
+    "gen.num.pwr-regen",
+    "gen.num.rh-accuracy",
+    "gen.kit.shelves-perf",
+    "gen.kit.power-cord",
+    "gen.opt.feeder-basket-min",
+    "gen.opt.feeder-basket-max",
+    "gen.para.desiccant-qty",
+    "gen.foreign.mass-1106"
+  ],
+  "regression": {
+    "regressedFromTask39": [],
+    "persistentSinceTask39": [],
+    "improvedSinceTask39": []
+  },
+  "historicalReports": [
+    "C:\\Users\\SOVAI\\Documents\\Work\\QR\\logs\\baseline-task30\\task28-generalization-http-v1\\report.json",
+    "C:\\Users\\SOVAI\\Documents\\Work\\QR\\logs\\baseline-task32\\task28-generalization-http-v8\\report.json",
+    "C:\\Users\\SOVAI\\Documents\\Work\\QR\\logs\\baseline-task33\\task28-generalization-http-v9\\report.json",
+    "C:\\Users\\SOVAI\\Documents\\Work\\QR\\logs\\baseline-task39\\task28-generalization-http\\report.json"
+  ],
+  "primaryClassificationCountsFinal": {
+    "A": 3,
+    "B": 1,
+    "C": 3,
+    "D": 20,
+    "E": 0,
+    "F": 6,
+    "G": 2,
+    "H": 1
+  },
+  "finalClassificationsRef": "logs/baseline-task41/task41-final-classifications.json",
+  "historicalRegressionRef": "logs/baseline-task41/historical-regression.json"
+}

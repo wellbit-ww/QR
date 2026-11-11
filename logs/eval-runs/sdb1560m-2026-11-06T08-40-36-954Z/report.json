@@ -1,0 +1,6359 @@
+{
+  "manifest": {
+    "capturedAt": "2026-11-06T08:40:36.788Z",
+    "schemaVersion": "1.0-eval-contour",
+    "evalRunnerLibVersion": "1.7-task33",
+    "git": {
+      "commit": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+      "branch": "backup/sova-portal",
+      "dirty": true,
+      "dirtyLineCount": 151,
+      "interpretResultsAsHeadOnly": false,
+      "note": "Working tree dirty — results may include uncommitted changes not in commit"
+    },
+    "dataset": {
+      "path": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\scripts\\eval\\sdb1560m-generalization-v1.json",
+      "sha256": "c83ace6d1b08f6030970c02ff3010437ca0c116624ea3d47f5d2048d2062af20",
+      "partition": "all"
+    },
+    "run": {
+      "mode": "dry-run",
+      "noProvision": true,
+      "allowHttp": false,
+      "dryRun": true,
+      "authMode": "not-used"
+    },
+    "serverEnvFingerprint": {
+      "RAG_HONEST_EQUIPMENT": "unknown",
+      "RAG_PURE": "unknown",
+      "SOVA_QUERY_REWRITE": "unknown",
+      "OLLAMA_MODEL": "unknown",
+      "EMBEDDING_MODEL": "unknown",
+      "EVAL_BASE_URL": "unknown",
+      "EVAL_LOGIN": "missing",
+      "EVAL_PASSWORD": "missing"
+    },
+    "indexFingerprint": {
+      "value": "unknown",
+      "method": "not probed (no DB read by default)"
+    },
+    "skipReasons": [],
+    "secretsPolicy": "passwords and .env contents are never stored"
+  },
+  "caseResults": [
+    {
+      "case": {
+        "id": "gen.num.mass.base",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Какова масса базового исполнения SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "sourceHint": "PDF table 1.1 p.7",
+            "unit": "kg",
+            "factId": "F-MASS"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "180",
+            "reason": "wrong model or value"
+          },
+          {
+            "pattern": "160",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.width.mm",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Укажите ширину шкафа SDB1560М в миллиметрах.",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1202",
+            "sourceHint": "PDF table 1.1 p.7",
+            "unit": "mm"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "1004",
+            "reason": "wrong model or value"
+          },
+          {
+            "pattern": "602",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.height.mm",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Какая высота SDB1560М по таблице габаритов?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1693",
+            "sourceHint": "PDF table 1.1 p.7",
+            "unit": "mm"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "1917",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.depth.mm",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Глубина SDB1560М по Таблице 1.1?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1028",
+            "sourceHint": "PDF table 1.1 p.7",
+            "unit": "mm"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "772",
+            "reason": "wrong model or value"
+          },
+          {
+            "pattern": "665",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.dim-tolerance",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "С какой погрешностью указаны габариты в Таблице 1.1?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "5",
+            "sourceHint": "PDF table 1.1 note p.7",
+            "unit": "mm"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.pwr-storage",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальная мощность в режиме хранения для SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "8",
+            "sourceHint": "PDF p.5 п.1.1.2.7а",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "40",
+            "reason": "wrong model or value"
+          },
+          {
+            "pattern": "540",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.pwr-dry",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Сколько ватт не более в режиме осушения у SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "40",
+            "sourceHint": "PDF p.6 п.1.1.2.7в",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "20",
+            "reason": "wrong model or value"
+          },
+          {
+            "pattern": "8",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.pwr-regen",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Потолок мощности в режиме регенерации осушителя для SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "540",
+            "sourceHint": "PDF p.6 п.1.1.2.7д",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "285",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.pwr-storage-opt810",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Мощность в режиме хранения с азотом и подогревом для SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "810",
+            "sourceHint": "PDF p.5 п.1.1.2.7б",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "405",
+            "reason": "wrong model or value"
+          },
+          {
+            "pattern": "8",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.pwr-dry-opt810",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальная мощность в режиме осушения с опциями азота и подогрева для SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "810",
+            "sourceHint": "PDF p.6 п.1.1.2.7г",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "415",
+            "reason": "wrong model or value"
+          },
+          {
+            "pattern": "40",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.voltage",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "От какого напряжения сети питается шкаф?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "220",
+            "sourceHint": "PDF p.5 п.1.1.2.6"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.freq",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Какая частота питающей сети указана в РЭ?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "50",
+            "sourceHint": "PDF p.5 п.1.1.2.6"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.rh-range-low",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Нижняя граница диапазона поддержания влажности внутри шкафа?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "0",
+            "sourceHint": "PDF p.4 п.1.1.2.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.rh-range-high",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Верхняя граница диапазона поддержания RH% внутри рабочего объёма?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "80",
+            "sourceHint": "PDF p.4 п.1.1.2.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.rh-step",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Какой шаг установки диапазона влажности в меню?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "0[,.]1",
+            "sourceHint": "PDF p.4 п.1.1.2.2"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.rh-accuracy",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Точность поддержания установленного диапазона влажности?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1",
+            "sourceHint": "PDF p.4 п.1.1.2.3"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.rh-warmup-hours",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Сколько времени не более нужно для выхода на установленную влажность после включения?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "3",
+            "sourceHint": "PDF p.4 п.1.1.2.4"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "180",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.env.temp-min",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Минимальная температура окружающего воздуха при эксплуатации SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "15",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.env.temp-max",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальная температура окружающего воздуха для эксплуатации?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "35",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.env.rh-ambient",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Предельная относительная влажность окружающего воздуха при эксплуатации?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "80",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.env.pressure-kpa-min",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Нижняя граница атмосферного давления для эксплуатации (кПа)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "84",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.env.pressure-kpa-max",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Верхняя граница атмосферного давления (кПа)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "106[,.]7",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.ip55",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Какой класс защиты не ниже указан для шкафа?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "IP55",
+            "sourceHint": "PDF p.7 п.1.1.2.11"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.ral",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Какой цвет корпуса RAL указан в РЭ?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "7035",
+            "sourceHint": "PDF p.7 п.1.1.2.10"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.num.shelf-load",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальная нагрузка на стандартную полку SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "100",
+            "sourceHint": "PDF p.2 / раздел 2.1",
+            "unit": "kg"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "20",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.kit.wheels",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Сколько колёс для транспортирования в базовой поставке SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "4",
+            "sourceHint": "PDF table 1.2 p.10"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.kit.feet",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Сколько регулируемых ножек в комплекте SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "4",
+            "sourceHint": "PDF table 1.2 p.10"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.kit.feet-height",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Максимальная высота регулируемых ножек?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "50",
+            "sourceHint": "PDF table 1.2 p.10",
+            "unit": "mm"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.kit.desiccant",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Сколько осушителей в базовой поставке SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "2",
+            "sourceHint": "PDF table 1.2 p.10 item 6.2"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "1",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.kit.shelves-perf",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Сколько полок с перфорацией для SDB1560М в таблице 1.2?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "4",
+            "sourceHint": "PDF table 1.2 p.10 item 8.6"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.kit.power-cord",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Минимальная длина шнура питания в комплекте?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "4",
+            "sourceHint": "PDF table 1.2 p.10",
+            "unit": "m"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.kit.ground-wire",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Минимальная длина провода функционального заземления?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1[,.]8",
+            "sourceHint": "PDF table 1.2 p.10",
+            "unit": "m"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.kit.ground-resistor",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Сопротивление резистора в комплекте заземления?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1",
+            "sourceHint": "PDF table 1.2 p.10 (1 МОм)"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.kit.ethernet",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Есть ли разъём Ethernet в базовой поставке?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Ethernet",
+            "sourceHint": "PDF table 1.2 p.10 item 4"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.kit.indicator",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Какой световой индикатор встроен в панель управления?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "трехцвет",
+            "sourceHint": "PDF table 1.2 p.10 item 7"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.heat-modules",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Сколько модулей системы подогрева воздуха для SDB1560M в опциях?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "2",
+            "sourceHint": "PDF table 1.4 p.11 item 6"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "1",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.feeder-basket-min",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Минимальное число корзин питателей для SDB1560М по опциям?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1",
+            "sourceHint": "PDF table 1.4 p.11 item 9"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.feeder-basket-max",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Максимальное число корзин питателей для SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "2",
+            "sourceHint": "PDF table 1.4 p.11 item 9"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.n2-pressure",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальное давление азота на входе опции?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "6",
+            "sourceHint": "PDF p.25 п.1.2.2.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.n2-tube",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Диаметр трубки для подключения опции азота к магистрали?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "8",
+            "sourceHint": "PDF p.25 п.1.2.2.1",
+            "unit": "mm"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.n2-flow-min",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Минимальный расход азота по опции?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "3",
+            "sourceHint": "PDF p.25 п.1.2.2.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.n2-flow-max",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальный расход азота?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "30",
+            "sourceHint": "PDF p.25 п.1.2.2.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.n2-timer-max",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Верхний предел установки времени подачи азота без датчика (мин)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "99[,.]9",
+            "sourceHint": "PDF p.25 п.1.2.2.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.n2-sensor-min",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Минимальный порог концентрации азота с датчиком (%)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "78",
+            "sourceHint": "PDF p.25 п.1.2.2.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.n2-sensor-max",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальный порог концентрации азота с датчиком?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "98",
+            "sourceHint": "PDF p.25 п.1.2.2.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.maint.desiccant-months",
+        "equipmentId": "sdb1560m",
+        "category": "maintenance",
+        "message": "Периодичность замены блока осушения?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "36",
+            "sourceHint": "PDF table 3.1 p.35"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "12",
+            "reason": "wrong model or value"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.maint.dust-months",
+        "equipmentId": "sdb1560m",
+        "category": "maintenance",
+        "message": "Как часто продувать от пыли узел поддержания температуры (если опция есть)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "12",
+            "sourceHint": "PDF table 3.1 p.35"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.maint.door-seals",
+        "equipmentId": "sdb1560m",
+        "category": "maintenance",
+        "message": "Периодичность проверки уплотнительных резинок дверей?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1",
+            "sourceHint": "PDF table 3.1 p.35"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.maint.power-cable",
+        "equipmentId": "sdb1560m",
+        "category": "maintenance",
+        "message": "Как часто проверять кабель сетевого питания 220 В?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1",
+            "sourceHint": "PDF table 3.1 p.35"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.maint.eth-cable",
+        "equipmentId": "sdb1560m",
+        "category": "maintenance",
+        "message": "Периодичность проверки кабеля Ethernet?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1",
+            "sourceHint": "PDF table 3.1 p.35"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.mode.green-storage",
+        "equipmentId": "sdb1560m",
+        "category": "operating_mode",
+        "message": "Что означает постоянный зелёный световой сигнал на панели?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Хранен",
+            "sourceHint": "PDF p.15 п.1.1.4.3.3а"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.mode.yellow-regen",
+        "equipmentId": "sdb1560m",
+        "category": "operating_mode",
+        "message": "Жёлтый световой индикатор — это какой режим?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Регенерац",
+            "sourceHint": "PDF p.15 п.1.1.4.3.3в"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.mode.dry-blink",
+        "equipmentId": "sdb1560m",
+        "category": "operating_mode",
+        "message": "Зелёный и мигающий красный — что за режим работы?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Осушен",
+            "sourceHint": "PDF p.15 п.1.1.4.3.3б"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.ind.red-door",
+        "equipmentId": "sdb1560m",
+        "category": "alarm_troubleshooting",
+        "message": "Постоянный красный световой сигнал при зелёном — что произошло?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "двер",
+            "sourceHint": "PDF p.15 п.1.1.4.3.3г"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.sym.w-heating",
+        "equipmentId": "sdb1560m",
+        "category": "operating_mode",
+        "message": "Что означает символ W на LCD дисплее?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "подогрев",
+            "sourceHint": "PDF p.15 п.1.1.4.3.2е"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.sym.n2",
+        "equipmentId": "sdb1560m",
+        "category": "operating_mode",
+        "message": "Символ N2 на дисплее — что подключено?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "азот",
+            "sourceHint": "PDF p.15 п.1.1.4.3.2д"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.proc.sound-door",
+        "equipmentId": "sdb1560m",
+        "category": "alarm_troubleshooting",
+        "message": "Когда включается звуковая сигнализация по двери?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "открыт",
+            "sourceHint": "PDF p.15 п.1.1.4.3.4"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.proc.door-fan-off",
+        "equipmentId": "sdb1560m",
+        "category": "alarm_troubleshooting",
+        "message": "Что происходит с вентилятором осушителя при открытой двери?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "отключ",
+            "sourceHint": "PDF п.1.1.4.4.1 / card door-close-dry"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.proc.close-door-timer",
+        "equipmentId": "sdb1560m",
+        "category": "alarm_troubleshooting",
+        "message": "Сколько минут длится ускоренное осушение после закрытия двери (±1 мин)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "60",
+            "sourceHint": "PDF п.1.1.4.4.1 / card door-close-dry"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.proc.fan-restart-1rh",
+        "equipmentId": "sdb1560m",
+        "category": "alarm_troubleshooting",
+        "message": "При каком росте RH относительно установленного снова включается вентилятор?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1",
+            "sourceHint": "PDF п.1.1.4.4.1 / card fan-restart-1rh"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.proc.regen-shutdown",
+        "equipmentId": "sdb1560m",
+        "category": "operating_mode",
+        "message": "Можно ли выключать шкаф при жёлтом индикаторе регенерации?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "запрещ|нельзя|не\\s+выключ",
+            "sourceHint": "PDF п.1.1.4 / card yellow-and-w"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "можно выключ",
+            "reason": "forbidden during regen"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.multi.mass-depth",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Назовите массу и глубину SDB1560М по Таблице 1.1.",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "sourceHint": "PDF table 1.1 p.7",
+            "unit": "kg",
+            "factId": "F-MASS"
+          },
+          {
+            "claimPattern": "1028",
+            "sourceHint": "PDF table 1.1 p.7",
+            "unit": "mm"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "772",
+            "reason": "SDB1106NM depth"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.multi.dry-regen-power",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Максимальная мощность в осушении и в регенерации для SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "40",
+            "sourceHint": "PDF p.6",
+            "unit": "W"
+          },
+          {
+            "claimPattern": "540",
+            "sourceHint": "PDF p.6",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "20",
+            "reason": "small cabinet dry power"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.multi.ambient-temp-rh",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Допустимые температура и RH окружающего воздуха при эксплуатации?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "15",
+            "sourceHint": "PDF p.7"
+          },
+          {
+            "claimPattern": "35",
+            "sourceHint": "PDF p.7"
+          },
+          {
+            "claimPattern": "80",
+            "sourceHint": "PDF p.7"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.multi.n2-flow-range",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Диапазон расхода азота для опции (л/мин)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "3",
+            "sourceHint": "PDF p.25"
+          },
+          {
+            "claimPattern": "30",
+            "sourceHint": "PDF p.25"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.para.mass",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Масса шкафа модели SDB1560М в килограммах?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "sourceHint": "PDF table 1.1 p.7",
+            "unit": "kg"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.para.storage-w",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Сколько максимум ватт в режиме поддержания влажности без опций?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "8",
+            "sourceHint": "PDF p.5",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.para.rh-step",
+        "equipmentId": "sdb1560m",
+        "category": "paraphrase",
+        "message": "Минимальный шаг изменения уставки влажности в RH%?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "0[,.]1",
+            "sourceHint": "PDF p.4"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.para.ip",
+        "equipmentId": "sdb1560m",
+        "category": "paraphrase",
+        "message": "Степень защиты корпуса по IP?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "IP55",
+            "sourceHint": "PDF p.7"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.para.desiccant-qty",
+        "equipmentId": "sdb1560m",
+        "category": "paraphrase",
+        "message": "Число блоков осушителя у SDB1560М в базовой комплектации?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "2",
+            "sourceHint": "PDF table 1.2"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.para.wheels-qty",
+        "equipmentId": "sdb1560m",
+        "category": "paraphrase",
+        "message": "Количество транспортировочных колёс у SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "4",
+            "sourceHint": "PDF table 1.2"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.para.36m",
+        "equipmentId": "sdb1560m",
+        "category": "paraphrase",
+        "message": "Через сколько месяцев менять блок осушения по графику ТО?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "36",
+            "sourceHint": "PDF table 3.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.para.operating-247",
+        "equipmentId": "sdb1560m",
+        "category": "operating_mode",
+        "message": "Какой режим работы шкафа указан в ТТХ?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "круглосуточ",
+            "sourceHint": "PDF p.4 п.1.1.2.5"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.para.no-humidify",
+        "equipmentId": "sdb1560m",
+        "category": "operating_mode",
+        "message": "Может ли шкаф повышать RH выше окружающей среды?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "не\\s+предназнач|выше\\s+.*окружа",
+            "sourceHint": "PDF p.4 п.1.1.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.para.dry-storage-sw",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Как называется ПО для удалённого доступа по Ethernet?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Dry Storage",
+            "sourceHint": "PDF p.9–10"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.disc.storage-vs-dry",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Чем отличается 8 Вт от 40 Вт в ТТХ SDB1560М (какой режим 40 Вт)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "40",
+            "sourceHint": "PDF p.5–6",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "notes": "Comparative 8 W vs 40 W — forbidden «8» removed (Task 31 dataset fix)",
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.disc.810-storage-vs-dry",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "810 Вт с опциями — это режим хранения или осушения для SDB1560М?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "810",
+            "sourceHint": "PDF p.5–6",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.foreign.dry-power-1560",
+        "equipmentId": "sdb1560m",
+        "category": "foreign_model",
+        "message": "Для SDB1560М какая максимальная мощность в режиме осушения — 20 Вт или 40 Вт?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "40",
+            "sourceHint": "PDF p.6",
+            "unit": "W"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "20",
+            "reason": "SDB302 dry power",
+            "leakageModel": "SDB302"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.foreign.mass-1106",
+        "equipmentId": "sdb1560m",
+        "category": "foreign_model",
+        "message": "Сколько kilogram весит SDB1106 по той же таблице габаритов?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "160",
+            "sourceHint": "PDF table 1.1 p.7",
+            "unit": "kg"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "260",
+            "reason": "SDB1560M mass leak"
+          }
+        ],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.wifi",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Есть ли встроенный Wi-Fi модуль?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "Wi-Fi not in manual"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.mqtt-api",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Поддерживается ли протокол MQTT для интеграции?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "MQTT not in manual"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.mobile-app",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Как скачать мобильное приложение шкафа?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "no mobile app in RE"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.default-ip",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Какой IP-адрес по умолчанию у шкафа?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "default IP not in RE"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.cpu",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Какой процессор в блоке управления?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "CPU not specified"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.regen-duration-min",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Сколько минут длится цикл регенерации осушителя?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "regen duration minutes not in RE"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.bluetooth",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Есть Bluetooth для настройки?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "Bluetooth not in manual"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.firmware-version",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Какая версия прошивки установлена с завода?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "firmware version not in RE"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.warranty-years",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Сколько лет гарантия от изготовителя?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "warranty term not in this RE body"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.sdb151-mass-for-1560",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Сколько весит SDB151 — нужно для расчёта помещения под SDB1560М.",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "wrong model transfer"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.internal-volume-liters",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Точный внутренний объём SDB1560M в литрах по PDF?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "volume L not verified in PDF text layer"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.full-volume-liters",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Полный объём шкафа в литрах по руководству?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "full volume L not verified in PDF text"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.warehouse-humidity-setpoint",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Какую влажность установить для хранения печатных плат без указания класса?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "insufficient input"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF/golden unsupported list",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.modbus",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Есть Modbus RTU на шкафу?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "Modbus not in manual"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [
+          {
+            "pattern": "Modbus\\s+есть|поддержива",
+            "reason": "unsupported claim"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.insuf.n2-without-option",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Какой расход азота у шкафа без установленной опции азота?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "N2 flow only defined for option"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "notes": "PDF p.25 applies to option only",
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.std.esd",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Каким стандартам по ESD соответствует шкаф?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "61340",
+            "sourceHint": "PDF p.7 п.1.1.2.9"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.spare.lock-excluded",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Входит ли запасной замок на каждую дверь в перечень запасных частей для SDB1560M?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "кроме.*1560|1560M\\)",
+            "sourceHint": "PDF table 1.3 p.11 item 1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "notes": "SDB1560M excluded from spare lock row",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.opt.water-containers",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Сколько контейнеров для воды тип 12.401 для SDB1560M в опциях?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "2",
+            "sourceHint": "PDF table 1.4 p.11 item 10.1"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.note.height-signal",
+        "equipmentId": "sdb1560m",
+        "category": "paraphrase",
+        "message": "Учитывается ли светосигнальная колонна «Светофор» в высоте из Таблицы 1.1?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "без\\s+учета|не\\s+учитыва",
+            "sourceHint": "PDF table 1.1 note p.7"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.sw.remote",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Какие функции выполняет ПО Dry Storage по Ethernet?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "удален",
+            "sourceHint": "PDF p.9 п.1.1.2.14"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.rh.rule-below30",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Для уставки 0–30 RH% установка не выше какой величины относительно окружающей?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "10",
+            "sourceHint": "PDF p.4–5 ВНИМАНИЕ п.2"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.rh.rule-above30",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Для уставки от 30 RH% и выше — не более RH окружающей минус сколько?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "20",
+            "sourceHint": "PDF p.4–5 ВНИМАНИЕ п.2"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.spare.fuse-heating",
+        "equipmentId": "sdb1560m",
+        "category": "kit_completeness",
+        "message": "Какой предохранитель указан для SDB1560M с системой подогрева воздуха?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "6\\s*А|H520",
+            "sourceHint": "PDF table 1.3 p.11 item 3.2"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.env.pressure-mmhg-min",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Нижняя граница давления в мм рт. ст.?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "630",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.env.pressure-mmhg-max",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Верхняя граница давления в мм рт. ст.?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "800",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.multi.width-height",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Ширина и высота SDB1560М по Таблице 1.1?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1202",
+            "sourceHint": "PDF table 1.1",
+            "unit": "mm"
+          },
+          {
+            "claimPattern": "1693",
+            "sourceHint": "PDF table 1.1",
+            "unit": "mm"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.ind.green-only-storage",
+        "equipmentId": "sdb1560m",
+        "category": "paraphrase",
+        "message": "Если горит только зелёный (без красного и жёлтого), какой режим?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Хранен",
+            "sourceHint": "PDF p.15"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.blockchain",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Записывает ли шкаф данные в блокчейн?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "not in manual"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.unsup.serial-format",
+        "equipmentId": "sdb1560m",
+        "category": "unsupported_by_manual",
+        "message": "Как расшифровать серийный номер на шильдике?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_abstain",
+          "abstainReason": "serial decode not in RE"
+        },
+        "requiredFacts": [],
+        "abstentionRules": {
+          "allowedAbstainPatterns": [
+            "Информация отсутствует в документации\\.",
+            "не\\s+указан|отсутств"
+          ]
+        },
+        "forbiddenClaims": [],
+        "scoring": {
+          "countsToward": [
+            "correct_abstention_rate"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.proc.open-door-symbol",
+        "equipmentId": "sdb1560m",
+        "category": "operating_mode",
+        "message": "Какой символ на LCD показывает открытую дверь?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "двер",
+            "sourceHint": "PDF p.15 п.1.1.4.3.2г"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    },
+    {
+      "case": {
+        "id": "gen.proc.fan-symbol",
+        "equipmentId": "sdb1560m",
+        "category": "operating_mode",
+        "message": "Какой символ означает включённый вентилятор осушителя?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "вентилятор",
+            "sourceHint": "PDF p.15 п.1.1.4.3.2в"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "not_run",
+        "reason": "dry-run"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_run",
+          "detail": null
+        },
+        "forbiddenLeakage": {
+          "status": "not_run",
+          "detail": null
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": null
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": null
+        }
+      },
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": []
+    }
+  ],
+  "metrics": {
+    "answer_factual_accuracy": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "value": null,
+      "zeroDenominatorBehavior": "value is null; do not report as 100%",
+      "note": "Deterministic number/text heuristic on answer text — not semantic factual accuracy or PDF grounding"
+    },
+    "cross_model_leakage_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "value": null,
+      "note": "numerator = cases where forbidden pattern matched answer"
+    },
+    "regression_pass_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "includedCaseIds": [],
+      "value": null,
+      "note": "pass only when all required layers for the case passed; not_evaluable excluded from denominator"
+    },
+    "retrieval_recall_at_k": {
+      "value": null,
+      "reason": "not computed: requires chunk-level recall evidence"
+    },
+    "grounded_claim_rate": {
+      "value": null,
+      "reason": "not computed unless chunk texts present in payload"
+    },
+    "correct_abstention_rate": {
+      "value": null,
+      "reason": "not aggregated: abstention scoring only per-case when allowedAbstainPatterns set"
+    },
+    "answerable_abstention_rate": {
+      "value": null,
+      "reason": "not computed: requires chunk grounding for answerable context"
+    }
+  },
+  "summary": {
+    "total": 110,
+    "not_run": 110,
+    "message": "Validation and manifest only; no HTTP requests"
+  }
+}

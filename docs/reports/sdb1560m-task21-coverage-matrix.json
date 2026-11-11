@@ -1,0 +1,165 @@
+{
+  "generatedAt": "2026-10-29",
+  "gitHead": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+  "manual": "public/manuals/SDB1560NM.pdf",
+  "rows": [
+    {
+      "section": "PDF p.7 table 1.1",
+      "fact": "F-MASS 260 kg",
+      "draftCoverage": "num.mass.verified",
+      "expandedIds": [
+        "exp.num.mass.direct",
+        "exp.para.mass-heavy",
+        "exp.leak.mass-180"
+      ],
+      "source": "table 1.1 SDB1560M row",
+      "risk": "high",
+      "deterministic": "yes",
+      "status": "verified"
+    },
+    {
+      "section": "PDF p.7 table 1.1",
+      "fact": "F-DIMS 1202x1693x1028",
+      "draftCoverage": "none verified",
+      "expandedIds": [
+        "exp.num.dims.table11",
+        "exp.para.dims-typo",
+        "exp.multi.mass-and-width"
+      ],
+      "source": "table 1.1",
+      "risk": "high",
+      "deterministic": "partial multi-number",
+      "status": "verified"
+    },
+    {
+      "section": "PDF p.7 1.1.2.11",
+      "fact": "F-IP IP55",
+      "draftCoverage": "none",
+      "expandedIds": [
+        "exp.num.ip55",
+        "exp.para.ip-bryzgi"
+      ],
+      "source": "para 1.1.2.11",
+      "risk": "medium",
+      "deterministic": "regex",
+      "status": "verified"
+    },
+    {
+      "section": "PDF p.5-6 1.1.2.7",
+      "fact": "F-PWR-STOR/Dry/Reg",
+      "draftCoverage": "num.dry-power-base.verified",
+      "expandedIds": [
+        "exp.num.pwr-storage-8",
+        "exp.num.pwr-dry-base-40",
+        "exp.num.pwr-regen-540",
+        "exp.para.dry-no-options",
+        "exp.num.pwr-storage-with-opt-810"
+      ],
+      "source": "1.1.2.7",
+      "risk": "high",
+      "deterministic": "yes with caps",
+      "status": "verified"
+    },
+    {
+      "section": "PDF p.10 table 1.2",
+      "fact": "F-SHELF-KIT C1",
+      "draftCoverage": "kit.shelves.blocked",
+      "expandedIds": [
+        "exp.block.shelf-count-c1",
+        "exp.leak.shelf-18"
+      ],
+      "source": "8.6 vs golden 2",
+      "risk": "critical",
+      "deterministic": "blocked",
+      "status": "conflict"
+    },
+    {
+      "section": "PDF p.10 table 1.2",
+      "fact": "F-DESICC-KIT C2",
+      "draftCoverage": "kit.desicc-count.blocked",
+      "expandedIds": [
+        "exp.block.desicc-count-c2"
+      ],
+      "source": "6.2 vs golden 1",
+      "risk": "high",
+      "deterministic": "blocked",
+      "status": "conflict"
+    },
+    {
+      "section": "golden only",
+      "fact": "F-VOL-INT/F-VOL-FULL C4",
+      "draftCoverage": "num.volume-internal.blocked",
+      "expandedIds": [
+        "exp.block.vol-internal-c4",
+        "exp.block.vol-full-c4",
+        "exp.leak.depth-as-volume"
+      ],
+      "source": "not in PDF text",
+      "risk": "high",
+      "deterministic": "blocked",
+      "status": "unverified"
+    },
+    {
+      "section": "PDF p.35 table 3.1",
+      "fact": "F-MAINT-DES 36 mo",
+      "draftCoverage": "maint.desicc-interval.verified",
+      "expandedIds": [
+        "exp.maint.desicc-36mo"
+      ],
+      "source": "TO table",
+      "risk": "medium",
+      "deterministic": "yes",
+      "status": "verified"
+    },
+    {
+      "section": "PDF p.15 1.1.4.3.4",
+      "fact": "F-BEEP-DOOR",
+      "draftCoverage": "alarm.beep-door.verified",
+      "expandedIds": [
+        "exp.alarm.beep-open-door"
+      ],
+      "source": "behavior",
+      "risk": "medium",
+      "deterministic": "regex not semantic",
+      "status": "verified"
+    },
+    {
+      "section": "PDF 2.4 / safety",
+      "fact": "F-SMOKE-REGEN",
+      "draftCoverage": "mode.regen-shutdown.verified",
+      "expandedIds": [
+        "exp.mode.regen-no-shutdown"
+      ],
+      "source": "safety norm",
+      "risk": "critical",
+      "deterministic": "regex",
+      "status": "verified"
+    },
+    {
+      "section": "golden unsupported",
+      "fact": "Wi-Fi/MQTT/vendor",
+      "draftCoverage": "unsupported.sensor-vendor",
+      "expandedIds": [
+        "exp.unsup.wifi",
+        "exp.unsup.mqtt",
+        "exp.unsup.sensor-vendor",
+        "exp.unsup.mobile-app",
+        "exp.unsup.default-ip"
+      ],
+      "source": "golden list",
+      "risk": "medium",
+      "deterministic": "abstain patterns only",
+      "status": "verified absent"
+    },
+    {
+      "section": "N/A installation detail",
+      "fact": "Foundation anchoring bolt torque",
+      "draftCoverage": "none",
+      "expandedIds": [],
+      "source": "not found in audited PDF excerpts",
+      "risk": "low",
+      "deterministic": "n/a",
+      "status": "not_applicable"
+    }
+  ]
+}

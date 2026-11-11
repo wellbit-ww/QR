@@ -1,0 +1,243 @@
+{
+  "manifest": {
+    "capturedAt": "2026-11-10T05:25:10.514Z",
+    "schemaVersion": "1.0-eval-contour",
+    "evalRunnerLibVersion": "1.10-task42-r1",
+    "git": {
+      "commit": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+      "branch": "backup/sova-portal",
+      "dirty": true,
+      "dirtyLineCount": 162,
+      "interpretResultsAsHeadOnly": false,
+      "note": "Working tree dirty — results may include uncommitted changes not in commit"
+    },
+    "dataset": {
+      "path": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\scripts\\eval\\sdb1560m-generalization-v1.json",
+      "sha256": "c83ace6d1b08f6030970c02ff3010437ca0c116624ea3d47f5d2048d2062af20",
+      "partition": "all"
+    },
+    "run": {
+      "mode": "http",
+      "noProvision": true,
+      "allowHttp": true,
+      "dryRun": false,
+      "authMode": "missing_credentials"
+    },
+    "serverEnvFingerprint": {
+      "RAG_HONEST_EQUIPMENT": "sdb1560m",
+      "RAG_PURE": "unknown",
+      "SOVA_QUERY_REWRITE": "unknown",
+      "OLLAMA_MODEL": "unknown",
+      "EMBEDDING_MODEL": "unknown",
+      "EVAL_BASE_URL": "unknown",
+      "EVAL_LOGIN": "missing",
+      "EVAL_PASSWORD": "missing"
+    },
+    "indexFingerprint": {
+      "value": "unknown",
+      "method": "not probed (no DB read by default)"
+    },
+    "skipReasons": [],
+    "secretsPolicy": "passwords and .env contents are never stored"
+  },
+  "caseResults": [
+    {
+      "case": {
+        "id": "gen.env.pressure-kpa-min",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Нижняя граница атмосферного давления для эксплуатации (кПа)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "84",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.env.pressure-kpa-max",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Верхняя граница атмосферного давления (кПа)?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "106[,.]7",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.env.pressure-mmhg-min",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Нижняя граница давления в мм рт. ст.?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "630",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "gen.env.pressure-mmhg-max",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Верхняя граница давления в мм рт. ст.?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "800",
+            "sourceHint": "PDF p.7 п.1.1.2.12"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    }
+  ],
+  "metrics": {
+    "answer_factual_accuracy": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "value": null,
+      "zeroDenominatorBehavior": "value is null; do not report as 100%",
+      "note": "Deterministic number/text heuristic on answer text — not semantic factual accuracy or PDF grounding"
+    },
+    "cross_model_leakage_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "value": null,
+      "note": "numerator = cases where forbidden pattern matched answer"
+    },
+    "regression_pass_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "includedCaseIds": [],
+      "value": null,
+      "note": "pass only when all required layers for the case passed; not_evaluable excluded from denominator"
+    },
+    "retrieval_recall_at_k": {
+      "value": null,
+      "reason": "not computed: requires chunk-level recall evidence"
+    },
+    "grounded_claim_rate": {
+      "value": null,
+      "reason": "not computed unless chunk texts present in payload"
+    },
+    "correct_abstention_rate": {
+      "value": null,
+      "reason": "not aggregated: abstention scoring only per-case when allowedAbstainPatterns set"
+    },
+    "answerable_abstention_rate": {
+      "value": null,
+      "reason": "not computed: requires chunk grounding for answerable context"
+    }
+  },
+  "summary": {
+    "total": 4,
+    "pass": 0,
+    "fail": 0,
+    "blocked": 0,
+    "infrastructure_error": 4,
+    "not_run": 0,
+    "not_evaluable": 0
+  },
+  "diagnosticsByCaseId": {}
+}

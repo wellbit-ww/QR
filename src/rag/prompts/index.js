@@ -41,6 +41,7 @@ const {
   isRegenerationShutdownQuery,
   contextHasMandatoryAnswerTriggers,
 } = require("../safety-query-scope");
+const { isRagPureEnabled, contextHasSdb1560AnswerableData } = require("../honest-rag-mode");
 const { isHumidityNotDroppingQuery, HUMIDITY_MANDATORY_CHECKS } = require("../troubleshooting-scope");
 const { isUnsupportedReplacementQuery } = require("../unsupported-replacement-scope");
 const { resolveNormalIndicatorMode } = require("../indicator-scope");
@@ -94,7 +95,17 @@ function buildEquipmentExpertRole(equipment) {
     return SDB151NM_EXPERT_ROLE;
   }
   if (/sdb1560/i.test(model)) {
-    return SDB1560NM_EXPERT_ROLE;
+    const role = [...SDB1560NM_EXPERT_ROLE];
+    if (isRagPureEnabled()) {
+      role.push(
+        "RAG PURE (приоритет над строкой «параметр не указан» выше):",
+        "- Если во фрагментах CONTEXT есть golden-facts-sdb1560, табл. 1.1 или табл. 1.2 — извлеки ответ пользователю.",
+        `- Запрещены отказы «${MODEL_PARAM_NOT_SPECIFIED}» и «контекст не содержит», когда цифра или формулировка видна в CONTEXT.`,
+        "- ЗАПРЕЩЕНО: «можно предположить», «в общем случае», «нет прямого ответа», «рекомендуется обратиться к производителю/руководству» — если во фрагментах CONTEXT есть ответ (табл. 3.1, golden-facts, п. 1.1.4.4.1 и т.д.).",
+        `- Только если факта нет ни в одном фрагменте CONTEXT — «${STRICT_ABSTAIN}».`,
+      );
+    }
+    return role;
   }
   return [
     `Ты — сервисный инженер по шкафу ${model}. Пользователь уже обслуживается этой моделью; не проси уточнить артикул.`,
@@ -338,7 +349,12 @@ function equipmentHeader(equipment) {
 /**
  * Динамические подсказки перед генерацией ответа (смешанные таблицы, режим хранения, полки).
  */
-function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equipment = null) {
+function buildLlmAnswerCompositionBlocks(
+  retrievalContext,
+  userMessage = "",
+  equipment = null,
+  chatHistory = [],
+) {
   const blocks = [];
   const ctx = String(retrievalContext || "");
   const msg = String(userMessage || "");
@@ -405,7 +421,10 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
     );
   }
 
-  const normalIndicator = equipmentIsSdb1106nm(equipment) ? resolveNormalIndicatorMode(msg) : null;
+  const normalIndicator =
+    equipmentIsSdb1106nm(equipment) || equipmentIsSdb1560m(equipment)
+      ? resolveNormalIndicatorMode(msg)
+      : null;
   if (normalIndicator) {
     blocks.push(
       "",
@@ -430,6 +449,17 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
       "",
       "ВНИМАНИЕ — мощность в режиме хранения (п. 2.2.7.1):",
       "Одно-два предложения «тезис + факт», например про предел 8 Вт; без обзора всех режимов.",
+    );
+  } else if (
+    equipmentIsSdb1560m(equipment) &&
+    asksStorageModePower(msg) &&
+    contextSupportsStorageMode8W(ctx) &&
+    !/азот|подогрев|опци|установлен[\p{L}]*\s+систем/iu.test(msg)
+  ) {
+    blocks.push(
+      "",
+      "ВНИМАНИЕ — мощность в режиме «Хранения» SDB1560NM (п. 1.1.2.7 а):",
+      "Вопрос без опций — ответь **не более 8 Вт**; не подставляй 810 Вт (это строка с азотом и подогревом).",
     );
   }
 
@@ -491,7 +521,7 @@ function buildLlmAnswerCompositionBlocks(retrievalContext, userMessage = "", equ
   } else if (equipmentIsSdb702nm(equipment)) {
     blocks.push(...buildSdb702nmLlmAnswerCompositionBlocks(ctx, msg));
   } else if (equipmentIsSdb1560m(equipment)) {
-    blocks.push(...buildSdb1560mLlmAnswerCompositionBlocks(ctx, msg));
+    blocks.push(...buildSdb1560mLlmAnswerCompositionBlocks(ctx, msg, chatHistory));
   }
 
   return blocks.length ? blocks.join("\n") : "";
@@ -541,6 +571,15 @@ function baseGroundingPrompt(equipment, context, extraBlocks = "") {
   const sdb302nmRules = isSdb302nm ? SDB302NM_GROUNDING_RULES : [];
   const sdb151nmRules = isSdb151nm ? SDB151NM_GROUNDING_RULES : [];
   const sdb1560mRules = isSdb1560m ? SDB1560NM_GROUNDING_RULES : [];
+  const sdb1560PureAddon =
+    isSdb1560m && isRagPureEnabled()
+      ? [
+          "",
+          "RAG PURE SDB1560NM:",
+          "CONTEXT может содержать golden-facts и таблицы 1.1/1.2 — это полноценный источник ТТХ и комплектации.",
+          "Не отвечай, что «данных недостаточно», если нужное число или строка таблицы есть в любом фрагменте CONTEXT.",
+        ]
+      : [];
 
   return [
     ...buildEquipmentExpertRole(equipment),
@@ -551,14 +590,16 @@ function baseGroundingPrompt(equipment, context, extraBlocks = "") {
     ...sdb302nmRules,
     ...sdb151nmRules,
     ...sdb1560mRules,
+    ...sdb1560PureAddon,
     equipmentHeader(equipment),
     extraBlocks ? String(extraBlocks).trim() : "",
     "Контекст из retrieved RAG chunks:",
     context || "Релевантный контекст не найден.",
     "Главное правило: RAG context является единственным source of truth.",
     "Запрещено использовать внешние знания и догадки.",
-    contextHasMandatoryAnswerTriggers(context)
-      ? "В контексте есть данные по вопросу — ответь по ним; не используй формулировку «информация отсутствует»."
+    contextHasMandatoryAnswerTriggers(context) ||
+    (isSdb1560m && isRagPureEnabled() && contextHasSdb1560AnswerableData(context))
+      ? "В контексте есть данные по вопросу — ответь по ним; не используй формулировку «информация отсутствует» и не отказывайся без извлечения факта."
       : `Если данных по ТТХ ${equipmentModelName(equipment)} недостаточно — «${MODEL_PARAM_NOT_SPECIFIED}»; иначе — «${STRICT_ABSTAIN}».`,
     `Не придумывай числа, сроки и ГОСТы, которых нет в контексте для ${equipmentModelName(equipment)}.`,
   ].join("\n");
@@ -608,12 +649,22 @@ function buildSafetyGroundedSystemPrompt(equipment, context, extraBlocks = "") {
 }
 
 function buildProceduralSystemPrompt(equipment, context, extraBlocks = "") {
+  const unsupportedBlock =
+    /замена узла без инструкции/i.test(String(extraBlocks || "")) ?
+      [
+        "",
+        "Замена узла без процедуры в РЭ:",
+        "Не используй формат TROUBLESHOOTING («уточните симптом», чек-лист неисправностей).",
+        "Ответ: нет инструкции по замене + техподдержка из CONTEXT.",
+      ].join("\n")
+    : "";
   return [
     baseGroundingPrompt(equipment, context, extraBlocks),
     "",
     "Режим: PROCEDURAL_QA.",
     "Используй ТОЛЬКО инструкции и шаги из контекста.",
     "Формат: короткое вводное предложение и нумерованный список шагов.",
+    unsupportedBlock,
   ].join("\n");
 }
 
@@ -631,13 +682,17 @@ function buildTroubleshootingSystemPrompt(equipment, context, extraBlocks = "") 
 }
 
 function buildContextualFactSystemPrompt(equipment, context, extraBlocks = "") {
+  const is1560Pure =
+    equipmentIsSdb1560m(equipment) && isRagPureEnabled() && contextHasSdb1560AnswerableData(context);
   return [
     baseGroundingPrompt(equipment, context, extraBlocks),
     "",
     "Режим: CONTEXTUAL_FACT.",
     `Один параметр — «тезис + факт»; несколько связанных пунктов — буллеты «термин: суть + цифры»; только ${equipmentModelName(equipment)}.`,
     ...TECHNICAL_SYNONYM_GUIDANCE,
-    `Если точного значения для ${equipmentModelName(equipment)} нет в контексте — ответь ровно: "${MODEL_PARAM_NOT_SPECIFIED}"`,
+    is1560Pure
+      ? `Извлеки число или формулировку из фрагментов CONTEXT (табл. 1.1, табл. 1.2, golden-facts). Запрещены отказы «${MODEL_PARAM_NOT_SPECIFIED}» и «контекст не содержит», если значение видно во фрагментах.`
+      : `Если точного значения для ${equipmentModelName(equipment)} нет в контексте — ответь ровно: "${MODEL_PARAM_NOT_SPECIFIED}"`,
   ].join("\n");
 }
 
@@ -698,10 +753,10 @@ function buildQueryRewriteSystemPrompt(equipment) {
   ].join("\n");
 }
 
-function buildQueryRewriteUserMessage(userQuery, history = []) {
+function buildQueryRewriteUserMessage(userQuery, history = [], opts = {}) {
   const hist = Array.isArray(history) ? history : [];
-  const lines = hist
-    .slice(-6)
+  const tail = opts.ragPure ? hist.slice(-2) : hist.slice(-6);
+  const lines = tail
     .filter((e) => e && (e.role === "user" || e.role === "assistant") && String(e.content || "").trim())
     .map((e) => `${e.role === "user" ? "Пользователь" : "Ассистент"}: ${String(e.content).trim()}`);
   return [

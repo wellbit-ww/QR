@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "task43-offline-rescore",
+  "evalRunnerLibVersion": "1.11-task43-r1",
+  "sourceReport": "logs/baseline-task42/targeted-http-pressure-4-verified/report.json",
+  "method": "Re-evaluate stored answerPreview + §1.1.2.12 source line + ambient-pressure card (same production text, new matcher)",
+  "results": [
+    {
+      "id": "gen.env.pressure-kpa-min",
+      "task42Overall": "fail",
+      "task43RescoreOverall": "pass",
+      "answerPreviewFromTask42": "84,0 kPa form (unchanged)"
+    },
+    {
+      "id": "gen.env.pressure-kpa-max",
+      "task42Overall": "pass",
+      "task43RescoreOverall": "pass"
+    },
+    {
+      "id": "gen.env.pressure-mmhg-min",
+      "task42Overall": "pass",
+      "task43RescoreOverall": "pass"
+    },
+    {
+      "id": "gen.env.pressure-mmhg-max",
+      "task42Overall": "pass",
+      "task43RescoreOverall": "pass"
+    }
+  ],
+  "note": "Not a substitute for live HTTP re-run; confirms evaluator fix on Task 42 captured answers."
+}

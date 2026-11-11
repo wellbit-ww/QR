@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "task42-repo-snapshot",
+  "capturedAt": "2026-11-10T08:00:00.000Z",
+  "branch": "backup/sova-portal",
+  "head": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+  "evalRunnerLibVersion": "1.10-task42-r1",
+  "httpRuns": {
+    "pressure4": {
+      "path": "logs/baseline-task42/targeted-http-pressure-4-verified",
+      "pass": 3,
+      "fail": 1,
+      "failedCase": "gen.env.pressure-kpa-min"
+    },
+    "priorityB10": {
+      "path": "logs/baseline-task42/targeted-http-priority-b-10",
+      "pass": 10,
+      "fail": 0
+    },
+    "rhAbove30": {
+      "path": "logs/baseline-task42/targeted-http-rh-above30",
+      "pass": 1,
+      "fail": 0
+    },
+    "task27VerifiedGeneralizationV1": {
+      "path": "logs/baseline-task42/task27-regression",
+      "pass": 62,
+      "total": 93,
+      "note": "Not canonical Task 27 32-case suite (expanded-v2)"
+    },
+    "task28Full": {
+      "path": "logs/baseline-task42/task28-generalization-http",
+      "pass": 73,
+      "total": 110,
+      "deltaVsTask40": 3,
+      "leakageDen": 20,
+      "leakageFail": 0
+    }
+  },
+  "dodClosed": false,
+  "dodGap": "gen.env.pressure-kpa-min factual+grounding (answer 84,0 vs claim 84)"
+}

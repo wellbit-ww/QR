@@ -52,6 +52,7 @@ const {
 const { buildReasoningMessages } = require("./src/rag/synthesis/reasoning-synthesis");
 const { validateGrounding } = require("./src/rag/synthesis/grounding-validation");
 const { routeQuery } = require("./src/rag/router/query-router");
+const { runWithEvalCaptureRagTraceAsync } = require("./src/rag/eval-capture");
 const { runPipeline } = require("./src/rag/pipeline/run-pipeline");
 const {
   shouldUseHonestRag,
@@ -144,9 +145,10 @@ const globalLimiter = rateLimit({
 app.use(globalLimiter);
 
 // Specific Rate Limiting for Chat API to protect LLM from abuse
+const chatRateLimitMax = Number(process.env.CHAT_RATE_LIMIT_MAX);
 const chatLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: Number.isFinite(chatRateLimitMax) && chatRateLimitMax > 0 ? chatRateLimitMax : 100,
   message: "Слишком много запросов к чату с вашего IP, пожалуйста, попробуйте позже.",
   standardHeaders: true,
   legacyHeaders: false,
@@ -217,7 +219,16 @@ function resolveChatRequestSocketMs() {
   return Math.max(60_000, Number(raw || 360_000));
 }
 
-function shouldExposeDebugChatFields() {
+function shouldExposeDebugChatFields(req) {
+  if (req) {
+    const evalTrace = String(req.headers?.["x-sova-eval-trace"] || "").trim();
+    if (evalTrace === "1") {
+      return true;
+    }
+  }
+  if (process.env.EVAL_CAPTURE_RAG_TRACE === "1") {
+    return true;
+  }
   if (IS_PRODUCTION) {
     return false;
   }
@@ -245,17 +256,19 @@ function buildChatResponsePayload({
   ragTrace = null,
   chatMode = null,
   chatCapabilities = null,
+  exposeDebug = null,
 }) {
+  const debug = exposeDebug ?? shouldExposeDebugChatFields();
   const payload = {
     equipmentId: equipment.id,
     equipmentName: equipment.name,
     answer,
     items,
-    sources: IS_PRODUCTION ? sanitizeSourcesForClient(sources) : sources,
+    sources: IS_PRODUCTION && !debug ? sanitizeSourcesForClient(sources) : sources,
     chatMode,
   };
 
-  if (shouldExposeDebugChatFields()) {
+  if (debug) {
     payload.retrieval = retrieval;
     payload.ragTrace = ragTrace;
     payload.chatCapabilities = chatCapabilities;
@@ -2370,6 +2383,7 @@ app.post("/api/chat", chatLimiter, async (req, res) => {
         retrieval: gateRetrieval,
         ragTrace: gateRagTrace,
         chatMode: gateChatMode,
+        exposeDebug: shouldExposeDebugChatFields(req),
         chatCapabilities,
       }));
     }
@@ -2565,6 +2579,7 @@ app.post("/api/chat", chatLimiter, async (req, res) => {
         sources,
         retrieval,
         ragTrace,
+        exposeDebug: shouldExposeDebugChatFields(req),
         chatMode,
         chatCapabilities,
       }));
@@ -2591,12 +2606,17 @@ app.post("/api/chat", chatLimiter, async (req, res) => {
       equipment,
     });
 
-    const result = await runPipeline({
-      equipment,
-      message: trimmedMessage,
-      history: normalizedHistory,
-      routerDecision,
-    });
+    const evalTrace = shouldExposeDebugChatFields(req);
+
+    const result = await runWithEvalCaptureRagTraceAsync(evalTrace, () =>
+      runPipeline({
+        equipment,
+        message: trimmedMessage,
+        history: normalizedHistory,
+        routerDecision,
+        evalCaptureRagTrace: evalTrace,
+      }),
+    );
 
     logInfo("RAG trace.", result.ragTrace);
 
@@ -2686,6 +2706,7 @@ app.post("/api/chat", chatLimiter, async (req, res) => {
       ragTrace: finalRagTrace,
       chatMode: ragChatMode,
       chatCapabilities,
+      exposeDebug: shouldExposeDebugChatFields(req),
     }));
   } catch (error) {
     const raw = error instanceof Error ? error.message : String(error);

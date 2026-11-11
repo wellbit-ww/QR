@@ -1,0 +1,6 @@
+branch: backup/sova-portal
+HEAD: 8523954fadcc4f31b92305f81b8dfc09f3e61a14
+eval_runner: 1.7-task33
+task35_baseline:
+  task27: logs/baseline-task35/task27-regression-http-v11 (32/32)
+  task28: logs/baseline-task35/task28-generalization-http-v12 (58/110, must_abstain 11/17)

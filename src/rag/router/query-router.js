@@ -55,10 +55,20 @@ const { isShelfConvectionSpacingQuery } = require("../sdb1106nm-query-variants")
 const { troubleshootingSectionHintsForQuery } = require("../troubleshooting-scope");
 const { isMaintenanceQuery, maintenanceSectionHintsForQuery } = require("../maintenance-scope");
 const { resolveNormalIndicatorMode } = require("../indicator-scope");
+const { isUnsupportedReplacementQuery } = require("../unsupported-replacement-scope");
+const {
+  isSdb1560mLoadHumidityRiseQuery,
+  isSdb1560mDoorSoundNormalityQuery,
+  sectionHintsForSdb1560mMessage,
+} = require("../sdb1560m-rag-priority");
+const { isRhSetpointRuleAbove30Query } = require("../honest-contextual-extract");
+
+function isSdb1560EquipmentRoute(equipmentId, equipment) {
+  const id = String(equipmentId || equipment?.id || "").trim().toLowerCase();
+  return id === "sdb1560m" || /^sdb1560/.test(id);
+}
 
 function computeRegexRouteDecision({ query, history, equipmentId, equipment }) {
-  void history;
-  void equipmentId;
   const q = String(query || "").trim();
   const baseIntent = classifyQueryIntent(q, equipment, { forceSafety: false });
   const focusParameter = detectFocusParameter(q);
@@ -74,14 +84,32 @@ function computeRegexRouteDecision({ query, history, equipmentId, equipment }) {
     symptoms.length > 0 &&
     /почему|причин|провер|пропада|не\s+|нет\s+/iu.test(q) &&
     !isSoundAlarmProceduralCheckQuery(q) &&
+    !isSdb1560mDoorSoundNormalityQuery(q) &&
     !emergencySmoke &&
     !regenerationShutdown;
   const normalIndicator = resolveNormalIndicatorMode(q);
+
+  if (isUnsupportedReplacementQuery(q, history)) {
+    return {
+      intent: "PROCEDURE_QUERY",
+      route: ROUTES.PROCEDURAL_QA,
+      focusParameter: null,
+      symptom: null,
+      confidence: 0.88,
+      retrievalMode: "hybrid_wide",
+      symptoms: [],
+      parameterResolved: null,
+      originalQuery: q,
+    };
+  }
 
   const troubleshootingLike =
     !normalIndicator &&
     !emergencySmoke &&
     !regenerationShutdown &&
+    !isSdb1560mDoorSoundNormalityQuery(q) &&
+    !isSdb1560mLoadHumidityRiseQuery(q) &&
+    !(isSdb1560EquipmentRoute(equipmentId, equipment) && isRhSetpointRuleAbove30Query(q)) &&
     (baseIntent.intentType === "TROUBLESHOOTING_QUERY" ||
       TROUBLESHOOTING_RE.test(q) ||
       symptomTroubleshootingLike ||
@@ -204,6 +232,40 @@ function computeRegexRouteDecision({ query, history, equipmentId, equipment }) {
       confidence: 0.88,
       retrievalMode: "procedural_focused",
       sectionHints: ["1.1.4.3.4", "2.2.2.3", "двер", "звук"],
+      symptoms,
+      parameterResolved,
+      originalQuery: q,
+    };
+  }
+
+  if (isSdb1560EquipmentRoute(equipmentId, equipment) && isRhSetpointRuleAbove30Query(q)) {
+    return {
+      intent: "FACT_QUERY",
+      route: ROUTES.REASONING_QA,
+      focusParameter: focusParameter || "humidity",
+      symptom: null,
+      confidence: 0.92,
+      retrievalMode: "hybrid_wide",
+      sectionHints: ["1.1.1", "1.1.2", "ВНИМАНИЕ", "RH%окр"],
+      symptoms: [],
+      parameterResolved,
+      originalQuery: q,
+    };
+  }
+
+  if (
+    isSdb1560EquipmentRoute(equipmentId, equipment) &&
+    (isSdb1560mLoadHumidityRiseQuery(q) || isSdb1560mDoorSoundNormalityQuery(q))
+  ) {
+    const s1560Hints = sectionHintsForSdb1560mMessage(q);
+    return {
+      intent: "FACT_QUERY",
+      route: ROUTES.REASONING_QA,
+      focusParameter,
+      symptom,
+      confidence: 0.9,
+      retrievalMode: "hybrid_wide",
+      ...(s1560Hints.length ? { sectionHints: s1560Hints } : {}),
       symptoms,
       parameterResolved,
       originalQuery: q,

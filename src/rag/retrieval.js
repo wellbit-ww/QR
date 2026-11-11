@@ -15,6 +15,7 @@ const {
   shouldUseHonestRag,
   isNumericTtxRetrievalQuery,
   shouldSkipRetrievalCardsForHonest1560,
+  shouldUseRagPure,
 } = require("./honest-rag-mode");
 
 const RETRIEVAL_CARD_EQUIPMENT = new Set(["w-700", "sdb702-nm", "sdb151-nm", "sdb1560m"]);
@@ -569,6 +570,33 @@ async function fetchP1GoldenFactsChunks(pool, equipmentId, cap = 10) {
       ...sanitizeChunk(row),
       p1GoldenFactsInjected: true,
       score: Math.max(Number(row.score) || 0, 0.91),
+    }));
+  } catch (_e) {
+    return [];
+  }
+}
+
+async function fetchSdb1560GoldenFactsChunks(pool, equipmentId, cap = 8) {
+  if (equipmentId !== "sdb1560m") {
+    return [];
+  }
+  const lim = Math.max(1, Math.min(12, Math.floor(cap)));
+  try {
+    const r = await pool.query(
+      `
+        SELECT source_doc, section, page, chunk_index, content, metadata, 0.96::float AS score
+        FROM knowledge_chunks
+        WHERE equipment_id = $1
+          AND source_doc ILIKE '%golden-facts-sdb1560%'
+        ORDER BY chunk_index
+        LIMIT $2
+      `,
+      [equipmentId, lim],
+    );
+    return r.rows.map((row) => ({
+      ...sanitizeChunk(row),
+      sdb1560GoldenFactsInjected: true,
+      score: Math.max(Number(row.score) || 0, 0.96),
     }));
   } catch (_e) {
     return [];
@@ -1380,7 +1408,18 @@ async function retrieveEquipmentContext({
     intent?.intentType === "SINGLE_FIELD_QUERY"
       ? chunks.slice(0, Math.min(24, chunks.length)).map((ch) => ({ ...ch }))
       : null;
-  const singleFieldFiltered = filterChunksForSingleFieldIntent(chunks, intent);
+  const ragPureEarly = shouldUseRagPure(equipmentId);
+  const singleFieldFiltered = ragPureEarly
+    ? {
+        chunks,
+        diagnostics: {
+          retrievalFilterReason: "rag_pure_skip_single_field_narrow",
+          rejectedByParameterMismatch: 0,
+          rejectedByBlockType: 0,
+          retrievalMode: intent?.retrievalMode || null,
+        },
+      }
+    : filterChunksForSingleFieldIntent(chunks, intent);
   chunks = singleFieldFiltered.chunks;
   const gettingStartedFiltered = filterChunksForGettingStartedIntent(chunks, intent);
   chunks = gettingStartedFiltered.chunks;
@@ -1409,6 +1448,7 @@ async function retrieveEquipmentContext({
   const rerankApplied =
     Boolean(config.ragRerankEnabled) && Boolean(intent && intent.intentType);
   const honestRag = shouldUseHonestRag(equipmentId);
+  const ragPure = shouldUseRagPure(equipmentId);
   const numericTtx = isNumericTtxRetrievalQuery(originalQuery, intent);
   let ranked = rerankApplied
     ? rerankChunks(chunks, intent, {
@@ -1416,6 +1456,7 @@ async function retrieveEquipmentContext({
         equipmentId,
         honestRag,
         numericTtx,
+        ragPure,
       })
     : chunks;
 
@@ -1473,6 +1514,10 @@ async function retrieveEquipmentContext({
     const kitRows = await fetchSdb1560KitSupplyChunks(pool, equipmentId, 8);
     injectedRows = [...kitRows, ...injectedRows];
   }
+  if (boosters.sdb1560GoldenFacts) {
+    const goldenRows = await fetchSdb1560GoldenFactsChunks(pool, equipmentId, 14);
+    injectedRows = [...goldenRows, ...injectedRows];
+  }
   if (boosters.sdb1560SpecTable) {
     const specRows = await fetchSdb1560SpecTableChunks(pool, equipmentId, 10);
     injectedRows = [...specRows, ...injectedRows];
@@ -1483,7 +1528,8 @@ async function retrieveEquipmentContext({
   }
   const injectRetrievalCards =
     (boosters.sdb302RetrievalCards || RETRIEVAL_CARD_EQUIPMENT.has(equipmentId)) &&
-    !shouldSkipRetrievalCardsForHonest1560(equipmentId, originalQuery, intent, honestRag);
+    !shouldSkipRetrievalCardsForHonest1560(equipmentId, originalQuery, intent, honestRag) &&
+    !(ragPure && isNumericTtxRetrievalQuery(originalQuery, intent));
   if (injectRetrievalCards) {
     const cardRows = await fetchSdb302nmRetrievalCardChunks(pool, equipmentId, originalQuery, 3);
     injectedRows = [...cardRows, ...injectedRows];

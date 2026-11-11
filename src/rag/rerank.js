@@ -560,6 +560,12 @@ function retrievalCardBoost(chunk, queryText, intent, opts = {}) {
     return 0;
   }
   const overlap = computeKeywordOverlapScore(queryText, chunk);
+  if (opts.ragPure) {
+    if (overlap < 0.28) {
+      return -0.24;
+    }
+    return -0.1;
+  }
   const numericTtx = Boolean(opts.numericTtx);
   if (numericTtx) {
     if (overlap < 0.12) {
@@ -574,7 +580,8 @@ function retrievalCardBoost(chunk, queryText, intent, opts = {}) {
 }
 
 function honestManualSpecBoost(chunk, intent, opts = {}) {
-  if (!opts.honestRag || !opts.numericTtx) {
+  const pureOrNumericTtx = opts.ragPure || (opts.honestRag && opts.numericTtx);
+  if (!pureOrNumericTtx) {
     return 0;
   }
   const src = String(chunk?.sourceDoc || "");
@@ -582,7 +589,10 @@ function honestManualSpecBoost(chunk, intent, opts = {}) {
     return 0;
   }
   if (/golden-facts/i.test(src)) {
-    return -0.12;
+    if (opts.ragPure && opts.numericTtx) {
+      return 0.16;
+    }
+    return opts.ragPure ? -0.2 : -0.12;
   }
   const text = `${chunk.content || ""} ${chunk.section || ""}`;
   const fromPdf = /\.pdf/i.test(src) || /SDB1560NM/i.test(src) || /Руководство/i.test(src);
@@ -726,6 +736,7 @@ function rerankChunks(chunks, intent, opts = {}) {
       retrievalCardBoost(chunk, queryText, intent, {
         numericTtx: opts.numericTtx,
         honestRag: opts.honestRag,
+        ragPure: opts.ragPure,
       }),
     );
     pushAdj("honest_manual_spec", honestManualSpecBoost(chunk, intent, opts));

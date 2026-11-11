@@ -1,0 +1,16 @@
+Task 29 pre-task snapshot
+Date: 2026-11-02
+Branch: backup/sova-portal
+HEAD: 8523954fadcc4f31b92305f81b8dfc09f3e61a14
+git status lines: 110 (dirty)
+
+SHA-256:
+  Task27 report.json: 634197E4FFDD8095B9589D50E7B8F34103156CA229B6518BD2948CE89A39A93C
+  Task28 v3 report.json: F540C5F848C94E0322D200778098ADFC9554852D4EAD43A1156B77AD825D480
+  generalization-v1.json: 38236023A4631691A32A62422066B58FED2F00AEA9EF76F88D6F8D4C4DBCFF
+
+Task28 HTTP v3 summary: 41 pass / 66 fail / 3 not_evaluable / 0 infra (110 total)
+
+Task29 artifacts started:
+  logs/baseline-task29/task28-v3-case-audit.json
+  scripts/analyze-sdb1560m-task29-from-report.js

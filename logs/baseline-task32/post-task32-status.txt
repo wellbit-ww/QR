@@ -1,0 +1,130 @@
+﻿## backup/sova-portal...origin/backup/sova-portal
+ M .env.example
+ M docs/RUNBOOK_EQUIPMENT_PORTAL.md
+ M knowledge/sdb1560m/golden-facts-sdb1560m.md
+ M knowledge/sdb1560m/retrieval-cards/nitrogen-option.md
+ M package.json
+ M scripts/start-portal.js
+ M scripts/test-sdb1560m-honest-smoke-ci.js
+ M scripts/test-sdb1560m-honest-smoke.js
+ M scripts/test-sdb1560m-profile.js
+ M server.js
+ M src/rag/guardrails/guardrail-engine.js
+ M src/rag/honest-contextual-extract.js
+ M src/rag/honest-rag-deterministic.js
+ M src/rag/honest-rag-mode.js
+ M src/rag/honest-rag-post-gate.js
+ M src/rag/indicator-scope.js
+ M src/rag/maintenance-scope.js
+ M src/rag/pipeline/run-pipeline.js
+ M src/rag/prompts/index.js
+ M src/rag/query-rewriting.js
+ M src/rag/rerank.js
+ M src/rag/retrieval.js
+ M src/rag/retrieval/unified-retriever.js
+ M src/rag/router/query-router.js
+ M src/rag/sdb1560m-chat-gate.js
+ M src/rag/sdb1560m-direct-facts.js
+ M src/rag/sdb1560m-prompt-rules.js
+ M src/rag/sdb1560m-rag-priority.js
+ M src/rag/unsupported-replacement-scope.js
+?? QR-sdb1560m-code-2026-10-29.zip
+?? backups/equipment_rag.dump
+?? data/.eval-phase6-tail.json
+?? data/ad-hoc-probe-sdb1560m.json
+?? data/live-user-regression-sdb1560m.json
+?? docs/RAG_DATA_TRUTH.md
+?? docs/RAG_POLICY.md
+?? docs/reports/sdb1560m-accuracy-90-2026-10-28.md
+?? docs/reports/sdb1560m-audit-pdf-pages/
+?? docs/reports/sdb1560m-baseline-task7.md
+?? docs/reports/sdb1560m-baseline-task8.md
+?? docs/reports/sdb1560m-baseline-task9.md
+?? docs/reports/sdb1560m-eval-case-schema-v1.json
+?? docs/reports/sdb1560m-eval-contour-spec.md
+?? docs/reports/sdb1560m-eval-plan-proposed.json
+?? docs/reports/sdb1560m-eval-runner-counterexample-audit.md
+?? docs/reports/sdb1560m-eval-runner-independent-audit.md
+?? docs/reports/sdb1560m-eval-runner.md
+?? docs/reports/sdb1560m-eval-suite-draft-v1.json
+?? docs/reports/sdb1560m-eval-suite-expanded-v1.json
+?? docs/reports/sdb1560m-eval-suite-expanded-v2.json
+?? docs/reports/sdb1560m-facts-and-eval-audit.md
+?? docs/reports/sdb1560m-rag-pure-2026-10-28.md
+?? docs/reports/sdb1560m-root-cause-task11.md
+?? docs/reports/sdb1560m-task12-chat-gate-fix.md
+?? docs/reports/sdb1560m-task13-eval-numeric-cap-fix.md
+?? docs/reports/sdb1560m-task14-post-fix-baseline.md
+?? docs/reports/sdb1560m-task15-post-fix-baseline.md
+?? docs/reports/sdb1560m-task16-restart-verification.md
+?? docs/reports/sdb1560m-task17-mass-mismatch-diagnosis.md
+?? docs/reports/sdb1560m-task18-verification.md
+?? docs/reports/sdb1560m-task19-checker-audit.md
+?? docs/reports/sdb1560m-task20-checker-regression.md
+?? docs/reports/sdb1560m-task21-coverage-matrix.json
+?? docs/reports/sdb1560m-task21-rag-quality-audit.md
+?? docs/reports/sdb1560m-task22-case-diagnostics.json
+?? docs/reports/sdb1560m-task22-expanded-http-evaluation.md
+?? docs/reports/sdb1560m-task23-eval-repair-and-rag-diagnosis.md
+?? docs/reports/sdb1560m-task24-http-v2-evaluation.md
+?? docs/reports/sdb1560m-task25-first-rag-quality-improvement.md
+?? docs/reports/sdb1560m-task26-alarm-rag-improvement.md
+?? docs/reports/sdb1560m-task27-extract-routing-regression-recovery.md
+?? docs/reports/sdb1560m-task28-generalization-evaluation.md
+?? docs/reports/sdb1560m-task29-generalization-failure-analysis.md
+?? docs/reports/sdb1560m-task30-rag-observability-and-quality-improvement.md
+?? docs/reports/sdb1560m-task31-regression-recovery-and-observability.md
+?? docs/reports/sdb1560m-task32-grounding-recovery.md
+?? knowledge/sdb1560m/retrieval-cards/table-1.1-ttx.md
+?? logs/ad-hoc-probe-sdb1560m.json
+?? logs/baseline-task15/
+?? logs/baseline-task16/
+?? logs/baseline-task17/
+?? logs/baseline-task18/
+?? logs/baseline-task22/
+?? logs/baseline-task24/
+?? logs/baseline-task25/
+?? logs/baseline-task26/
+?? logs/baseline-task27/
+?? logs/baseline-task28/
+?? logs/baseline-task29/
+?? logs/baseline-task30/
+?? logs/baseline-task31/
+?? logs/baseline-task32/
+?? logs/baseline-task7/
+?? logs/baseline-task8/
+?? logs/baseline-task9/
+?? logs/eval-runs/
+?? logs/eval-sdb1560m-honest-phase5-last.log
+?? logs/eval-sdb1560m-honest-phase5-r2.log
+?? logs/live-regression-run-latest.log
+?? logs/live-user-regression-sdb1560m.json
+?? logs/task26-pre-status-snapshot.txt
+?? scripts/analyze-sdb1560m-task29-from-report.js
+?? scripts/build-sdb1560m-generalization-v1.js
+?? scripts/build-task31-triage-from-reports.js
+?? scripts/build-task32-grounding-analysis.js
+?? scripts/compare-task30-task31-generalization.js
+?? scripts/eval/
+?? scripts/pack-sdb1560m-archive.ps1
+?? scripts/run-sdb1560m-eval-v1.js
+?? scripts/sdb1560m-eval-http-client.js
+?? scripts/sdb1560m-eval-runner-lib.js
+?? scripts/sdb1560m-http-test-lib.js
+?? scripts/test-sdb1560m-ad-hoc-probe.js
+?? scripts/test-sdb1560m-eval-runner-counterexamples.js
+?? scripts/test-sdb1560m-eval-runner-unit.js
+?? scripts/test-sdb1560m-generalization-v1-dataset.js
+?? scripts/test-sdb1560m-live-regression.js
+?? scripts/test-sdb1560m-task17-mass-mismatch.js
+?? scripts/test-sdb1560m-task23-eval-repair.js
+?? scripts/test-sdb1560m-task25-rag-control.js
+?? scripts/test-sdb1560m-task26-alarm-rag.js
+?? scripts/test-sdb1560m-task27-extract-routing.js
+?? scripts/test-sdb1560m-task30-routing-extract.js
+?? scripts/test-sdb1560m-task31-regression.js
+?? scripts/test-sdb1560m-task32-grounding.js
+?? src/rag/eval-capture.js
+?? src/rag/pipeline/chunk-select.js
+?? src/rag/synthesis/sdb1560-grounding-contract.js
+8523954fadcc4f31b92305f81b8dfc09f3e61a14

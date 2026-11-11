@@ -1,0 +1,2032 @@
+{
+  "meta": {
+    "sourceReport": "logs/baseline-task44/task28-generalization-http/report.json",
+    "evalRunner": "1.11-task43-r1",
+    "git": {
+      "commit": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+      "branch": "backup/sova-portal",
+      "dirty": true,
+      "dirtyLineCount": 168,
+      "interpretResultsAsHeadOnly": false,
+      "note": "Working tree dirty — results may include uncommitted changes not in commit"
+    },
+    "summary": {
+      "total": 110,
+      "pass": 74,
+      "fail": 32,
+      "blocked": 0,
+      "infrastructure_error": 0,
+      "not_run": 0,
+      "not_evaluable": 4
+    },
+    "failCount": 32,
+    "notEvaluableCount": 4,
+    "distribution": {
+      "EVALUATOR_MISMATCH": 2,
+      "RETRIEVAL_FAILURE": 12,
+      "GENERATION_ERROR": 8,
+      "RETRIEVAL_RANKING": 4,
+      "ABSTENTION_POLICY": 6
+    },
+    "confidence": {
+      "HIGH": 2,
+      "MEDIUM": 23,
+      "LOW": 7
+    }
+  },
+  "notEvaluable": [
+    {
+      "caseId": "gen.num.ip55",
+      "message": "Какой класс защиты не ниже указан для шкафа?",
+      "overall": {
+        "status": "not_evaluable",
+        "reason": "factual_heuristic_limit"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_evaluable",
+          "detail": "heuristic cannot verify requiredFacts safely",
+          "missing": [
+            {
+              "claimPattern": "IP55",
+              "factId": null,
+              "status": "not_evaluable",
+              "reason": "unsafe_text_pattern"
+            }
+          ]
+        },
+        "grounding": {
+          "status": "fail",
+          "detail": "required fact not found in evidence segments",
+          "missing": [
+            {
+              "claimPattern": "IP55",
+              "factId": null,
+              "detail": "required fact not found in evidence segments"
+            }
+          ]
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        }
+      }
+    },
+    {
+      "caseId": "gen.ind.red-door",
+      "message": "Постоянный красный световой сигнал при зелёном — что произошло?",
+      "overall": {
+        "status": "not_evaluable",
+        "reason": "factual_heuristic_limit"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_evaluable",
+          "detail": "heuristic cannot verify requiredFacts safely",
+          "missing": [
+            {
+              "claimPattern": "двер",
+              "factId": null,
+              "status": "not_evaluable",
+              "reason": "unsafe_text_pattern"
+            }
+          ]
+        },
+        "grounding": {
+          "status": "fail",
+          "detail": "required fact not found in evidence segments",
+          "missing": [
+            {
+              "claimPattern": "двер",
+              "factId": null,
+              "detail": "required fact not found in evidence segments"
+            }
+          ]
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        }
+      }
+    },
+    {
+      "caseId": "gen.sym.n2",
+      "message": "Символ N2 на дисплее — что подключено?",
+      "overall": {
+        "status": "not_evaluable",
+        "reason": "factual_heuristic_limit"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_evaluable",
+          "detail": "heuristic cannot verify requiredFacts safely",
+          "missing": [
+            {
+              "claimPattern": "азот",
+              "factId": null,
+              "status": "not_evaluable",
+              "reason": "unsafe_text_pattern"
+            }
+          ]
+        },
+        "grounding": {
+          "status": "fail",
+          "detail": "required fact not found in evidence segments",
+          "missing": [
+            {
+              "claimPattern": "азот",
+              "factId": null,
+              "detail": "required fact not found in evidence segments"
+            }
+          ]
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        }
+      }
+    },
+    {
+      "caseId": "gen.para.ip",
+      "message": "Степень защиты корпуса по IP?",
+      "overall": {
+        "status": "not_evaluable",
+        "reason": "factual_heuristic_limit"
+      },
+      "layers": {
+        "factual": {
+          "status": "not_evaluable",
+          "detail": "heuristic cannot verify requiredFacts safely",
+          "missing": [
+            {
+              "claimPattern": "IP55",
+              "factId": null,
+              "status": "not_evaluable",
+              "reason": "unsafe_text_pattern"
+            }
+          ]
+        },
+        "grounding": {
+          "status": "fail",
+          "detail": "required fact not found in evidence segments",
+          "missing": [
+            {
+              "claimPattern": "IP55",
+              "factId": null,
+              "detail": "required fact not found in evidence segments"
+            }
+          ]
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        }
+      }
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "gen.num.pwr-regen",
+      "message": "Потолок мощности в режиме регенерации осушителя для SDB1560М?",
+      "category": "numeric_spec",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "540",
+          "unit": "W",
+          "sourceHint": "PDF p.6 п.1.1.2.7д"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "540",
+          "factId": null,
+          "status": "fail",
+          "reason": "contradiction"
+        }
+      ],
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Максимальная потребляемая мощность: в режиме **осушения** — **не более 40 Вт**, в режиме **регенерации** осушителя — **не более 540 Вт** (п. 1.1.2.7).",
+      "extractKind": "power_dry_regen",
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "EVALUATOR_MISMATCH",
+      "secondaryCategories": [],
+      "confidence": "HIGH",
+      "evidence": [
+        "contradiction on required fact despite composite answer: 540"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P3: EVALUATOR_MISMATCH — review gen.num.pwr-regen",
+      "backlogPriority": "P3",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": "power_regen",
+        "symptom": "humidity",
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [
+          "humidity"
+        ],
+        "parameterResolved": null,
+        "originalQuery": "Потолок мощности в режиме регенерации осушителя для SDB1560М?"
+      }
+    },
+    {
+      "caseId": "gen.num.rh-range-high",
+      "message": "Верхняя граница диапазона поддержания RH% внутри рабочего объёма?",
+      "category": "numeric_spec",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "80",
+          "unit": null,
+          "sourceHint": "PDF p.4 п.1.1.2.1"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "80",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Верхняя граница диапазона поддержания относительной влажности (RH%) внутри рабочего объема шкафа не должна превышать значение относительной влажности окружающей среды.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "missing: 80",
+        "fact not in diagnostic snippets (truncated)"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P1: RETRIEVAL_FAILURE — review gen.num.rh-range-high",
+      "backlogPriority": "P1",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": "humidity",
+        "symptom": "humidity",
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [
+          "humidity"
+        ],
+        "parameterResolved": {
+          "parameterKey": "humidity_range",
+          "confidence": 0.58,
+          "matchedAlias": "rh%"
+        },
+        "originalQuery": "Верхняя граница диапазона поддержания RH% внутри рабочего объёма?"
+      }
+    },
+    {
+      "caseId": "gen.num.rh-accuracy",
+      "message": "Точность поддержания установленного диапазона влажности?",
+      "category": "numeric_spec",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "1",
+          "unit": null,
+          "sourceHint": "PDF p.4 п.1.1.2.3"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "1",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Диапазон поддержания относительной влажности внутри рабочего объёма SDB1560NM — **0–80 %RH**, но не выше влажности окружающего воздуха (п. 1.1.2.1).",
+      "extractKind": "rh_range",
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "GENERATION_ERROR",
+      "secondaryCategories": [],
+      "confidence": "LOW",
+      "evidence": [
+        "missing: 1"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: GENERATION_ERROR — review gen.num.rh-accuracy",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": "humidity",
+        "symptom": "humidity",
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [
+          "humidity"
+        ],
+        "parameterResolved": {
+          "parameterKey": "humidity_range",
+          "confidence": 0.52,
+          "matchedAlias": "humidity"
+        },
+        "originalQuery": "Точность поддержания установленного диапазона влажности?"
+      }
+    },
+    {
+      "caseId": "gen.num.ral",
+      "message": "Какой цвет корпуса RAL указан в РЭ?",
+      "category": "numeric_spec",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "7035",
+          "unit": null,
+          "sourceHint": "PDF p.7 п.1.1.2.10"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "fail",
+      "groundingDetail": "required fact not found in evidence segments",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В предоставленном контексте не указан конкретный цвет RAL для корпуса шкафа SDB1560M.",
+      "extractKind": null,
+      "chunkTextCount": 14,
+      "sourceDocs": [
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "no fact in snippets; chunkTextCount=14"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_FAILURE — review gen.num.ral",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Какой цвет корпуса RAL указан в РЭ?"
+      }
+    },
+    {
+      "caseId": "gen.kit.wheels",
+      "message": "Сколько колёс для транспортирования в базовой поставке SDB1560М?",
+      "category": "kit_completeness",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "4",
+          "unit": null,
+          "sourceHint": "PDF table 1.2 p.10"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В предоставленном контексте не указано количество колёс для транспортирования в базовой поставке SDB1560М.",
+      "extractKind": null,
+      "chunkTextCount": 14,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_RANKING",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "fact 4 in truncated snippets but abstain answer"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_RANKING — review gen.kit.wheels",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Сколько колёс для транспортирования в базовой поставке SDB1560М?"
+      }
+    },
+    {
+      "caseId": "gen.kit.shelves-perf",
+      "message": "Сколько полок с перфорацией для SDB1560М в таблице 1.2?",
+      "category": "kit_completeness",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "4",
+          "unit": null,
+          "sourceHint": "PDF table 1.2 p.10 item 8.6"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "4",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В шкафу SDB1560NM предусмотрено **2 полки**.",
+      "extractKind": "kit_shelf",
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "GENERATION_ERROR",
+      "secondaryCategories": [],
+      "confidence": "LOW",
+      "evidence": [
+        "missing: 4"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: GENERATION_ERROR — review gen.kit.shelves-perf",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": "kit_shelf_count",
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Сколько полок с перфорацией для SDB1560М в таблице 1.2?"
+      }
+    },
+    {
+      "caseId": "gen.kit.power-cord",
+      "message": "Минимальная длина шнура питания в комплекте?",
+      "category": "kit_completeness",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "4",
+          "unit": "m",
+          "sourceHint": "PDF table 1.2 p.10"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "4",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Минимальная длина шнура питания в комплекте для модели SDB1560М не менее 4 м.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "GENERATION_ERROR",
+      "secondaryCategories": [],
+      "confidence": "LOW",
+      "evidence": [
+        "missing: 4"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: GENERATION_ERROR — review gen.kit.power-cord",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": "voltage",
+        "symptom": "power",
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [
+          "power"
+        ],
+        "parameterResolved": {
+          "parameterKey": "power_voltage",
+          "confidence": 0.52,
+          "matchedAlias": "voltage"
+        },
+        "originalQuery": "Минимальная длина шнура питания в комплекте?"
+      }
+    },
+    {
+      "caseId": "gen.opt.feeder-basket-min",
+      "message": "Минимальное число корзин питателей для SDB1560М по опциям?",
+      "category": "kit_completeness",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "1",
+          "unit": null,
+          "sourceHint": "PDF table 1.4 p.11 item 9"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "1",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Минимальное число корзин питателей для модели SDB1560М по опциям составляет 1.",
+      "extractKind": null,
+      "chunkTextCount": 12,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "GENERATION_ERROR",
+      "secondaryCategories": [],
+      "confidence": "LOW",
+      "evidence": [
+        "missing: 1"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: GENERATION_ERROR — review gen.opt.feeder-basket-min",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Минимальное число корзин питателей для SDB1560М по опциям?"
+      }
+    },
+    {
+      "caseId": "gen.opt.feeder-basket-max",
+      "message": "Максимальное число корзин питателей для SDB1560М?",
+      "category": "kit_completeness",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "2",
+          "unit": null,
+          "sourceHint": "PDF table 1.4 p.11 item 9"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "2",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Максимальное число корзин питателей для модели SDB1560М — от 1 до 2.",
+      "extractKind": null,
+      "chunkTextCount": 14,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "GENERATION_ERROR",
+      "secondaryCategories": [],
+      "confidence": "LOW",
+      "evidence": [
+        "missing: 2"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: GENERATION_ERROR — review gen.opt.feeder-basket-max",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Максимальное число корзин питателей для SDB1560М?"
+      }
+    },
+    {
+      "caseId": "gen.maint.dust-months",
+      "message": "Как часто продувать от пыли узел поддержания температуры (если опция есть)?",
+      "category": "maintenance",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "12",
+          "unit": null,
+          "sourceHint": "PDF table 3.1 p.35"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В предоставленном контексте нет информации о частоте продувки узла поддержания температуры от пыли для модели SDB1560M. Таким образом, на основе только данного контекста, конкретная информация об этом параметре недоступна.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "no fact in snippets; chunkTextCount=10"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_FAILURE — review gen.maint.dust-months",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": "temperature",
+        "symptom": null,
+        "confidence": 0.86,
+        "retrievalMode": "hybrid_wide",
+        "sectionHints": [
+          "1.1.2",
+          "3.1",
+          "техническ",
+          "обслуживани",
+          "замен",
+          "ресурс",
+          "осушител"
+        ],
+        "symptoms": [],
+        "parameterResolved": {
+          "parameterKey": "ambient_temperature",
+          "confidence": 0.52,
+          "matchedAlias": "temperature"
+        },
+        "originalQuery": "Как часто продувать от пыли узел поддержания температуры (если опция есть)?"
+      }
+    },
+    {
+      "caseId": "gen.maint.power-cable",
+      "message": "Как часто проверять кабель сетевого питания 220 В?",
+      "category": "maintenance",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "1",
+          "unit": null,
+          "sourceHint": "PDF table 3.1 p.35"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В документации на данную модель этот параметр не указан.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "no fact in snippets; chunkTextCount=10"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_FAILURE — review gen.maint.power-cable",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "TROUBLESHOOTING_QUERY",
+        "route": "TROUBLESHOOTING_QA",
+        "focusParameter": "voltage",
+        "symptom": "power",
+        "confidence": 0.87,
+        "retrievalMode": "troubleshooting_focused",
+        "symptoms": [
+          "power"
+        ],
+        "parameterResolved": {
+          "parameterKey": "power_voltage",
+          "confidence": 0.6,
+          "matchedAlias": "220 в"
+        },
+        "originalQuery": "Как часто проверять кабель сетевого питания 220 В?"
+      }
+    },
+    {
+      "caseId": "gen.proc.sound-door",
+      "message": "Когда включается звуковая сигнализация по двери?",
+      "category": "alarm_troubleshooting",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "открыт",
+          "unit": null,
+          "sourceHint": "PDF p.15 п.1.1.4.3.4"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В предоставленном контексте нет конкретной информации о том, когда включается звуковая сигнализация по двери. Однако, на основании общих принципов работы подобных устройств, звуковая сигнализация по двери обычно включается при неплотном закрытии дверей или при открытии дверей во время работы шкафа. \n\nДля точной информа",
+      "extractKind": null,
+      "chunkTextCount": 14,
+      "sourceDocs": [
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_RANKING",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "fact открыт in truncated snippets but abstain answer"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_RANKING — review gen.proc.sound-door",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "TROUBLESHOOTING_QUERY",
+        "route": "TROUBLESHOOTING_QA",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.87,
+        "retrievalMode": "troubleshooting_focused",
+        "symptoms": [
+          "beep",
+          "door"
+        ],
+        "parameterResolved": null,
+        "originalQuery": "Когда включается звуковая сигнализация по двери?",
+        "sectionHints": [
+          "Симптом:",
+          "Неисправность",
+          "3.2",
+          "типовые",
+          "2.2.2"
+        ]
+      }
+    },
+    {
+      "caseId": "gen.proc.door-fan-off",
+      "message": "Что происходит с вентилятором осушителя при открытой двери?",
+      "category": "alarm_troubleshooting",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "отключ",
+          "unit": null,
+          "sourceHint": "PDF п.1.1.4.4.1 / card door-close-dry"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В контексте не указано конкретное действие, которое происходит с вентилятором осушителя при открытой двери. Однако, известно, что при открытии двери Шкафа звучит звуковой сигнал, и при закрытии двери Шкафа звуковой сигнал отключается. Информация о работе вентилятора осушителя при открытой двери не предоставлена.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "no fact in snippets; chunkTextCount=10"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_FAILURE — review gen.proc.door-fan-off",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "FACT_QUERY",
+        "route": "REASONING_QA",
+        "focusParameter": null,
+        "symptom": "humidity",
+        "confidence": 0.82,
+        "retrievalMode": "reasoning_causal",
+        "symptoms": [
+          "humidity",
+          "door"
+        ],
+        "parameterResolved": null,
+        "originalQuery": "Что происходит с вентилятором осушителя при открытой двери?"
+      }
+    },
+    {
+      "caseId": "gen.multi.mass-depth",
+      "message": "Назовите массу и глубину SDB1560М по Таблице 1.1.",
+      "category": "numeric_spec",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "260",
+          "unit": "kg",
+          "sourceHint": "PDF table 1.1 p.7"
+        },
+        {
+          "pattern": "1028",
+          "unit": "mm",
+          "sourceHint": "PDF table 1.1 p.7"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В документации на данную модель этот параметр не указан.",
+      "extractKind": "mass_and_dimensions",
+      "chunkTextCount": 11,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_RANKING",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "fact 1028 in truncated snippets but abstain answer"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_RANKING — review gen.multi.mass-depth",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": "dimensions",
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Назовите массу и глубину SDB1560М по Таблице 1.1."
+      }
+    },
+    {
+      "caseId": "gen.para.storage-w",
+      "message": "Сколько максимум ватт в режиме поддержания влажности без опций?",
+      "category": "numeric_spec",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "8",
+          "unit": "W",
+          "sourceHint": "PDF p.5"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В документации на данную модель этот параметр не указан.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "no fact in snippets; chunkTextCount=10"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_FAILURE — review gen.para.storage-w",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": "humidity",
+        "symptom": "humidity",
+        "confidence": 0.92,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [
+          "humidity"
+        ],
+        "parameterResolved": {
+          "parameterKey": "humidity_range",
+          "confidence": 0.52,
+          "matchedAlias": "humidity"
+        },
+        "originalQuery": "Сколько максимум ватт в режиме поддержания влажности без опций?"
+      }
+    },
+    {
+      "caseId": "gen.para.desiccant-qty",
+      "message": "Число блоков осушителя у SDB1560М в базовой комплектации?",
+      "category": "paraphrase",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "2",
+          "unit": null,
+          "sourceHint": "PDF table 1.2"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "2",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Число блоков осушителя у модели SDB1560М в базовой комплектации: 2.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "GENERATION_ERROR",
+      "secondaryCategories": [],
+      "confidence": "LOW",
+      "evidence": [
+        "missing: 2"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: GENERATION_ERROR — review gen.para.desiccant-qty",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": null,
+        "symptom": "humidity",
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [
+          "humidity"
+        ],
+        "parameterResolved": null,
+        "originalQuery": "Число блоков осушителя у SDB1560М в базовой комплектации?"
+      }
+    },
+    {
+      "caseId": "gen.para.36m",
+      "message": "Через сколько месяцев менять блок осушения по графику ТО?",
+      "category": "paraphrase",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "36",
+          "unit": null,
+          "sourceHint": "PDF table 3.1"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В предоставленном контексте не указано конкретное время для замены блока осушения по графику технического обслуживания для модели SDB1560M. Поэтому, на основе доступной информации, невозможно предоставить точный ответ на этот вопрос.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_RANKING",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "fact 36 in truncated snippets but abstain answer"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_RANKING — review gen.para.36m",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": null,
+        "symptom": "humidity",
+        "confidence": 0.86,
+        "retrievalMode": "hybrid_wide",
+        "sectionHints": [
+          "1.1.2",
+          "3.1",
+          "техническ",
+          "обслуживани",
+          "замен",
+          "ресурс",
+          "осушител"
+        ],
+        "symptoms": [
+          "humidity"
+        ],
+        "parameterResolved": null,
+        "originalQuery": "Через сколько месяцев менять блок осушения по графику ТО?"
+      }
+    },
+    {
+      "caseId": "gen.disc.storage-vs-dry",
+      "message": "Чем отличается 8 Вт от 40 Вт в ТТХ SDB1560М (какой режим 40 Вт)?",
+      "category": "numeric_spec",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "40",
+          "unit": "W",
+          "sourceHint": "PDF p.5–6"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "40",
+          "factId": null,
+          "status": "fail",
+          "reason": "contradiction"
+        }
+      ],
+      "groundingStatus": "fail",
+      "groundingDetail": "required fact not found in evidence segments",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Максимальная потребляемая мощность Шкафа SDB1560М составляет 8 Вт в режиме хранения и 40 Вт в режиме осушения. \n\n- 8 Вт – это потребляемая мощность в режиме хранения.\n- 40 Вт – это потребляемая мощность в режиме осушения.",
+      "extractKind": null,
+      "chunkTextCount": 14,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "EVALUATOR_MISMATCH",
+      "secondaryCategories": [
+        "GROUNDING_FAILURE"
+      ],
+      "confidence": "HIGH",
+      "evidence": [
+        "contradiction on required fact despite composite answer: 40"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P3: EVALUATOR_MISMATCH — review gen.disc.storage-vs-dry",
+      "backlogPriority": "P3",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.84,
+        "retrievalMode": "hybrid_wide",
+        "sectionHints": [
+          "1.1.3",
+          "1.1.2",
+          "условия",
+          "эксплуатац"
+        ],
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Чем отличается 8 Вт от 40 Вт в ТТХ SDB1560М (какой режим 40 Вт)?"
+      }
+    },
+    {
+      "caseId": "gen.disc.810-storage-vs-dry",
+      "message": "810 Вт с опциями — это режим хранения или осушения для SDB1560М?",
+      "category": "numeric_spec",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "810",
+          "unit": "W",
+          "sourceHint": "PDF p.5–6"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В документации на данную модель этот параметр не указан.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "no fact in snippets; chunkTextCount=10"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_FAILURE — review gen.disc.810-storage-vs-dry",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": null,
+        "symptom": "humidity",
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [
+          "humidity"
+        ],
+        "parameterResolved": null,
+        "originalQuery": "810 Вт с опциями — это режим хранения или осушения для SDB1560М?"
+      }
+    },
+    {
+      "caseId": "gen.foreign.mass-1106",
+      "message": "Сколько kilogram весит SDB1106 по той же таблице габаритов?",
+      "category": "foreign_model",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "160",
+          "unit": "kg",
+          "sourceHint": "PDF table 1.1 p.7"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "160",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "not_evaluable",
+      "groundingDetail": "grounding requires chunk bodies, not sources list alone",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Я специализируюсь только на модели SDB1560 M. Могу подсказать параметры и эксплуатацию именно этого устройства.",
+      "extractKind": null,
+      "chunkTextCount": null,
+      "sourceDocs": [],
+      "primaryCategory": "GENERATION_ERROR",
+      "secondaryCategories": [],
+      "confidence": "LOW",
+      "evidence": [
+        "missing: 160"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: GENERATION_ERROR — review gen.foreign.mass-1106",
+      "backlogPriority": "P2",
+      "router": null
+    },
+    {
+      "caseId": "gen.unsup.bluetooth",
+      "message": "Есть Bluetooth для настройки?",
+      "category": "unsupported_by_manual",
+      "mode": "must_abstain",
+      "requiredFacts": [],
+      "overall": {
+        "status": "fail",
+        "reason": "abstention"
+      },
+      "factualStatus": "not_applicable",
+      "factualDetail": "must_abstain case",
+      "factualMissing": null,
+      "groundingStatus": "not_evaluable",
+      "groundingDetail": "grounding requires chunk bodies, not sources list alone",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В документации не упоминается использование Bluetooth для настройки Шкафа SDB1560NM. Подключение осуществляется через кабель Ethernet и панель управления.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "ABSTENTION_POLICY",
+      "secondaryCategories": [],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_abstain fail: substantive or pattern mismatch"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P0: ABSTENTION_POLICY — review gen.unsup.bluetooth",
+      "backlogPriority": "P0",
+      "router": {
+        "intent": "FACT_QUERY",
+        "route": "REASONING_QA",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "reasoning_causal",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Есть Bluetooth для настройки?"
+      }
+    },
+    {
+      "caseId": "gen.unsup.sdb151-mass-for-1560",
+      "message": "Сколько весит SDB151 — нужно для расчёта помещения под SDB1560М.",
+      "category": "unsupported_by_manual",
+      "mode": "must_abstain",
+      "requiredFacts": [],
+      "overall": {
+        "status": "fail",
+        "reason": "abstention"
+      },
+      "factualStatus": "not_applicable",
+      "factualDetail": "must_abstain case",
+      "factualMissing": null,
+      "groundingStatus": "not_evaluable",
+      "groundingDetail": "grounding requires chunk bodies, not sources list alone",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Я специализируюсь только на модели SDB1560 M. Могу подсказать параметры и эксплуатацию именно этого устройства.",
+      "extractKind": null,
+      "chunkTextCount": null,
+      "sourceDocs": [],
+      "primaryCategory": "ABSTENTION_POLICY",
+      "secondaryCategories": [],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_abstain fail: substantive or pattern mismatch"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P0: ABSTENTION_POLICY — review gen.unsup.sdb151-mass-for-1560",
+      "backlogPriority": "P0",
+      "router": null
+    },
+    {
+      "caseId": "gen.unsup.warehouse-humidity-setpoint",
+      "message": "Какую влажность установить для хранения печатных плат без указания класса?",
+      "category": "unsupported_by_manual",
+      "mode": "must_abstain",
+      "requiredFacts": [],
+      "overall": {
+        "status": "fail",
+        "reason": "abstention"
+      },
+      "factualStatus": "not_applicable",
+      "factualDetail": "must_abstain case",
+      "factualMissing": null,
+      "groundingStatus": "not_evaluable",
+      "groundingDetail": "grounding requires chunk bodies, not sources list alone",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Установленное значение относительной влажности внутри рабочего объема Шкафа для диапазона от 30RH% и выше должно быть не более RH%окр.ср. - 20RH%.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "ABSTENTION_POLICY",
+      "secondaryCategories": [],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_abstain fail: substantive or pattern mismatch"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P0: ABSTENTION_POLICY — review gen.unsup.warehouse-humidity-setpoint",
+      "backlogPriority": "P0",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": "humidity",
+        "symptom": "humidity",
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [
+          "humidity"
+        ],
+        "parameterResolved": {
+          "parameterKey": "humidity_range",
+          "confidence": 0.64,
+          "matchedAlias": "влажность"
+        },
+        "originalQuery": "Какую влажность установить для хранения печатных плат без указания класса?"
+      }
+    },
+    {
+      "caseId": "gen.insuf.n2-without-option",
+      "message": "Какой расход азота у шкафа без установленной опции азота?",
+      "category": "unsupported_by_manual",
+      "mode": "must_abstain",
+      "requiredFacts": [],
+      "overall": {
+        "status": "fail",
+        "reason": "abstention"
+      },
+      "factualStatus": "not_applicable",
+      "factualDetail": "must_abstain case",
+      "factualMissing": null,
+      "groundingStatus": "not_evaluable",
+      "groundingDetail": "grounding requires chunk bodies, not sources list alone",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+      "extractKind": "n2_option",
+      "chunkTextCount": 11,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "ABSTENTION_POLICY",
+      "secondaryCategories": [],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_abstain fail: substantive or pattern mismatch"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P0: ABSTENTION_POLICY — review gen.insuf.n2-without-option",
+      "backlogPriority": "P0",
+      "router": {
+        "intent": "SINGLE_FIELD_QUERY",
+        "route": "UNKNOWN",
+        "focusParameter": "nitrogen",
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "hybrid_wide",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Какой расход азота у шкафа без установленной опции азота?"
+      }
+    },
+    {
+      "caseId": "gen.std.esd",
+      "message": "Каким стандартам по ESD соответствует шкаф?",
+      "category": "numeric_spec",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "61340",
+          "unit": null,
+          "sourceHint": "PDF p.7 п.1.1.2.9"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "61340",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Шкаф снабжен антистатическим тканевым браслетом с кнопкой (STUD) диаметром 4 мм и проводом для подключения, а также витым проводом функционального заземления с резистором сопротивлением 1 МОм, что соответствует требованиям по защите от статического электричества (ESD).",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "missing: 61340",
+        "fact not in diagnostic snippets (truncated)"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P1: RETRIEVAL_FAILURE — review gen.std.esd",
+      "backlogPriority": "P1",
+      "router": {
+        "intent": "FACT_QUERY",
+        "route": "REASONING_QA",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "reasoning_causal",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Каким стандартам по ESD соответствует шкаф?"
+      }
+    },
+    {
+      "caseId": "gen.spare.lock-excluded",
+      "message": "Входит ли запасной замок на каждую дверь в перечень запасных частей для SDB1560M?",
+      "category": "kit_completeness",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "кроме.*1560|1560M\\)",
+          "unit": null,
+          "sourceHint": "PDF table 1.3 p.11 item 1"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В предоставленном контексте нет информации о перечне запасных частей для модели SDB1560M, включая наличие запасного замка на каждую дверь.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "no fact in snippets; chunkTextCount=10"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_FAILURE — review gen.spare.lock-excluded",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "FACT_QUERY",
+        "route": "REASONING_QA",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.86,
+        "retrievalMode": "reasoning_causal",
+        "sectionHints": [
+          "1.1.2",
+          "3.1",
+          "техническ",
+          "обслуживани",
+          "замен",
+          "ресурс",
+          "осушител"
+        ],
+        "symptoms": [
+          "door"
+        ],
+        "parameterResolved": null,
+        "originalQuery": "Входит ли запасной замок на каждую дверь в перечень запасных частей для SDB1560M?"
+      }
+    },
+    {
+      "caseId": "gen.rh.rule-below30",
+      "message": "Для уставки 0–30 RH% установка не выше какой величины относительно окружающей?",
+      "category": "numeric_spec",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "10",
+          "unit": null,
+          "sourceHint": "PDF p.4–5 ВНИМАНИЕ п.2"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "10",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "fail",
+      "groundingDetail": "required fact not found in evidence segments",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Для уставки 0–30 RH%, влажность внутри рабочего объема Шкафа поддерживается не выше окружающей влажности.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "retrieval-cards/humidity-time.md"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "missing: 10",
+        "fact not in diagnostic snippets (truncated)"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P1: RETRIEVAL_FAILURE — review gen.rh.rule-below30",
+      "backlogPriority": "P1",
+      "router": {
+        "intent": "TROUBLESHOOTING_QUERY",
+        "route": "TROUBLESHOOTING_QA",
+        "focusParameter": "humidity",
+        "symptom": "humidity",
+        "confidence": 0.87,
+        "retrievalMode": "troubleshooting_focused",
+        "symptoms": [
+          "humidity"
+        ],
+        "parameterResolved": {
+          "parameterKey": "humidity_range",
+          "confidence": 0.58,
+          "matchedAlias": "rh%"
+        },
+        "originalQuery": "Для уставки 0–30 RH% установка не выше какой величины относительно окружающей?"
+      }
+    },
+    {
+      "caseId": "gen.ind.green-only-storage",
+      "message": "Если горит только зелёный (без красного и жёлтого), какой режим?",
+      "category": "paraphrase",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "Хранен",
+          "unit": null,
+          "sourceHint": "PDF p.15"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "missing or contradicted required facts",
+      "factualMissing": [
+        {
+          "claimPattern": "Хранен",
+          "factId": null,
+          "status": "fail",
+          "reason": "missing_or_negated"
+        }
+      ],
+      "groundingStatus": "pass",
+      "groundingDetail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Если горит только зелёный индикатор, то Шкаф работает в режиме «Осушения».",
+      "extractKind": null,
+      "chunkTextCount": 12,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "GENERATION_ERROR",
+      "secondaryCategories": [],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "missing: Хранен",
+        "fact not in diagnostic snippets (truncated)",
+        "text claim required"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P1: GENERATION_ERROR — review gen.ind.green-only-storage",
+      "backlogPriority": "P1",
+      "router": {
+        "intent": "TROUBLESHOOTING_QUERY",
+        "route": "TROUBLESHOOTING_QA",
+        "focusParameter": null,
+        "symptom": "indicator",
+        "confidence": 0.87,
+        "retrievalMode": "troubleshooting_focused",
+        "symptoms": [
+          "indicator"
+        ],
+        "parameterResolved": null,
+        "originalQuery": "Если горит только зелёный (без красного и жёлтого), какой режим?"
+      }
+    },
+    {
+      "caseId": "gen.unsup.blockchain",
+      "message": "Записывает ли шкаф данные в блокчейн?",
+      "category": "unsupported_by_manual",
+      "mode": "must_abstain",
+      "requiredFacts": [],
+      "overall": {
+        "status": "fail",
+        "reason": "abstention"
+      },
+      "factualStatus": "not_applicable",
+      "factualDetail": "must_abstain case",
+      "factualMissing": null,
+      "groundingStatus": "not_evaluable",
+      "groundingDetail": "grounding requires chunk bodies, not sources list alone",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В предоставленном контексте нет информации о том, что шкаф SDB1560M записывает данные в блокчейн. Все упомянутые функции и характеристики шкафа не включают работу с блокчейн-технологиями.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "ABSTENTION_POLICY",
+      "secondaryCategories": [],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_abstain fail: substantive or pattern mismatch"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P0: ABSTENTION_POLICY — review gen.unsup.blockchain",
+      "backlogPriority": "P0",
+      "router": {
+        "intent": "FACT_QUERY",
+        "route": "REASONING_QA",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "reasoning_causal",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Записывает ли шкаф данные в блокчейн?"
+      }
+    },
+    {
+      "caseId": "gen.unsup.serial-format",
+      "message": "Как расшифровать серийный номер на шильдике?",
+      "category": "unsupported_by_manual",
+      "mode": "must_abstain",
+      "requiredFacts": [],
+      "overall": {
+        "status": "fail",
+        "reason": "abstention"
+      },
+      "factualStatus": "not_applicable",
+      "factualDetail": "must_abstain case",
+      "factualMissing": null,
+      "groundingStatus": "not_evaluable",
+      "groundingDetail": "grounding requires chunk bodies, not sources list alone",
+      "forbiddenStatus": "pass",
+      "answerPreview": "**Серийный номер** шкафа **SDB1560NM** указан на **заводском знаке (табличке изделия)** (раздел **«Маркировка»**, рис. 1.2 РЭ).\n\nНа табличке также указаны: изготовитель, наименование и модель шкафа, напряжение питания, дата изготовления, страна-изготовитель, сведения о сертификатах.\n\n**Формат серийного номера** (п. «Ма",
+      "extractKind": null,
+      "chunkTextCount": null,
+      "sourceDocs": [],
+      "primaryCategory": "ABSTENTION_POLICY",
+      "secondaryCategories": [],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_abstain fail: substantive or pattern mismatch"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P0: ABSTENTION_POLICY — review gen.unsup.serial-format",
+      "backlogPriority": "P0",
+      "router": {
+        "intent": "FACT_QUERY",
+        "route": "REASONING_QA",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "reasoning_causal",
+        "symptoms": [],
+        "parameterResolved": null,
+        "originalQuery": "Как расшифровать серийный номер на шильдике?"
+      }
+    },
+    {
+      "caseId": "gen.proc.open-door-symbol",
+      "message": "Какой символ на LCD показывает открытую дверь?",
+      "category": "operating_mode",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "двер",
+          "unit": null,
+          "sourceHint": "PDF p.15 п.1.1.4.3.2г"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "fail",
+      "groundingDetail": "required fact not found in evidence segments",
+      "forbiddenStatus": "pass",
+      "answerPreview": "Символ, который на LCD индикаторе показывает открытую дверь Шкафа, не указан явно в предоставленных фрагментах. Однако, в описании символов на LCD индикаторе есть пункт, который относится к состоянию двери:\n\n- символ - дверь Шкафа открыта. \n\nТаким образом,虽然上下文中没有明确指出LCD显示器上表示开门的符号，但可以得出结论，有一个特定的符号表示柜门打开。如果需要具体的符号表示，建议",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "no fact in snippets; chunkTextCount=10"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_FAILURE — review gen.proc.open-door-symbol",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "FACT_QUERY",
+        "route": "REASONING_QA",
+        "focusParameter": null,
+        "symptom": null,
+        "confidence": 0.78,
+        "retrievalMode": "reasoning_causal",
+        "symptoms": [
+          "door"
+        ],
+        "parameterResolved": null,
+        "originalQuery": "Какой символ на LCD показывает открытую дверь?"
+      }
+    },
+    {
+      "caseId": "gen.proc.fan-symbol",
+      "message": "Какой символ означает включённый вентилятор осушителя?",
+      "category": "operating_mode",
+      "mode": "must_answer",
+      "requiredFacts": [
+        {
+          "pattern": "вентилятор",
+          "unit": null,
+          "sourceHint": "PDF p.15 п.1.1.4.3.2в"
+        }
+      ],
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "factualStatus": "fail",
+      "factualDetail": "must_answer but answer is empty or abstain-like",
+      "factualMissing": null,
+      "groundingStatus": "fail",
+      "groundingDetail": "required fact not found in evidence segments",
+      "forbiddenStatus": "pass",
+      "answerPreview": "В предоставленном контексте не указан символ, который означает включённый вентилятор осушителя. Информация об этом не представлена в фрагментах.",
+      "extractKind": null,
+      "chunkTextCount": 10,
+      "sourceDocs": [
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ],
+      "primaryCategory": "RETRIEVAL_FAILURE",
+      "secondaryCategories": [
+        "ABSTENTION_POLICY"
+      ],
+      "confidence": "MEDIUM",
+      "evidence": [
+        "must_answer but answer is empty or abstain-like",
+        "no fact in snippets; chunkTextCount=10"
+      ],
+      "missingEvidence": "snippets truncated to ~200 chars in diagnostics",
+      "recommendedNextStep": "P2: RETRIEVAL_FAILURE — review gen.proc.fan-symbol",
+      "backlogPriority": "P2",
+      "router": {
+        "intent": "FACT_QUERY",
+        "route": "REASONING_QA",
+        "focusParameter": null,
+        "symptom": "humidity",
+        "confidence": 0.78,
+        "retrievalMode": "reasoning_causal",
+        "symptoms": [
+          "humidity"
+        ],
+        "parameterResolved": null,
+        "originalQuery": "Какой символ означает включённый вентилятор осушителя?"
+      }
+    }
+  ]
+}

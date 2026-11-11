@@ -32,6 +32,7 @@ copy .env.example .env
 - `POSTGRES_URL=postgresql://rag:rag_secret_change_me@127.0.0.1:5432/equipment_rag`
 - `SESSION_SECRET=` — случайная строка ≥ 32 символов
 - **`RAG_HONEST_EQUIPMENT=sdb1560m`** — honest-пилот 1560
+- **`RAG_PURE=1`** — embed+LLM only (без extract hot path); см. `docs/RAG_POLICY.md`
 - `AUTH_REQUIRED=1` (портал с входом)
 
 ---
@@ -106,7 +107,9 @@ powershell -File scripts/stop-equipment-stack.ps1 -All
 
 | Команда | Назначение |
 |---------|------------|
-| `npm run test:sdb1560m:honest-smoke:ci` | Honest smoke + HTTP «2 полки», PDF top |
+| `npm run test:sdb1560m:honest-smoke:ci` | Honest smoke + HTTP |
+| `npm run test:sdb1560m:live-regression -- --strict --runs=3` | 20 кейсов, ≥90% × 3 прогона (server не останавливать) |
+| `npm run test:sdb1560m:ad-hoc-probe` | 30 paraphrase, blocking ≥27/30 |
 | `npm run uat:sdb1560m:api` | 8 сценариев UAT через API |
 | `npm run eval:sdb1560m:cards` | Полный eval 100 (долго, ~7–15 мин) |
 | `npm run eval:sdb1560m:phase6-tail` | 4 backlog-id (быстро) |
@@ -154,9 +157,11 @@ npm run user:create -- --help
 
 ## 8. Что не трогать (пилот)
 
-- Модели **без** id в `RAG_HONEST_EQUIPMENT` — по-прежнему legacy deterministic / post-gate где настроено.
+- Модели **без** id в `RAG_HONEST_EQUIPMENT` — legacy deterministic / post-gate где настроено.
 - **Не** расширять honest на 702/1106 без отдельного решения.
-- Новые spec для **1560 honest**: слой **document extract (PDF/table)** — `honest-contextual-extract.js` + inject + focusParameter, **не** `sdb1560m-direct-facts.js`.
+- При **`RAG_PURE=1`**: ТТХ через retrieval+LLM; **`honest-contextual-extract.js` и `sdb1560m-direct-facts` для ТТХ выключены** (см. `docs/RAG_DATA_TRUTH.md`).
+
+Приёмка accuracy 90%: `docs/reports/sdb1560m-accuracy-90-2026-10-28.md`.
 
 ---
 

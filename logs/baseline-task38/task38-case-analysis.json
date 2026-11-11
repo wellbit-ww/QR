@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "task38-case-analysis-v2",
+  "capturedAt": "2026-11-06T12:30:00.000Z",
+  "runner": {
+    "evalRunnerLibVersion": "1.7-task33",
+    "branch": "backup/sova-portal",
+    "gitHeadFromReports": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+    "authMode": "eval_login",
+    "evalBaseUrl": "http://127.0.0.1:3000"
+  },
+  "httpReports": {
+    "expPwrDryBase40": "logs/baseline-task38/targeted-http/exp-pwr-dry-base-40/report.json",
+    "priorityB10": "logs/baseline-task38/targeted-http/priority-b-10/report.json",
+    "task27Full": "logs/baseline-task38/task27-regression-http/report.json",
+    "task28Full": "logs/baseline-task38/task28-generalization-http/report.json"
+  },
+  "task37BaselineReference": {
+    "task27Report": "logs/baseline-task37/task27-v19/report.json",
+    "task28Report": "logs/baseline-task37/task28-v1/report.json",
+    "targetedReport": "logs/baseline-task37/targeted-http-v23/report.json",
+    "task37Doc": "docs/reports/sdb1560m-task37-contextual-extract-diagnosis-and-recovery.md"
+  },
+  "cases": [
+    {
+      "caseId": "exp.num.pwr-dry-base-40",
+      "suiteDataset": "docs/reports/sdb1560m-eval-suite-expanded-v2.json",
+      "httpReport": "logs/baseline-task38/targeted-http/exp-pwr-dry-base-40/report.json",
+      "httpOverall": "pass",
+      "answerPreviewNote": "«не более 40 Вт» / base configuration wording",
+      "confirmedRootCause": "Substring «опци» in «без опций» matched old dryingPowerWithOptions → power_drying_opt → 810 W.",
+      "fixApplied": "dryingConfigurationIsOptional + power_drying kind.",
+      "confidence": "high"
+    },
+    {
+      "caseId": "gen.multi.dry-regen-power",
+      "httpReport": "logs/baseline-task38/targeted-http/priority-b-10/report.json",
+      "httpOverall": "fail",
+      "primaryReason": "factual",
+      "layerDetail": "requiredFacts 40 W and 540 W both fail reason contradiction",
+      "answerPreviewNote": "Single answer with 40 Вт and 540 Вт; extractKind power_dry_regen",
+      "confirmedRootCause": "hasConflictingAlternateNumeric treats second W-number in same answer as contradiction when checking each required fact.",
+      "confidence": "high"
+    },
+    {
+      "caseId": "gen.note.height-signal",
+      "httpReport": "logs/baseline-task38/targeted-http/priority-b-10/report.json",
+      "httpOverall": "fail",
+      "primaryReason": "grounding",
+      "layerDetail": "factual pass; grounding fail — claim без/учета not found in evidence line segments",
+      "answerPreviewNote": "Answer contains «без учета»; extractKind height_table_note",
+      "confidence": "medium"
+    },
+    {
+      "caseId": "gen.rh.rule-above30",
+      "httpReport": "logs/baseline-task38/targeted-http/priority-b-10/report.json",
+      "httpOverall": "fail",
+      "primaryReason": "factual",
+      "layerDetail": "claimPattern 20 missing_or_negated; LLM answer omitted numeric 20; extractKind rh_setpoint_rule without replacing weak answer",
+      "confidence": "medium"
+    },
+    {
+      "caseId": "gen.opt.n2-sensor-max",
+      "httpReport": "logs/baseline-task38/targeted-http/priority-b-10/report.json",
+      "httpOverall": "pass",
+      "note": "Recovered vs Task 37 targeted batch (6/10 → 7/10 on this 10-case HTTP run)",
+      "confidence": "high"
+    }
+  ],
+  "priorityB10Batch": {
+    "pass": [
+      "gen.num.dim-tolerance",
+      "gen.num.pwr-dry-opt810",
+      "gen.kit.feet-height",
+      "gen.opt.n2-timer-max",
+      "gen.opt.n2-sensor-max",
+      "gen.multi.ambient-temp-rh",
+      "gen.multi.n2-flow-range"
+    ],
+    "fail": ["gen.multi.dry-regen-power", "gen.note.height-signal", "gen.rh.rule-above30"]
+  },
+  "fullSuite": {
+    "task27": { "path": "logs/baseline-task38/task27-regression-http/report.json", "summary": "32/32 pass" },
+    "task28": { "path": "logs/baseline-task38/task28-generalization-http/report.json", "summary": "66 pass, 40 fail, 4 not_evaluable, 0 infra" }
+  },
+  "unitTestsRun": [
+    "node scripts/test-sdb1560m-task38-regression-recovery.js",
+    "node scripts/test-sdb1560m-task37-contextual-extract.js",
+    "node scripts/test-sdb1560m-task27-extract-routing.js"
+  ]
+}

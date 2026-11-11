@@ -1,0 +1,724 @@
+{
+  "manifest": {
+    "capturedAt": "2026-11-11T05:40:25.299Z",
+    "schemaVersion": "1.0-eval-contour",
+    "evalRunnerLibVersion": "1.11-task43-r1",
+    "git": {
+      "commit": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+      "branch": "backup/sova-portal",
+      "dirty": true,
+      "dirtyLineCount": 168,
+      "interpretResultsAsHeadOnly": false,
+      "note": "Working tree dirty — results may include uncommitted changes not in commit"
+    },
+    "dataset": {
+      "path": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\scripts\\eval\\sdb1560m-generalization-v1.json",
+      "sha256": "c83ace6d1b08f6030970c02ff3010437ca0c116624ea3d47f5d2048d2062af20",
+      "partition": "all"
+    },
+    "run": {
+      "mode": "http",
+      "noProvision": true,
+      "allowHttp": true,
+      "dryRun": false,
+      "authMode": "eval_login"
+    },
+    "serverEnvFingerprint": {
+      "RAG_HONEST_EQUIPMENT": "sdb1560m",
+      "RAG_PURE": "1",
+      "SOVA_QUERY_REWRITE": "unknown",
+      "OLLAMA_MODEL": "unknown",
+      "EMBEDDING_MODEL": "unknown",
+      "EVAL_BASE_URL": "http://127.0.0.1:3000",
+      "EVAL_LOGIN": "(set)",
+      "EVAL_PASSWORD": "(set)"
+    },
+    "indexFingerprint": {
+      "value": "unknown",
+      "method": "not probed (no DB read by default)"
+    },
+    "skipReasons": [],
+    "secretsPolicy": "passwords and .env contents are never stored"
+  },
+  "caseResults": [
+    {
+      "case": {
+        "id": "gen.rh.rule-above30",
+        "equipmentId": "sdb1560m",
+        "category": "numeric_spec",
+        "message": "Для уставки от 30 RH% и выше — не более RH окружающей минус сколько?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "20",
+            "sourceHint": "PDF p.4–5 ВНИМАНИЕ п.2"
+          }
+        ],
+        "forbiddenClaims": [],
+        "factIds": [],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "history": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "pass",
+          "detail": "required facts supported by prompt chunks and/or source-backed extract corpus (heuristic)"
+        },
+        "_chunkTextCount": 11
+      },
+      "answerPreview": "Для уставки **от 30 RH% и выше** установленное значение влажности внутри шкафа — **не более RH%окр.ср. минус 20 RH%** (величина отступа **20 RH%**) (ВНИМАНИЕ п. 2, §1.1.1).",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "golden-facts-sdb1560m.md",
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 11,
+        "hasDebugTrace": true,
+        "extractKind": "rh_setpoint_rule",
+        "promptChunkTraceCount": 10,
+        "fusedChunkTraceCount": 16
+      }
+    }
+  ],
+  "metrics": {
+    "answer_factual_accuracy": {
+      "numerator": 1,
+      "denominator": 1,
+      "includedCaseIds": [
+        "gen.rh.rule-above30"
+      ],
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "value": 1,
+      "zeroDenominatorBehavior": "value is null; do not report as 100%",
+      "note": "Deterministic number/text heuristic on answer text — not semantic factual accuracy or PDF grounding"
+    },
+    "cross_model_leakage_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "value": null,
+      "note": "numerator = cases where forbidden pattern matched answer"
+    },
+    "regression_pass_rate": {
+      "numerator": 1,
+      "denominator": 1,
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "includedCaseIds": [
+        "gen.rh.rule-above30"
+      ],
+      "value": 1,
+      "note": "pass only when all required layers for the case passed; not_evaluable excluded from denominator"
+    },
+    "retrieval_recall_at_k": {
+      "value": null,
+      "reason": "not computed: requires chunk-level recall evidence"
+    },
+    "grounded_claim_rate": {
+      "value": null,
+      "reason": "not computed unless chunk texts present in payload"
+    },
+    "correct_abstention_rate": {
+      "value": null,
+      "reason": "not aggregated: abstention scoring only per-case when allowedAbstainPatterns set"
+    },
+    "answerable_abstention_rate": {
+      "value": null,
+      "reason": "not computed: requires chunk grounding for answerable context"
+    }
+  },
+  "summary": {
+    "total": 1,
+    "pass": 1,
+    "fail": 0,
+    "blocked": 0,
+    "infrastructure_error": 0,
+    "not_run": 0,
+    "not_evaluable": 0
+  },
+  "diagnosticsByCaseId": {
+    "gen.rh.rule-above30": {
+      "chunkTextCount": 11,
+      "sourceDocCount": 11,
+      "sources": [
+        {
+          "i": 0,
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "page": null,
+          "chunkIndex": 1,
+          "contentLen": 1430,
+          "contentSha256": "d79dad954506acc8",
+          "snippet": "[Модель: SDB1106NM]\n| Параметр | Значение для SDB1560M | Источник |\n|---|---:|---|\n| Ширина × высота × глубина | 1202 × 1693 × 1028 мм | Таблица 1.1 |\n| Масса | 260 кг | Таблица 1.1 |\n| Полки (стандар"
+        },
+        {
+          "i": 1,
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "page": null,
+          "chunkIndex": 0,
+          "contentLen": 354,
+          "contentSha256": "abccde905cf587b9",
+          "snippet": "# Эталонные факты SDB1560NM\n\nИсточник: семейное РЭ `SATE.421411.001.00.00.00.00.00.000 РЭ`, редакция 2026, файл `Руководство SDB1560NM.pdf`.\n\n## Модель и границы\n\nВсе значения ниже относятся только к "
+        },
+        {
+          "i": 2,
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "page": null,
+          "chunkIndex": 2,
+          "contentLen": 360,
+          "contentSha256": "bb3aa2179eaee7f8",
+          "snippet": "[Модель: SDB1106NM]\n## Комплектация\n\n- **4 колеса** для транспортирования и **4 регулируемые ножки** — для SDB1560M в таблице 1.2.\n- **1 осушитель** в базовой поставке (семейная таблица 1.2).\n\n## Непо"
+        },
+        {
+          "i": 3,
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "page": null,
+          "chunkIndex": 27,
+          "contentLen": 1520,
+          "contentSha256": "2782f983b11936cf",
+          "snippet": "[Модель: SDB1106NM]\nвия \nи соответствует требованиям всех распространяющихся на данную продукцию \nтехнических регламентов Таможенного союза.\n\n \n22 \n1.2 \nОПИСАНИЕ И РАБОТА СОСТАВНЫХ ЧАСТЕЙ \n1.2.1 СИСТЕ"
+        },
+        {
+          "i": 4,
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "page": null,
+          "chunkIndex": 30,
+          "contentLen": 1474,
+          "contentSha256": "fa0f060c3e4aad09",
+          "snippet": "[Модель: SDB1106NM]\nэлектромагнитного клапана и \nпредназначен для установки дополнительного расхода азота, который необходим \nдля быстрого вытеснения влажного воздуха из внутреннего рабочего объема \nШ"
+        },
+        {
+          "i": 5,
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "page": null,
+          "chunkIndex": 4,
+          "contentLen": 1360,
+          "contentSha256": "ca8004b06e7f3a54",
+          "snippet": "[Модель: SDB1106NM]\nДНАЗНАЧЕН ДЛЯ ОСУШЕНИЯ ВОЗДУХА ВНУТРИ \nСВОЕГО РАБОЧЕГО ОБЪЕМА И ПОДДЕРЖАНИЯ УСТАНОВЛЕННОГО \nЗНАЧЕНИЯ С ТОЧНОСТЬЮ ± 1RH%;\n\n \n5 \n2) ШКАФ \nНЕ \nПРЕДНАЗНАЧЕН \nДЛЯ \nРАБОТЫ \nВ \nРЕЖИМЕ \nПО"
+        },
+        {
+          "i": 6,
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "page": null,
+          "chunkIndex": 3,
+          "contentLen": 1359,
+          "contentSha256": "505e819379b3b15a",
+          "snippet": "[Модель: SDB1106NM]\nизучившие настоящее РЭ и имеющие: \n− группу по электробезопасности не ниже I; \n− опыт работы на персональном компьютере.\n\n \n4 \n1 ОПИСАНИЕ И РАБОТА \n1.1 ОПИСАНИЕ И РАБОТА ШКАФА \n1.1"
+        },
+        {
+          "i": 7,
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "page": null,
+          "chunkIndex": 7,
+          "contentLen": 1520,
+          "contentSha256": "0124c95ae682c7ec",
+          "snippet": "[Модель: SDB1106NM]\nдля подключения \nкабеля Ethernet приведены в Приложении В. \n1.1.2.9 По способу защиты электронных устройств от электростатических \nявлений \nШкаф \nсоответствует \nтребованиям \nГОСТ I"
+        },
+        {
+          "i": 8,
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "page": null,
+          "chunkIndex": 6,
+          "contentLen": 1520,
+          "contentSha256": "800daa568133fce4",
+          "snippet": "[Модель: SDB1106NM]\nме осушения, с \nустановленными системами подачи азота и подогрева воздуха, для моделей: \n− SDB151, SDB302, SDB306, SDB702, SDB702M, SDB151NM, SDB302NM, \nSDB702NM: \n \n \n \n \n \n \n \nне"
+        },
+        {
+          "i": 9,
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "page": null,
+          "chunkIndex": 38,
+          "contentLen": 710,
+          "contentSha256": "86be5eddf04ba96f",
+          "snippet": "2.2.1.4 При оборудовании Шкафа Опцией подогрева необходимо обратить \nвнимание на следующие опасные факторы: \nа) питание \nОпции \nподогрева \nосуществляется \nопасным \nдля \nжизни \nпеременным напряжением 2"
+        },
+        {
+          "i": 10,
+          "sourceDoc": "retrieval-cards/setpoint-vs-ambient.md",
+          "page": null,
+          "chunkIndex": 0,
+          "contentLen": 693,
+          "contentSha256": "ac791aad3ab83eb2",
+          "snippet": "# SDB1560NM — уставка RH ниже влажности помещения\r\n\r\nИсточник: п. 1.1.1, 1.1.2 (RH%окр.ср.), п. 1.1.4.4.1. Только SDB1560NM.\r\n\r\nСинонимы: установил 10 а в помещении 50, что будет если порог ниже окруж"
+        }
+      ],
+      "retrieval": {
+        "route": "REASONING_QA",
+        "retrievalStrategy": "hybrid_wide",
+        "topScore": 2.2,
+        "chunks": 20,
+        "lexicalScore": 2.2,
+        "fusionScore": 2.2,
+        "fallback": false,
+        "llmUsed": true,
+        "deterministicUsed": false,
+        "abstained": false,
+        "intent": {
+          "intentType": "FACT_QUERY",
+          "focusParameter": "humidity",
+          "queryScope": "broad",
+          "queryRisk": "medium",
+          "retrievalMode": "hybrid_wide",
+          "symptomDomain": null,
+          "queryOperatingModes": [],
+          "originalQuery": "Для уставки от 30 RH% и выше — не более RH окружающей минус сколько шкаф SDB1560 M"
+        },
+        "groundingPassed": true
+      },
+      "ragTrace": {
+        "mode": null,
+        "router": {
+          "intent": "FACT_QUERY",
+          "route": "REASONING_QA",
+          "focusParameter": "humidity",
+          "symptom": null,
+          "confidence": 0.92,
+          "retrievalMode": "hybrid_wide",
+          "sectionHints": [
+            "1.1.1",
+            "1.1.2",
+            "ВНИМАНИЕ",
+            "RH%окр"
+          ],
+          "symptoms": [],
+          "parameterResolved": {
+            "parameterKey": "humidity_range",
+            "confidence": 0.58,
+            "matchedAlias": "rh%"
+          },
+          "originalQuery": "Для уставки от 30 RH% и выше — не более RH окружающей минус сколько?"
+        },
+        "decision": {
+          "action": "LLM_GENERATE",
+          "reason": "route_allows_grounded_generation",
+          "llmAllowed": true,
+          "retrievalPassed": true
+        },
+        "retrieval": {
+          "route": "REASONING_QA",
+          "bestMode": "hybrid_wide",
+          "chunks": 20,
+          "promptChunks": 10,
+          "topScore": 2.2,
+          "minSimilarityScore": 0.28,
+          "originalUserQuery": "Для уставки от 30 RH% и выше — не более RH окружающей минус сколько?",
+          "standaloneRetrievalQuery": "Для уставки от 30 RH% и выше — не более RH окружающей минус сколько шкаф SDB1560 M",
+          "queryRewriteSource": "llm",
+          "queryRewritten": true,
+          "queryRewriteModel": "qwen2.5:32b-instruct",
+          "fusedChunkSummaries": [
+            {
+              "rank": 1,
+              "sourceDoc": "golden-facts-sdb1560m.md",
+              "section": "golden-facts-sdb1560m",
+              "page": null,
+              "chunkIndex": 1,
+              "chunkKind": "table",
+              "blockType": "TABLE_BLOCK",
+              "primaryParameter": "protection",
+              "score": 1,
+              "snippet": "[Модель: SDB1106NM]\n| Параметр | Значение для SDB1560M | Источник |\n|---|---:|---|\n| Ширина × высота × глубина | 1202 × 1693 × 1028 мм | Таблица 1.1 |\n| Масса | 260 кг | Таблица 1.1 |\n| Полки (стандартные) | 2 шт. | Табл"
+            },
+            {
+              "rank": 2,
+              "sourceDoc": "golden-facts-sdb1560m.md",
+              "section": "golden-facts-sdb1560m",
+              "page": null,
+              "chunkIndex": 0,
+              "chunkKind": "spec",
+              "blockType": "SPEC_BLOCK",
+              "primaryParameter": null,
+              "score": 0.945,
+              "snippet": "# Эталонные факты SDB1560NM\n\nИсточник: семейное РЭ `SATE.421411.001.00.00.00.00.00.000 РЭ`, редакция 2026, файл `Руководство SDB1560NM.pdf`.\n\n## Модель и границы\n\nВсе значения ниже относятся только к **SDB1560NM** / **SD"
+            },
+            {
+              "rank": 3,
+              "sourceDoc": "golden-facts-sdb1560m.md",
+              "section": "golden-facts-sdb1560m",
+              "page": null,
+              "chunkIndex": 2,
+              "chunkKind": "spec",
+              "blockType": "SPEC_BLOCK",
+              "primaryParameter": "humidity",
+              "score": 0.945,
+              "snippet": "[Модель: SDB1106NM]\n## Комплектация\n\n- **4 колеса** для транспортирования и **4 регулируемые ножки** — для SDB1560M в таблице 1.2.\n- **1 осушитель** в базовой поставке (семейная таблица 1.2).\n\n## Неподдерживаемые вопросы"
+            },
+            {
+              "rank": 4,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 27,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0.945,
+              "snippet": "[Модель: SDB1106NM]\nвия \nи соответствует требованиям всех распространяющихся на данную продукцию \nтехнических регламентов Таможенного союза.\n\n \n22 \n1.2 \nОПИСАНИЕ И РАБОТА СОСТАВНЫХ ЧАСТЕЙ \n1.2.1 СИСТЕМА ПОДОГРЕВА ВОЗДУХА"
+            },
+            {
+              "rank": 5,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 30,
+              "chunkKind": "spec",
+              "blockType": "SPEC_BLOCK",
+              "primaryParameter": "humidity",
+              "score": 0.945,
+              "snippet": "[Модель: SDB1106NM]\nэлектромагнитного клапана и \nпредназначен для установки дополнительного расхода азота, который необходим \nдля быстрого вытеснения влажного воздуха из внутреннего рабочего объема \nШкафа после открытия "
+            },
+            {
+              "rank": 6,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 4,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0.7925982197125845,
+              "snippet": "[Модель: SDB1106NM]\nДНАЗНАЧЕН ДЛЯ ОСУШЕНИЯ ВОЗДУХА ВНУТРИ \nСВОЕГО РАБОЧЕГО ОБЪЕМА И ПОДДЕРЖАНИЯ УСТАНОВЛЕННОГО \nЗНАЧЕНИЯ С ТОЧНОСТЬЮ ± 1RH%;\n\n \n5 \n2) ШКАФ \nНЕ \nПРЕДНАЗНАЧЕН \nДЛЯ \nРАБОТЫ \nВ \nРЕЖИМЕ \nПОВЫШЕНИЯ \nВЛАЖНОСТИ \n"
+            },
+            {
+              "rank": 7,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 3,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0.7644874700484379,
+              "snippet": "[Модель: SDB1106NM]\nизучившие настоящее РЭ и имеющие: \n− группу по электробезопасности не ниже I; \n− опыт работы на персональном компьютере.\n\n \n4 \n1 ОПИСАНИЕ И РАБОТА \n1.1 ОПИСАНИЕ И РАБОТА ШКАФА \n1.1.1 НАЗНАЧЕНИЕ ИЗДЕЛИ"
+            },
+            {
+              "rank": 8,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 7,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "protection",
+              "score": 0.7348792476599341,
+              "snippet": "[Модель: SDB1106NM]\nдля подключения \nкабеля Ethernet приведены в Приложении В. \n1.1.2.9 По способу защиты электронных устройств от электростатических \nявлений \nШкаф \nсоответствует \nтребованиям \nГОСТ IEC 61340-5-1, \nГОСТ "
+            },
+            {
+              "rank": 9,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 6,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "protection",
+              "score": 0.7333405952473748,
+              "snippet": "[Модель: SDB1106NM]\nме осушения, с \nустановленными системами подачи азота и подогрева воздуха, для моделей: \n− SDB151, SDB302, SDB306, SDB702, SDB702M, SDB151NM, SDB302NM, \nSDB702NM: \n \n \n \n \n \n \n \nне более 415 Вт; \n− SD"
+            },
+            {
+              "rank": 10,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 38,
+              "chunkKind": "general",
+              "blockType": "GENERAL_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0.6848207917243342,
+              "snippet": "2.2.1.4 При оборудовании Шкафа Опцией подогрева необходимо обратить \nвнимание на следующие опасные факторы: \nа) питание \nОпции \nподогрева \nосуществляется \nопасным \nдля \nжизни \nпеременным напряжением 220 В, частотой 50 Гц"
+            },
+            {
+              "rank": 11,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 39,
+              "chunkKind": "general",
+              "blockType": "GENERAL_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0.683055576251645,
+              "snippet": "[Модель: SDB1106NM]\n2.2.1.5 При оборудовании Шкафа Опцией Азот необходимо обратить \nвнимание на следующие опасные факторы: \nа) выход магистрали (или баллона) с азотом должен быть оборудован \nзапорным краном и регулятором"
+            },
+            {
+              "rank": 12,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 8,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "protection",
+              "score": 0.6515580426408208,
+              "snippet": "[Модель: SDB1106NM]\nи установки и поддержания требуемого значения \nотносительной влажности воздуха внутри рабочего объема Шкафа; \n− управление в части установки и поддержания требуемого значения \nтемпературы воздуха внут"
+            },
+            {
+              "rank": 13,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 29,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0,
+              "snippet": "[Модель: SDB1106NM]\nльный. \n3. Защитный кожух. \n4. Розетка для подключения кабеля сетевого питания 220 В \n5. Сетка вентиляционного отверстия\n\n \n24 \n1.2.2 СИСТЕМА АВТОМАТИЧЕСКОЙ ПОДАЧИ АЗОТА (ОПЦИЯ) \nСистема автоматическо"
+            },
+            {
+              "rank": 14,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 26,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0,
+              "snippet": "[Модель: SDB1106NM]\n4210-001-47907279-2009. \n1.1.6.2 Шкаф имеет заводской знак (табличку изделия), содержащий \nследующую информацию, смотри Рисунок 1.2 ниже:\n\n \n21 \n \nРисунок  1.2 – Пример заводского знака Шкафа \nа) наим"
+            },
+            {
+              "rank": 15,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 28,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0,
+              "snippet": "[Модель: SDB1106NM]\nиваются в верхней части Шкафа. Поток воздуха Опций подогрева \nнаправлен вниз по двум воздуховодам; \n− Вариант 3: для шкафа SDB302, SDB302NM, SDB306 одна Опция \nподогрева устанавливается в верхней част"
+            },
+            {
+              "rank": 16,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 31,
+              "chunkKind": "spec",
+              "blockType": "SPEC_BLOCK",
+              "primaryParameter": "humidity",
+              "score": 0,
+              "snippet": "[Модель: SDB1106NM]\nазота: \nУстановка времени подачи азота осуществляется в меню установок Шкафа, \nсмотри п. 1.1.4.3.5 перечисление б) выше.\n\n \n26 \n1.2.2.3 Алгоритм работы Опции Азот без датчика азота \nПосле открытия и з"
+            }
+          ],
+          "promptChunkSummaries": [
+            {
+              "rank": 1,
+              "sourceDoc": "golden-facts-sdb1560m.md",
+              "section": "golden-facts-sdb1560m",
+              "page": null,
+              "chunkIndex": 1,
+              "chunkKind": "table",
+              "blockType": "TABLE_BLOCK",
+              "primaryParameter": "protection",
+              "score": 1,
+              "snippet": "[Модель: SDB1106NM]\n| Параметр | Значение для SDB1560M | Источник |\n|---|---:|---|\n| Ширина × высота × глубина | 1202 × 1693 × 1028 мм | Таблица 1.1 |\n| Масса | 260 кг | Таблица 1.1 |\n| Полки (стандартные) | 2 шт. | Табл"
+            },
+            {
+              "rank": 2,
+              "sourceDoc": "golden-facts-sdb1560m.md",
+              "section": "golden-facts-sdb1560m",
+              "page": null,
+              "chunkIndex": 0,
+              "chunkKind": "spec",
+              "blockType": "SPEC_BLOCK",
+              "primaryParameter": null,
+              "score": 0.945,
+              "snippet": "# Эталонные факты SDB1560NM\n\nИсточник: семейное РЭ `SATE.421411.001.00.00.00.00.00.000 РЭ`, редакция 2026, файл `Руководство SDB1560NM.pdf`.\n\n## Модель и границы\n\nВсе значения ниже относятся только к **SDB1560NM** / **SD"
+            },
+            {
+              "rank": 3,
+              "sourceDoc": "golden-facts-sdb1560m.md",
+              "section": "golden-facts-sdb1560m",
+              "page": null,
+              "chunkIndex": 2,
+              "chunkKind": "spec",
+              "blockType": "SPEC_BLOCK",
+              "primaryParameter": "humidity",
+              "score": 0.945,
+              "snippet": "[Модель: SDB1106NM]\n## Комплектация\n\n- **4 колеса** для транспортирования и **4 регулируемые ножки** — для SDB1560M в таблице 1.2.\n- **1 осушитель** в базовой поставке (семейная таблица 1.2).\n\n## Неподдерживаемые вопросы"
+            },
+            {
+              "rank": 4,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 27,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0.945,
+              "snippet": "[Модель: SDB1106NM]\nвия \nи соответствует требованиям всех распространяющихся на данную продукцию \nтехнических регламентов Таможенного союза.\n\n \n22 \n1.2 \nОПИСАНИЕ И РАБОТА СОСТАВНЫХ ЧАСТЕЙ \n1.2.1 СИСТЕМА ПОДОГРЕВА ВОЗДУХА"
+            },
+            {
+              "rank": 5,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 30,
+              "chunkKind": "spec",
+              "blockType": "SPEC_BLOCK",
+              "primaryParameter": "humidity",
+              "score": 0.945,
+              "snippet": "[Модель: SDB1106NM]\nэлектромагнитного клапана и \nпредназначен для установки дополнительного расхода азота, который необходим \nдля быстрого вытеснения влажного воздуха из внутреннего рабочего объема \nШкафа после открытия "
+            },
+            {
+              "rank": 6,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 4,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0.7925982197125845,
+              "snippet": "[Модель: SDB1106NM]\nДНАЗНАЧЕН ДЛЯ ОСУШЕНИЯ ВОЗДУХА ВНУТРИ \nСВОЕГО РАБОЧЕГО ОБЪЕМА И ПОДДЕРЖАНИЯ УСТАНОВЛЕННОГО \nЗНАЧЕНИЯ С ТОЧНОСТЬЮ ± 1RH%;\n\n \n5 \n2) ШКАФ \nНЕ \nПРЕДНАЗНАЧЕН \nДЛЯ \nРАБОТЫ \nВ \nРЕЖИМЕ \nПОВЫШЕНИЯ \nВЛАЖНОСТИ \n"
+            },
+            {
+              "rank": 7,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 3,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0.7644874700484379,
+              "snippet": "[Модель: SDB1106NM]\nизучившие настоящее РЭ и имеющие: \n− группу по электробезопасности не ниже I; \n− опыт работы на персональном компьютере.\n\n \n4 \n1 ОПИСАНИЕ И РАБОТА \n1.1 ОПИСАНИЕ И РАБОТА ШКАФА \n1.1.1 НАЗНАЧЕНИЕ ИЗДЕЛИ"
+            },
+            {
+              "rank": 8,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 7,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "protection",
+              "score": 0.7348792476599341,
+              "snippet": "[Модель: SDB1106NM]\nдля подключения \nкабеля Ethernet приведены в Приложении В. \n1.1.2.9 По способу защиты электронных устройств от электростатических \nявлений \nШкаф \nсоответствует \nтребованиям \nГОСТ IEC 61340-5-1, \nГОСТ "
+            },
+            {
+              "rank": 9,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 6,
+              "chunkKind": "procedure",
+              "blockType": "PROCEDURE_BLOCK",
+              "primaryParameter": "protection",
+              "score": 0.7333405952473748,
+              "snippet": "[Модель: SDB1106NM]\nме осушения, с \nустановленными системами подачи азота и подогрева воздуха, для моделей: \n− SDB151, SDB302, SDB306, SDB702, SDB702M, SDB151NM, SDB302NM, \nSDB702NM: \n \n \n \n \n \n \n \nне более 415 Вт; \n− SD"
+            },
+            {
+              "rank": 10,
+              "sourceDoc": "Руководство SDB1560NM.pdf",
+              "section": "Руководство SDB1560NM",
+              "page": null,
+              "chunkIndex": 38,
+              "chunkKind": "general",
+              "blockType": "GENERAL_BLOCK",
+              "primaryParameter": "voltage",
+              "score": 0.6848207917243342,
+              "snippet": "2.2.1.4 При оборудовании Шкафа Опцией подогрева необходимо обратить \nвнимание на следующие опасные факторы: \nа) питание \nОпции \nподогрева \nосуществляется \nопасным \nдля \nжизни \nпеременным напряжением 220 В, частотой 50 Гц"
+            }
+          ]
+        },
+        "llm": {
+          "used": true,
+          "model": "qwen2.5:32b-instruct",
+          "mode": "GROUNDING_CONTRACT_REGROUND",
+          "groundingContract": {
+            "groundingContract": true,
+            "passes": [
+              "contextual_extract_early"
+            ],
+            "contextualExtract": {
+              "kind": "rh_setpoint_rule",
+              "corpusChars": 51893,
+              "applied": true,
+              "extractPreview": "Для уставки **от 30 RH% и выше** установленное значение влажности внутри шкафа — **не более RH%окр.ср. минус 20 RH%** (величина отступа **20 RH%**) (ВНИМАНИЕ п. 2, §1.1.1).",
+              "groundingCorpusExcerpt": "[Фрагмент 1]\nИсточник: golden-facts-sdb1560m.md, раздел: golden-facts-sdb1560m\nМетаданные фрагмента: тип: table блок: TABLE_BLOCK режимы (индекс): drying, storage, regeneration primaryParameter: protection\n[Модель: SDB1106NM]\n| Параметр | Значение для SDB1560M | Источник |\n|---|---:|---|\n| Ширина × высота × глубина | 1202 × 1693 × 1028 мм | Таблица 1.1 |\n| Масса | 260 кг | Таблица 1.1 |\n| Полки (стандартные) | 2 шт. | Таблица 1.2 / комплектация |\n| Двери | 4 шт. | Таблица 1.2 |\n| Внутренний объём | 1 896 л | ТТХ модели / карточка |\n| Полный объём | 2 070 л | ТТХ модели / карточка |\n| Электропитание | 220 В ±10 %, 50 Гц ±0,4 Гц | Раздел 1.1 |\n| Мощность в режиме хранения | не более 8 Вт | Раздел 1.1 |\n| Мощность в режиме осушения (группа 1106/1560) | не более 40 Вт | Раздел 1.1 |\n| Мощность в режиме регенерации | не более 540 Вт | Раздел 1.1 |\n| С системой подогрева (хранение / осушение) | не более 810 Вт | Раздел 1.1 |\n| Диапазон поддержания влажности | 0–80 RH%, не выше влажности окружающего воздуха | Раздел 1.1 |\n| Шаг установки влажности | 0,1 RH% | Раздел 1.1 |\n| Точность поддержания влажности | ±1 RH% | Раздел 1.1 |\n| Время выхода на установленную влажность | не более 180 мин (3 ч) | ТТХ / раздел 1.1 |\n| Класс защиты | не ниже IP55 (п. 1.1.2.11) | Раздел 1.1 |\n| Нагрузка на стандартную полку | не более 100 кг | Раздел 2.1 |\n| Система подогрева воздуха (опция) | 2 модуля | Таблица 1.2 |\n| Корзина питателей (опция) | от 1 до 2 | Таблица 1.2 |\n| Замена блока осушения | каждые **36 месяцев** | п. 3.1 техническое обслуживание |\n| Таймер подачи азота N2Ton (без датчика) | **99,9 мин** | опция САПА / меню SET |\n\n[Фрагмент 2]\nИсточник: golden-facts-sdb1560m.md, раздел: golden-facts-sdb1560m\nМетаданные фрагмента: тип: spec блок: SPEC_BLOCK режимы (индекс): general\n# Эталонные факты SDB1560NM\n\nИсточник: семейное РЭ `SATE.421411.001.00.00.00.00.00.000 РЭ`, редакция 2026, файл `Руководство SDB1560NM.pdf`.\n\n## Модель и границы\n\nВсе значения ниже относятся только к **SDB1560NM** / **SDB1560M**. В руководстве есть таблицы с другими моделями серии SDB; их значения не применять к SDB1560M.\n\n## Технические характеристики\n\n[Фрагмент 3]\nИсточник: golden-facts-sdb1560m.md, раздел: golden-facts-sdb1560m\nМетаданные фрагмента: тип: spec блок: SPEC_BLOCK режимы (индекс): drying primaryParameter: humidity\n[Модель: SDB1106NM]\n## Комплектация\n\n- **4 колеса** для транспортирования и **4 регулируемые ножки** — для SDB1560M в таблице 1.2.\n- **1 осушитель** в базовой поставке (семейная таблица 1.2).\n\n## Неподдерживаемые вопросы (отказ)\n\nWi-Fi, MQTT, Modbus, API, IP-адрес по умолчанию, процессор, мобильное приложение, управление через интернет — **не указано в РЭ**.\n\n[Фрагмент 4]\nИсточник: Руководство SDB1560NM.pdf, раздел: Руководство SDB1560NM\nМетаданные фрагмента: тип: procedure блок: PROCEDURE_BLOCK режимы (индекс): drying, storage, regeneration primaryParameter: voltage\n[Модель: SDB1106NM]\n1.1.4.4.3 Режим «Регенерации» \nВНИМАНИЕ: ЗАПРЕЩАЕТСЯ ВЫКЛЮЧАТЬ ШКАФ ПРИ РАБОТЕ В \nРЕЖИМЕ «РЕГЕНЕРАЦИИ». \nВ режиме «Регенерации» на передней панели Блока управления и индикации \nШкафа светится желтый индикатор. \nЕсли текущее значение влажности (RH%т) внутри рабочего объема Шкафа, \nпосле отключения вентилятора осушителя, выше установленного порогового \nзначения влажности (RH%п) и динамика снижения влажности меньше 1RH% в \nтечение 30 ± 1 минут, то Шкаф переходит в режим «Регенерации».\n\n \n20 \nПри этом на 45 ± 1 минут включается ТЭН, на 60 ± 1 минут открываются \nзаслонки осушителя, что подтверждается символами \n \nна LCD индикаторе \nпередней панели Блока управления и индикации Шкафа. \nПо истечению 45 ± 1 минут ТЭН отключается, через 10 ± 1 минут включается \nвентилятор на 5 ± 1 минут, для охлаждения осушителя, что должно подтверждаться \nсимволами \n \n на LCD индикаторе передней панели Блока управления и \nиндикации Шкафа. \nПо истечению 60 ± 1 минут заслонки осушителя закрываются, вентилятор \nвключается на 60 ± 1 минут. Шкаф переходит в режим «Осушения». \n1.1.5 СРЕДСТВА ИЗМ",
+              "corpusSourceDocs": [
+                "golden-facts-sdb1560m.md",
+                "Руководство SDB1560NM.pdf"
+              ]
+            },
+            "mode": "CONTEXTUAL_EXTRACT_GROUNDING"
+          },
+          "contextualExtract": {
+            "kind": "rh_setpoint_rule",
+            "corpusChars": 51893,
+            "applied": true,
+            "extractPreview": "Для уставки **от 30 RH% и выше** установленное значение влажности внутри шкафа — **не более RH%окр.ср. минус 20 RH%** (величина отступа **20 RH%**) (ВНИМАНИЕ п. 2, §1.1.1).",
+            "groundingCorpusExcerpt": "[Фрагмент 1]\nИсточник: golden-facts-sdb1560m.md, раздел: golden-facts-sdb1560m\nМетаданные фрагмента: тип: table блок: TABLE_BLOCK режимы (индекс): drying, storage, regeneration primaryParameter: protection\n[Модель: SDB1106NM]\n| Параметр | Значение для SDB1560M | Источник |\n|---|---:|---|\n| Ширина × высота × глубина | 1202 × 1693 × 1028 мм | Таблица 1.1 |\n| Масса | 260 кг | Таблица 1.1 |\n| Полки (стандартные) | 2 шт. | Таблица 1.2 / комплектация |\n| Двери | 4 шт. | Таблица 1.2 |\n| Внутренний объём | 1 896 л | ТТХ модели / карточка |\n| Полный объём | 2 070 л | ТТХ модели / карточка |\n| Электропитание | 220 В ±10 %, 50 Гц ±0,4 Гц | Раздел 1.1 |\n| Мощность в режиме хранения | не более 8 Вт | Раздел 1.1 |\n| Мощность в режиме осушения (группа 1106/1560) | не более 40 Вт | Раздел 1.1 |\n| Мощность в режиме регенерации | не более 540 Вт | Раздел 1.1 |\n| С системой подогрева (хранение / осушение) | не более 810 Вт | Раздел 1.1 |\n| Диапазон поддержания влажности | 0–80 RH%, не выше влажности окружающего воздуха | Раздел 1.1 |\n| Шаг установки влажности | 0,1 RH% | Раздел 1.1 |\n| Точность поддержания влажности | ±1 RH% | Раздел 1.1 |\n| Время выхода на установленную влажность | не более 180 мин (3 ч) | ТТХ / раздел 1.1 |\n| Класс защиты | не ниже IP55 (п. 1.1.2.11) | Раздел 1.1 |\n| Нагрузка на стандартную полку | не более 100 кг | Раздел 2.1 |\n| Система подогрева воздуха (опция) | 2 модуля | Таблица 1.2 |\n| Корзина питателей (опция) | от 1 до 2 | Таблица 1.2 |\n| Замена блока осушения | каждые **36 месяцев** | п. 3.1 техническое обслуживание |\n| Таймер подачи азота N2Ton (без датчика) | **99,9 мин** | опция САПА / меню SET |\n\n[Фрагмент 2]\nИсточник: golden-facts-sdb1560m.md, раздел: golden-facts-sdb1560m\nМетаданные фрагмента: тип: spec блок: SPEC_BLOCK режимы (индекс): general\n# Эталонные факты SDB1560NM\n\nИсточник: семейное РЭ `SATE.421411.001.00.00.00.00.00.000 РЭ`, редакция 2026, файл `Руководство SDB1560NM.pdf`.\n\n## Модель и границы\n\nВсе значения ниже относятся только к **SDB1560NM** / **SDB1560M**. В руководстве есть таблицы с другими моделями серии SDB; их значения не применять к SDB1560M.\n\n## Технические характеристики\n\n[Фрагмент 3]\nИсточник: golden-facts-sdb1560m.md, раздел: golden-facts-sdb1560m\nМетаданные фрагмента: тип: spec блок: SPEC_BLOCK режимы (индекс): drying primaryParameter: humidity\n[Модель: SDB1106NM]\n## Комплектация\n\n- **4 колеса** для транспортирования и **4 регулируемые ножки** — для SDB1560M в таблице 1.2.\n- **1 осушитель** в базовой поставке (семейная таблица 1.2).\n\n## Неподдерживаемые вопросы (отказ)\n\nWi-Fi, MQTT, Modbus, API, IP-адрес по умолчанию, процессор, мобильное приложение, управление через интернет — **не указано в РЭ**.\n\n[Фрагмент 4]\nИсточник: Руководство SDB1560NM.pdf, раздел: Руководство SDB1560NM\nМетаданные фрагмента: тип: procedure блок: PROCEDURE_BLOCK режимы (индекс): drying, storage, regeneration primaryParameter: voltage\n[Модель: SDB1106NM]\n1.1.4.4.3 Режим «Регенерации» \nВНИМАНИЕ: ЗАПРЕЩАЕТСЯ ВЫКЛЮЧАТЬ ШКАФ ПРИ РАБОТЕ В \nРЕЖИМЕ «РЕГЕНЕРАЦИИ». \nВ режиме «Регенерации» на передней панели Блока управления и индикации \nШкафа светится желтый индикатор. \nЕсли текущее значение влажности (RH%т) внутри рабочего объема Шкафа, \nпосле отключения вентилятора осушителя, выше установленного порогового \nзначения влажности (RH%п) и динамика снижения влажности меньше 1RH% в \nтечение 30 ± 1 минут, то Шкаф переходит в режим «Регенерации».\n\n \n20 \nПри этом на 45 ± 1 минут включается ТЭН, на 60 ± 1 минут открываются \nзаслонки осушителя, что подтверждается символами \n \nна LCD индикаторе \nпередней панели Блока управления и индикации Шкафа. \nПо истечению 45 ± 1 минут ТЭН отключается, через 10 ± 1 минут включается \nвентилятор на 5 ± 1 минут, для охлаждения осушителя, что должно подтверждаться \nсимволами \n \n на LCD индикаторе передней панели Блока управления и \nиндикации Шкафа. \nПо истечению 60 ± 1 минут заслонки осушителя закрываются, вентилятор \nвключается на 60 ± 1 минут. Шкаф переходит в режим «Осушения». \n1.1.5 СРЕДСТВА ИЗМ",
+            "corpusSourceDocs": [
+              "golden-facts-sdb1560m.md",
+              "Руководство SDB1560NM.pdf"
+            ]
+          }
+        },
+        "guardrails": {
+          "skipped": true,
+          "reason": "deferred_to_server_post_gate"
+        },
+        "answerDelivery": {
+          "method": "grounding_contract",
+          "deferredPostGate": true,
+          "outboundLen": 172
+        },
+        "contextualExtractApplied": true
+      },
+      "extractProvenance": {
+        "applied": true,
+        "kind": "rh_setpoint_rule",
+        "corpusChars": 51893,
+        "groundingCorpusExcerpt": "[Фрагмент 1]\nИсточник: golden-facts-sdb1560m.md, раздел: golden-facts-sdb1560m\nМетаданные фрагмента: тип: table блок: TABLE_BLOCK режимы (индекс): drying, storage, regeneration primaryParameter: protection\n[Модель: SDB1106NM]\n| Параметр | Значение для SDB1560M | Источник |\n|---|---:|---|\n| Ширина × высота × глубина | 1202 × 1693 × 1028 мм | Таблица 1.1 |\n| Масса | 260 кг | Таблица 1.1 |\n| Полки (стандартные) | 2 шт. | Таблица 1.2 / комплектация |\n| Двери | 4 шт. | Таблица 1.2 |\n| Внутренний объём | 1 896 л | ТТХ модели / карточка |\n| Полный объём | 2 070 л | ТТХ модели / карточка |\n| Электропитание | 220 В ±10 %, 50 Гц ±0,4 Гц | Раздел 1.1 |\n| Мощность в режиме хранения | не более 8 Вт | Раздел 1.1 |\n| Мощность в режиме осушения (группа 1106/1560) | не более 40 Вт | Раздел 1.1 |\n| Мощность в режиме регенерации | не более 540 Вт | Раздел 1.1 |\n| С системой подогрева (хранение / осушение) | не более 810 Вт | Раздел 1.1 |\n| Диапазон поддержания влажности | 0–80 RH%, не выше влажности окружающего воздуха | Раздел 1.1 |\n| Шаг установки влажности | 0,1 RH% | Раздел 1.1 |\n| Точность поддержания влажности | ±1 RH% | Раздел 1.1 |\n| Время выхода на установленную влажность | не более 180 мин (3 ч) | ТТХ / раздел 1.1 |\n| Класс защиты | не ниже IP55 (п. 1.1.2.11) | Раздел 1.1 |\n| Нагрузка на стандартную полку | не более 100 кг | Раздел 2.1 |\n| Система подогрева воздуха (опция) | 2 модуля | Таблица 1.2 |\n| Корзина питателей (опция) | от 1 до 2 | Таблица 1.2 |\n| Замена блока осушения | каждые **36 месяцев** | п. 3.1 техническое обслуживание |\n| Таймер подачи азота N2Ton (без датчика) | **99,9 мин** | опция САПА / меню SET |\n\n[Фрагмент 2]\nИсточник: golden-facts-sdb1560m.md, раздел: golden-facts-sdb1560m\nМетаданные фрагмента: тип: spec блок: SPEC_BLOCK режимы (индекс): general\n# Эталонные факты SDB1560NM\n\nИсточник: семейное РЭ `SATE.421411.001.00.00.00.00.00.000 РЭ`, редакция 2026, файл `Руководство SDB1560NM.pdf`.\n\n## Модель и границы\n\nВсе значения ниже относятся только к **SDB1560NM** / **SDB1560M**. В руководстве есть таблицы с другими моделями серии SDB; их значения не применять к SDB1560M.\n\n## Технические характеристики\n\n[Фрагмент 3]\nИсточник: golden-facts-sdb1560m.md, раздел: golden-facts-sdb1560m\nМетаданные фрагмента: тип: spec блок: SPEC_BLOCK режимы (индекс): drying primaryParameter: humidity\n[Модель: SDB1106NM]\n## Комплектация\n\n- **4 колеса** для транспортирования и **4 регулируемые ножки** — для SDB1560M в таблице 1.2.\n- **1 осушитель** в базовой поставке (семейная таблица 1.2).\n\n## Неподдерживаемые вопросы (отказ)\n\nWi-Fi, MQTT, Modbus, API, IP-адрес по умолчанию, процессор, мобильное приложение, управление через интернет — **не указано в РЭ**.\n\n[Фрагмент 4]\nИсточник: Руководство SDB1560NM.pdf, раздел: Руководство SDB1560NM\nМетаданные фрагмента: тип: procedure блок: PROCEDURE_BLOCK режимы (индекс): drying, storage, regeneration primaryParameter: voltage\n[Модель: SDB1106NM]\n1.1.4.4.3 Режим «Регенерации» \nВНИМАНИЕ: ЗАПРЕЩАЕТСЯ ВЫКЛЮЧАТЬ ШКАФ ПРИ РАБОТЕ В \nРЕЖИМЕ «РЕГЕНЕРАЦИИ». \nВ режиме «Регенерации» на передней панели Блока управления и индикации \nШкафа светится желтый индикатор. \nЕсли текущее значение влажности (RH%т) внутри рабочего объема Шкафа, \nпосле отключения вентилятора осушителя, выше установленного порогового \nзначения влажности (RH%п) и динамика снижения влажности меньше 1RH% в \nтечение 30 ± 1 минут, то Шкаф переходит в режим «Регенерации».\n\n \n20 \nПри этом на 45 ± 1 минут включается ТЭН, на 60 ± 1 минут открываются \nзаслонки осушителя, что подтверждается символами \n \nна LCD индикаторе \nпередней панели Блока управления и индикации Шкафа. \nПо истечению 45 ± 1 минут ТЭН отключается, через 10 ± 1 минут включается \nвентилятор на 5 ± 1 минут, для охлаждения осушителя, что должно подтверждаться \nсимволами \n \n на LCD индикаторе передней панели Блока управления и \nиндикации Шкафа. \nПо истечению 60 ± 1 минут заслонки осушителя закрываются, вентилятор \nвключается на 60 ± 1 минут. Шкаф переходит в режим «Осушения». \n1.1.5 СРЕДСТВА ИЗМ",
+        "extractPreview": "Для уставки **от 30 RH% и выше** установленное значение влажности внутри шкафа — **не более RH%окр.ср. минус 20 RH%** (величина отступа **20 RH%**) (ВНИМАНИЕ п. 2, §1.1.1).",
+        "corpusSourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "missingProvenance": false
+      }
+    }
+  }
+}

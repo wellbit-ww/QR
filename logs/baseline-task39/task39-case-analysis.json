@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.0-task39-case-analysis",
+  "generatedAt": "2026-11-06T12:00:00.000Z",
+  "branch": "backup/sova-portal",
+  "head": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+  "evalRunnerLibVersion": "1.8-task39",
+  "cases": {
+    "gen.multi.dry-regen-power": {
+      "priority": "P0",
+      "rootCause": "evaluateRequiredFact + hasConflictingAlternateNumeric treated a second watt figure in the same answer as contradiction for each required W fact, so 40 W and 540 W could not both pass.",
+      "fix": "Structural pair detection isDualDryRegenWFactPair (exactly two pure numeric W facts 40+540). hasConflictingAlternateNumeric exempts the partner value only when alternateExemptDryRegenDualW ties each number to the correct mode clause (drying vs regeneration), excluding «осушителя» in «регенерации осушителя».",
+      "tests": [
+        "scripts/test-sdb1560m-eval-runner-unit.js (testTask39DryRegenDualWFactual)",
+        "scripts/test-sdb1560m-task39-priority-b.js"
+      ],
+      "httpVerification": {
+        "status": "pass",
+        "report": "logs/baseline-task39/targeted-http-priority-b-10/report.json",
+        "capturedAt": "2026-11-09T05:30:39.574Z"
+      }
+    },
+    "gen.note.height-signal": {
+      "priority": "P1",
+      "rootCause": "GroundingEvidenceSegments were single-line only; footnote split across two lines never contained the regex без\\s+учета as one substring.",
+      "fix": "buildGroundingEvidenceSegments concatenates adjacent lines as pair and triple segments for prompt chunks and extract corpus excerpt.",
+      "tests": [
+        "scripts/test-sdb1560m-eval-runner-unit.js (testTask39GroundingAdjacentLineJoin)",
+        "scripts/test-sdb1560m-task39-priority-b.js"
+      ],
+      "httpVerification": {
+        "status": "pass",
+        "report": "logs/baseline-task39/targeted-http-priority-b-10/report.json",
+        "capturedAt": "2026-11-09T05:30:39.574Z"
+      }
+    },
+    "gen.rh.rule-above30": {
+      "priority": "P2",
+      "rootCause": "Weak generic LLM answer (0–80 %RH) was not always replaced: rh_setpoint_rule needed stricter extractSatisfiesQuery; priorAnswerFullyAnswersQuery for power_dry_regen / rh_setpoint_rule must require full rule text, not two bare numbers.",
+      "fix": "extractSatisfiesQuery(rh_setpoint_rule): require 20 with offset phrasing or rh%окр context. priorAnswerFullyAnswersQuery(power_dry_regen): require осуш + регенерац with 40 and 540. RETRIEVAL_CARD_BY_KIND rh_setpoint_rule → setpoint-vs-ambient.md (merged into extract corpus). Test env: RAG_HONEST_EQUIPMENT=sdb1560m in test script.",
+      "tests": ["scripts/test-sdb1560m-task39-priority-b.js", "scripts/test-sdb1560m-task37-contextual-extract.js"],
+      "httpVerification": {
+        "status": "partial",
+        "factual": "pass",
+        "grounding": "fail",
+        "detail": "Answer and extract contain «минус 20 RH%»; retrieved chunk segments lack bounded «20» for grounding heuristic.",
+        "report": "logs/baseline-task39/targeted-http-priority-b-10/report.json",
+        "sameOnTask28": "logs/baseline-task39/task28-generalization-http/report.json"
+      }
+    }
+  },
+  "p3StoragePower": {
+    "expectedGenCaseIds": ["gen.num.pwr-storage", "gen.num.pwr-dry", "gen.num.pwr-dry-opt810"],
+    "httpVerification": {
+      "status": "pass",
+      "cases": ["gen.num.pwr-storage (8 W)", "gen.num.pwr-dry (40 W)", "gen.num.pwr-dry-opt810 (810 W)"],
+      "report": "logs/baseline-task39/targeted-http-power-smoke/report.json",
+      "capturedAt": "2026-11-09T05:33:52.840Z",
+      "summary": "3/3 pass"
+    }
+  }
+}

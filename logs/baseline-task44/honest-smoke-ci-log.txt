@@ -1,0 +1,9 @@
+Command: npm run test:sdb1560m:honest-smoke:ci
+Exit: 0 (implicit — SDB1560M honest smoke OK printed)
+
+Key output:
+- query_rewrite: qwen2.5:32b-instruct
+- guardrails.pass_strict
+- answerPreview: «В шкафу SDB1560NM предусмотрено **2 полки**.»
+- http: { ok: true, topSource: 'golden-facts-sdb1560m.md' }
+- chunks: 15, llmUsed: true

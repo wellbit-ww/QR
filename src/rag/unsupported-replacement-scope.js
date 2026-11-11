@@ -69,6 +69,7 @@ function inferUnsupportedPartLabel(message, history = []) {
 function modelNameFromEquipment(equipment) {
   const id = String(equipment?.id || "");
   const name = String(equipment?.name || "");
+  if (id.includes("1560") || /sdb1560/i.test(name)) return "SDB1560NM";
   if (id.includes("1106") || /sdb1106/i.test(name)) return "SDB1106NM";
   if (id.includes("702") || /sdb702/i.test(name)) return "SDB702NM";
   if (id.includes("151") || /sdb151/i.test(name)) return "SDB151NM";
@@ -91,6 +92,9 @@ function isUnsupportedReplacementQuery(message, history = []) {
   }
 
   if (DAMAGE_OR_REPLACE_INTENT.test(current) && UNSUPPORTED_PART.test(current)) {
+    return true;
+  }
+  if (/слом/i.test(current) && /полок|полк/i.test(ctx)) {
     return true;
   }
   if (

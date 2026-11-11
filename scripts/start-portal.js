@@ -59,10 +59,12 @@ ensureEnvFile();
 require("./load-env-file").loadEnvFile();
 
 ensureEnvKey("RAG_HONEST_EQUIPMENT", "sdb1560m");
+ensureEnvKey("RAG_PURE", "1");
 
 dockerPostgresUp();
 
 console.log("[start] RAG_HONEST_EQUIPMENT =", process.env.RAG_HONEST_EQUIPMENT);
+console.log("[start] RAG_PURE =", process.env.RAG_PURE);
 console.log("[start] Portal → http://127.0.0.1:" + (process.env.PORT || 3000) + "/");
 
 require(path.join(root, "server.js"));

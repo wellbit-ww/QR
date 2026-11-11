@@ -1,0 +1,11 @@
+branch: backup/sova-portal
+HEAD: 8523954fadcc4f31b92305f81b8dfc09f3e61a14
+eval_runner: 1.7-task33
+
+Task 37 HTTP authoritative:
+- logs/baseline-task37/task27-v19 — 31/32, infra 0 (fail: exp.num.pwr-dry-base-40 → 810 W opt extract)
+- logs/baseline-task37/task28-v1 — 65/41/4, must_abstain 11/17, factual 55/89, leakage 0/20, infra 0
+- logs/baseline-task37/targeted-http-v23 — 6/4/0 Priority B
+
+Vs Task 36: Task28 +5, factual +6; Task27 -1
+Volume/voltage/freq/leakage intact on Task28 HTTP

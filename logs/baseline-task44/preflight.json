@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "task44-preflight",
+  "capturedAt": "2026-11-10T08:45:00.000Z",
+  "git": {
+    "branch": "backup/sova-portal",
+    "head": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+    "headMatchesExpected": true,
+    "dirty": true
+  },
+  "evaluator": {
+    "version": "1.11-task43-r1",
+    "versionMatchesExpected": true,
+    "sourceFile": "scripts/sdb1560m-eval-runner-lib.js"
+  },
+  "infrastructure": {
+    "portalHttp1270013000": { "status": 200, "ok": true },
+    "ollama11434Tags": { "status": 200, "ok": true },
+    "postgresDocker": {
+      "equipment-rag-postgres": "Up (healthy)",
+      "sova-chat-app": "Up"
+    },
+    "evalCredentialsInAgentShell": {
+      "EVAL_LOGIN": "missing",
+      "EVAL_PASSWORD": "missing",
+      "EVAL_BASE_URL": "default http://127.0.0.1:3000 when set"
+    },
+    "honestRagFromEnvFile": {
+      "RAG_HONEST_EQUIPMENT": "sdb1560m",
+      "RAG_PURE": "1"
+    }
+  },
+  "task44HttpRunsBlockedReason": "EVAL_LOGIN and EVAL_PASSWORD not available in Cursor agent shell (.env has no EVAL_*); portal reachable but chat auth required for --allow-http",
+  "userHttpVerificationCompletedAt": "2026-11-11",
+  "userResults": {
+    "targeted-http-pressure-4-r2": "4/4",
+    "targeted-http-priority-b-10": "10/10",
+    "targeted-http-rh-above30": "1/1",
+    "task27-suite-v2-32": "32/32",
+    "task28-generalization-http": "74/110",
+    "honest-smoke-ci": "PASS"
+  }
+}

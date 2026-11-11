@@ -23,7 +23,10 @@ const {
   expandSdb1560mRetrievalSynonyms,
   isSdb1560mAmbientTempQuery,
   isSdb1560mEquipment,
+  isSdb1560mLoadHumidityRiseQuery,
+  isSdb1560mDoorSoundNormalityQuery,
 } = require("./sdb1560m-rag-priority");
+const { shouldUseRagPure } = require("./honest-rag-mode");
 
 const CHATTER_ONLY_RE =
   /^(?:спасибо|благодар(?:ю|им)?|понятно|ясно|окей|ок|хорошо|отлично|принято|да|нет|ага|угу|расскажи\s+подробнее|подробнее|ещё\s+раз|еще\s+раз)\s*[.!?…]*$/iu;
@@ -87,7 +90,7 @@ function expandMaintenanceSynonyms(query) {
   const q = String(query || "");
   const extras = [];
   if (
-    /замен|расходник|ресурс|техобслуж|техническ(?:ое|ого)\s+обслуживани|график\s+обслуж|36\s+месяц|запасн/i.test(
+    /замен|расходник|ресурс|техобслуж|техническ(?:ое|ого)\s+обслуживани|график\s+обслуж|36\s+месяц|запасн|как\s+часто|часто\s+меня|раз\s+в\s+сколько/i.test(
       q
     )
   ) {
@@ -253,9 +256,23 @@ function parseRewriteModelOutput(raw) {
   return lines[0] || t;
 }
 
-function shouldAttemptRewrite(userQuery, history) {
+function shouldAttemptRewrite(userQuery, history, equipment) {
   const q = String(userQuery || "").trim();
   if (!q || CHATTER_ONLY_RE.test(q)) {
+    return false;
+  }
+  if (
+    shouldUseRagPure(equipment?.id) &&
+    isSdb1560mEquipment(equipment) &&
+    is1560ShortNumericSpecQuery(q)
+  ) {
+    return false;
+  }
+  if (
+    shouldUseRagPure(equipment?.id) &&
+    isSdb1560mEquipment(equipment) &&
+    is1560StandaloneRetrievalQuestion(q)
+  ) {
     return false;
   }
   const hasModel = /\bSDB\d{4}/i.test(q);
@@ -274,19 +291,138 @@ function heuristicRewrite(userQuery, history, equipment) {
   return applyMandatoryRewriteRules(q, userQuery, history, equipment);
 }
 
+function lastUserTurn(history) {
+  const hist = Array.isArray(history) ? history : [];
+  for (let i = hist.length - 1; i >= 0; i -= 1) {
+    const e = hist[i];
+    if (e?.role === "user" && String(e.content || "").trim()) {
+      return String(e.content).trim();
+    }
+  }
+  return null;
+}
+
+/** RAG PURE SDB1560: короткий вопрос по ТТХ — не склеивать с прошлым «как начать» и не LLM-rewrite. */
+function is1560ShortNumericSpecQuery(q) {
+  const s = String(q || "").trim();
+  if (!s || s.length > 72) {
+    return false;
+  }
+  return (
+    /^(?:а\s+)?(?:какой|сколько|какова)\s+(?:вес|масс|габарит|объ[её]m|внутренн|полный|размер|ширин|высот|глубин|\bip\b|степень\s+защиты)/iu.test(
+      s,
+    ) ||
+    /^(?:вес|масса|габариты|габарит)\s+шкаф/iu.test(s) ||
+    /шкаф[^\n]{0,16}(?:вес|масс|габарит)/iu.test(s)
+  );
+}
+
+function is1560StandaloneRetrievalQuestion(q) {
+  if (is1560ShortNumericSpecQuery(q)) {
+    return true;
+  }
+  if (isSdb1560mLoadHumidityRiseQuery(q) || isSdb1560mDoorSoundNormalityQuery(q)) {
+    return true;
+  }
+  return false;
+}
+
+function isAnaphoricFollowUpQuery(q) {
+  const s = String(q || "").trim();
+  if (!s || s.length >= 80) {
+    return false;
+  }
+  return (
+    /\b(одну|одна|один|это|там|ещё|еще|сломал|полом|замен|уточн|сколько\s+ост|вреш|врёш|не\s+прав|написано|ошиб)\b/iu.test(
+      s,
+    ) ||
+    (/^(?:а|и|ну)\s+/iu.test(s) && s.length < 48)
+  );
+}
+
+function rulesOnly1560NumericRewrite(userQuery, history, equipment) {
+  const tuned = applyMandatoryRewriteRules(userQuery, userQuery, history, equipment);
+  return {
+    standaloneQuery: anchorQueryToEquipmentModel(tuned, equipment),
+    rewritten: tuned !== String(userQuery || "").trim(),
+    source: "rules_only",
+  };
+}
+
+/** RAG PURE: короткий follow-up → склеить с предыдущим user turn для retrieval. */
+function enrichFollowUpForRetrieval(userQuery, history, equipment) {
+  if (!shouldUseRagPure(equipment?.id)) {
+    return String(userQuery || "").trim();
+  }
+  const q = String(userQuery || "").trim();
+  if (!q || q.length >= 80) {
+    return q;
+  }
+  if (shouldUseRagPure(equipment?.id) && isSdb1560mEquipment(equipment) && is1560StandaloneRetrievalQuestion(q)) {
+    return applyMandatoryRewriteRules(q, q, history, equipment);
+  }
+  const prev = lastUserTurn(history);
+  if (!prev || prev === q) {
+    return q;
+  }
+  if (!isAnaphoricFollowUpQuery(q)) {
+    return applyMandatoryRewriteRules(q, q, history, equipment);
+  }
+  return `${prev}. Уточнение пользователя: ${q}`.replace(/\s+/g, " ").trim();
+}
+
+/** После «ты врёшь / там написано» — повторить извлечение факта по предыдущему вопросу пользователя. */
+function resolveEffectiveUserQuestion(message, history = []) {
+  const q = String(message || "").trim();
+  if (!q) {
+    return q;
+  }
+  if (
+    !/вреш|врёш|не\s+прав|там\s+написано|это\s+написано|написано\s+это|ошиб(?:ся|ли|аешь|аешься)/iu.test(q)
+  ) {
+    const prev = lastUserTurn(history);
+    if (
+      prev &&
+      prev.length >= 8 &&
+      q.length < 80 &&
+      (/\b(?:одну|один|одно|сломал|разбил|треснул|сломалась|сломалось)\b/iu.test(q) ||
+        is1560ShortNumericSpecQuery(q))
+    ) {
+      if (is1560ShortNumericSpecQuery(q)) {
+        return q;
+      }
+      return `${prev}. ${q}`.replace(/\s+/g, " ").trim();
+    }
+    return q;
+  }
+  const prev = lastUserTurn(history);
+  if (prev && prev.length >= 8 && !/вреш|врёш|не\s+прав/iu.test(prev)) {
+    return prev;
+  }
+  return q;
+}
+
 /**
  * @param {{ userQuery: string, history?: Array<{role:string,content:string}>, equipment?: object, ragConfig?: object }} params
  * @returns {Promise<{ standaloneQuery: string, rewritten: boolean, source: string, model?: string }>}
  */
 async function rewriteQueryForRetrieval({ userQuery, history = [], equipment, ragConfig = {} }) {
-  const original = String(userQuery || "").trim();
+  const raw = String(userQuery || "").trim();
+  if (
+    shouldUseRagPure(equipment?.id) &&
+    isSdb1560mEquipment(equipment) &&
+    is1560StandaloneRetrievalQuestion(raw)
+  ) {
+    return rulesOnly1560NumericRewrite(raw, history, equipment);
+  }
+  const original = enrichFollowUpForRetrieval(userQuery, history, equipment);
   if (!original) {
     return { standaloneQuery: original, rewritten: false, source: "empty" };
   }
   if (ragConfig.queryRewriteEnabled === false) {
     return { standaloneQuery: original, rewritten: false, source: "disabled" };
   }
-  if (!shouldAttemptRewrite(original, history)) {
+  if (!shouldAttemptRewrite(original, history, equipment)) {
     const tuned = applyMandatoryRewriteRules(original, original, history, equipment);
     return {
       standaloneQuery: tuned,
@@ -297,7 +433,9 @@ async function rewriteQueryForRetrieval({ userQuery, history = [], equipment, ra
 
   try {
     const systemPrompt = buildQueryRewriteSystemPrompt(equipment);
-    const userMessage = buildQueryRewriteUserMessage(original, history);
+    const userMessage = buildQueryRewriteUserMessage(original, history, {
+      ragPure: shouldUseRagPure(equipment?.id),
+    });
     const result = await generate({
       route: "QUERY_REWRITE",
       context: "",
@@ -342,6 +480,7 @@ async function rewriteQueryForRetrieval({ userQuery, history = [], equipment, ra
 
 module.exports = {
   rewriteQueryForRetrieval,
+  resolveEffectiveUserQuestion,
   applyMandatoryRewriteRules,
   expandRetrievalSynonyms,
   expandTroubleshootingSynonyms,

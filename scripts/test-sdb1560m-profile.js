@@ -19,6 +19,53 @@ const { buildSdb1560mLlmAnswerCompositionBlocks } = require("../src/rag/sdb1560m
 const { validateSdb1560mAnswerAgainstContext } = require("../src/rag/sdb1560m-answer-validation");
 const { applySdb1560mPostGate } = require("../src/rag/sdb1560m-post-gate");
 
+const {
+  ragPureSdb1560AnswerOffTopic,
+  ragPureSdb1560NeedsFactRetry,
+  contextHasSdb1560AnswerableData,
+} = require("../src/rag/honest-rag-mode");
+const { tryHonestContextualNumericFact } = require("../src/rag/honest-contextual-extract");
+const { answerPassesGroundingContract } = require("../src/rag/synthesis/sdb1560-grounding-contract");
+
+const directMassQ = "Какой вес шкафа SDB1560M?";
+const colloquialMassQ = "Тяжёлый? вдвоём поднимем или кран нужен";
+const massHallucination = "Вес шкафа SDB1560M составляет 156 кг.";
+const massVerified = "Масса Шкафа SDB1560М составляет 260 кг.";
+const massContext =
+  "Руководство SDB1560NM.pdf табл. 1.1 | масса | 260 | кг | golden-facts-sdb1560m.md";
+
+assert.equal(ragPureSdb1560AnswerOffTopic(directMassQ, massHallucination), true);
+assert.equal(ragPureSdb1560AnswerOffTopic(directMassQ, massVerified), false);
+assert.equal(ragPureSdb1560AnswerOffTopic(colloquialMassQ, massVerified), false);
+assert.equal(contextHasSdb1560AnswerableData(massContext), true);
+assert.equal(ragPureSdb1560NeedsFactRetry(directMassQ, massHallucination, {}, massContext), true);
+assert.equal(
+  answerPassesGroundingContract(directMassQ, directMassQ, massHallucination, massContext, {}),
+  false,
+);
+assert.equal(
+  answerPassesGroundingContract(directMassQ, directMassQ, massVerified, massContext, {}),
+  true,
+);
+
+const honestEnv = process.env.RAG_HONEST_EQUIPMENT;
+process.env.RAG_HONEST_EQUIPMENT = "sdb1560m";
+const extractedMass = tryHonestContextualNumericFact({
+  equipmentId: "sdb1560m",
+  message: directMassQ,
+  intent: {},
+  promptChunks: [],
+  retrievalContext: massContext,
+  parameterFactLlm: true,
+  priorAnswer: massHallucination,
+});
+if (honestEnv === undefined) {
+  delete process.env.RAG_HONEST_EQUIPMENT;
+} else {
+  process.env.RAG_HONEST_EQUIPMENT = honestEnv;
+}
+assert.match(String(extractedMass || ""), /260\s*кг/u);
+
 const cases = [
   ["внутренний объем", "1 896"],
   ["Какой полный объем шкафа?", "2 070"],
@@ -223,6 +270,41 @@ assert.equal(foreign.action, "FOREIGN_MODEL");
 const offTopic = classifySdb1560mMessage("Напиши программу на Python");
 assert.equal(offTopic.action, "OFF_TOPIC");
 assert.equal(classifySdb1560mMessage("Как сварить борщ?").action, "OFF_TOPIC");
+
+const SCOPE_GATE_REFUSAL =
+  "Я отвечаю только по шкафу SDB1560NM и его руководству. Задайте вопрос по эксплуатации, ТТХ, режимам, неисправностям или безопасности этого шкафа.";
+const scopedGateCtx = { equipmentChatScoped: true };
+
+const massWithModel = classifySdb1560mMessage("Какой вес шкафа SDB1560M?", scopedGateCtx);
+assert.equal(massWithModel.action, "IN_SCOPE");
+assert.notEqual(massWithModel.reply, SCOPE_GATE_REFUSAL);
+assert.match(
+  tryDeterministicSdb1560mAnswer("Какой вес шкафа SDB1560M?") || "",
+  /260\s*кг/u,
+  "non-honest deterministic mass must not use model-number prefix as kg",
+);
+assert.match(
+  tryDeterministicSdb1560mAnswer("Сколько весит шкаф SDB1560M?") || "",
+  /260\s*кг/u,
+);
+
+assert.equal(classifySdb1560mMessage("Какой вес?", scopedGateCtx).action, "IN_SCOPE");
+assert.equal(classifySdb1560mMessage("Тяжёлый? вдвоём поднимем?", scopedGateCtx).action, "IN_SCOPE");
+assert.equal(
+  classifySdb1560mMessage("Какие габариты шкафа SDB1560M?", scopedGateCtx).action,
+  "IN_SCOPE",
+);
+
+assert.equal(classifySdb1560mMessage("Напиши программу на Python", scopedGateCtx).action, "OFF_TOPIC");
+assert.equal(classifySdb1560mMessage("Как приготовить борщ?", scopedGateCtx).action, "OFF_TOPIC");
+assert.equal(
+  classifySdb1560mMessage("Где купить Wattsan sdb1560 для лазерной резки?", scopedGateCtx).action,
+  "OFF_TOPIC",
+);
+assert.equal(
+  classifySdb1560mMessage("Сколько стоит токарный станок 1560?", scopedGateCtx).action,
+  "OFF_TOPIC",
+);
 
 const unsupported = classifySdb1560mMessage("Поддерживает ли шкаф Wi-Fi?");
 assert.equal(unsupported.action, "UNSUPPORTED_SPEC");

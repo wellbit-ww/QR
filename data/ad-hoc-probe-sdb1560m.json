@@ -1,0 +1,157 @@
+{
+  "equipmentId": "sdb1560m",
+  "description": "Ad-hoc HTTP probe: paraphrases + colloquial Russian (not live-regression ids). PDF in sources → no abstain templates.",
+  "cases": [
+    {
+      "id": "adhoc-paraphrase-inner-volume",
+      "message": "Какой объём рабочего пространства у шкафа?",
+      "mustMatch": ["896"]
+    },
+    {
+      "id": "adhoc-paraphrase-full-volume",
+      "message": "Полный объём камеры сколько литров?",
+      "mustMatch": ["2070|2\\s*070|2100|2\\s*100"]
+    },
+    {
+      "id": "adhoc-paraphrase-shelf-kit",
+      "message": "Сколько полок кладут в базовую поставку?",
+      "mustMatch": ["\\b(2|4)\\b", "полк"]
+    },
+    {
+      "id": "adhoc-paraphrase-doors",
+      "message": "А дверей сколько у этой модели?",
+      "mustMatch": ["\\b4\\b", "двер"]
+    },
+    {
+      "id": "adhoc-paraphrase-dims",
+      "message": "Габариты в мм подскажите — ширина высота глубина",
+      "mustMatch": ["1202", "1693"]
+    },
+    {
+      "id": "adhoc-colloquial-weight",
+      "message": "Влезет в лифт? сколько килограмм весит",
+      "mustMatch": ["260"]
+    },
+    {
+      "id": "adhoc-paraphrase-storage-power",
+      "message": "Мощность в режиме хранения какая?",
+      "mustMatch": ["8", "Вт|ватт"]
+    },
+    {
+      "id": "adhoc-paraphrase-dry-power",
+      "message": "Сколько жрёт когда активно сушит без опций?",
+      "mustMatch": ["(?:40|415)", "Вт|ватт|В"]
+    },
+    {
+      "id": "adhoc-paraphrase-regen-power",
+      "message": "Регенерация — максимальная мощность?",
+      "mustMatch": ["540"]
+    },
+    {
+      "id": "adhoc-paraphrase-mains",
+      "message": "От какой сети питается — 220?",
+      "mustMatch": ["220"]
+    },
+    {
+      "id": "adhoc-paraphrase-rh-range",
+      "message": "Какой диапазон влажности держит?",
+      "mustMatch": ["0", "80"]
+    },
+    {
+      "id": "adhoc-paraphrase-shelf-load",
+      "message": "Сколько килограмм на стандартную полку можно?",
+      "mustMatch": ["100"]
+    },
+    {
+      "id": "adhoc-paraphrase-n2-pressure",
+      "message": "Максимальное давление азота на входе опции",
+      "mustMatch": ["6", "бар"]
+    },
+    {
+      "id": "adhoc-paraphrase-warmup-time",
+      "message": "Через сколько после включения выходит на влажность?",
+      "mustMatch": ["180", "мин"]
+    },
+    {
+      "id": "adhoc-paraphrase-desiccant-interval",
+      "message": "Блок осушения когда менять по графику?",
+      "mustMatch": ["36", "месяц"]
+    },
+    {
+      "id": "adhoc-paraphrase-n2-timer",
+      "message": "N2Ton без датчика — сколько минут ставят?",
+      "mustMatch": ["99", "мин"]
+    },
+    {
+      "id": "adhoc-paraphrase-sorbent",
+      "message": "Чем внутри осушитель влагу забирает?",
+      "mustMatch": ["цеолит|сорбент|молекулярн"]
+    },
+    {
+      "id": "adhoc-paraphrase-humidity-menu",
+      "message": "Как в меню выставить влажность?",
+      "mustMatch": ["SET|UP|DN"]
+    },
+    {
+      "id": "adhoc-paraphrase-ip-colloquial",
+      "message": "От воды и пыли какой там IP у корпуса, не помню",
+      "mustMatch": ["IP55|IP\\s*55"]
+    },
+    {
+      "id": "adhoc-paraphrase-regen-off",
+      "message": "Можно ли отключить шкаф во время регенерации?",
+      "mustMatch": ["Запрещается|запрещ"]
+    },
+    {
+      "id": "adhoc-colloquial-climate",
+      "message": "Климат какой по паспорту — УХЛ или что там",
+      "mustMatch": ["УХЛ"]
+    },
+    {
+      "id": "adhoc-colloquial-rh-precision",
+      "message": "С какой точностью держит установленную влажность?",
+      "mustMatch": ["±\\s*1|1\\s*RH"]
+    },
+    {
+      "id": "adhoc-colloquial-red-blink",
+      "message": "Красный мигает — это норма или паника?",
+      "mustMatch": ["осушен|мига|индикатор"]
+    },
+    {
+      "id": "adhoc-colloquial-first-start",
+      "message": "Только купил шкаф, с чего начать?",
+      "mustMatch": ["тумблер|220|включ|питан"]
+    },
+    {
+      "id": "adhoc-colloquial-rh-stuck",
+      "message": "Влажность не падает — что делать?",
+      "mustMatch": ["3\\.1|уплотнител|неисправ"]
+    },
+    {
+      "id": "adhoc-colloquial-w-display",
+      "message": "На экране W горит — что это",
+      "mustMatch": ["подогрев|W"]
+    },
+    {
+      "id": "adhoc-colloquial-yellow-long",
+      "message": "Жёлтый горит уже давно, выключать нельзя же?",
+      "mustMatch": ["регенерац|ж[её]лт"]
+    },
+    {
+      "id": "adhoc-colloquial-beep",
+      "message": "Очень громко пищит когда дверь открыта — так и должно?",
+      "mustMatch": ["звук|сигнал|двер"]
+    },
+    {
+      "id": "adhoc-paraphrase-heating-max",
+      "message": "Какая максимальная температура подогрева опции?",
+      "mustMatch": ["\\+40|40"]
+    },
+    {
+      "id": "adhoc-paraphrase-sensor-vendor",
+      "message": "Кто производитель встроенного датчика влажности?",
+      "allowAbstainWithPdf": true,
+      "mustMatch": ["не\\s+указан|отсутств|не\\s+найден|производител"]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "task33AuthoritativeHttp": {
+    "task27": { "pass": 32, "total": 32, "path": "logs/baseline-task33/task27-regression-http-v10" },
+    "task28": {
+      "pass": 55,
+      "fail": 51,
+      "not_evaluable": 4,
+      "total": 110,
+      "must_abstain_pass": "9/17",
+      "factual_heuristic": "46/89",
+      "leakage": "0/20",
+      "path": "logs/baseline-task33/task28-generalization-http-v9"
+    }
+  },
+  "task35OperatorHttp": {
+    "task27": {
+      "pass": 32,
+      "fail": 0,
+      "total": 32,
+      "infrastructure_error": 0,
+      "path": "logs/baseline-task35/task27-regression-http-v11",
+      "capturedAt": "2026-11-03T06:02:05.251Z"
+    },
+    "task28": {
+      "pass": 58,
+      "fail": 48,
+      "not_evaluable": 4,
+      "total": 110,
+      "infrastructure_error": 0,
+      "must_abstain_pass": "11/17",
+      "factual_heuristic": "47/89",
+      "leakage": "0/20",
+      "path": "logs/baseline-task35/task28-generalization-http-v12",
+      "capturedAt": "2026-11-03T06:08:54.107Z"
+    },
+    "deltaVsTask33": {
+      "task28_pass": "+3",
+      "must_abstain": "+2",
+      "factual_heuristic": "+1",
+      "confirmedFixes": [
+        "gen.unsup.internal-volume-liters",
+        "gen.unsup.full-volume-liters",
+        "gen.num.mass.base"
+      ],
+      "stillFailFromTask35Scope": ["gen.num.voltage", "gen.num.freq"]
+    }
+  },
+  "unitTests": {
+    "task35": "scripts/test-sdb1560m-task35-hallucination-grounding.js — OK",
+    "task32": "OK",
+    "task33": "OK",
+    "task31": "OK",
+    "task30": "OK",
+    "task27Extract": "OK",
+    "task26": "OK",
+    "task25": "OK",
+    "evalRunnerUnit": "OK",
+    "generalizationDataset": "OK"
+  }
+}

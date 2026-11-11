@@ -1,0 +1,41 @@
+{
+  "capturedAt": "2026-11-02T06:25:36.917Z",
+  "schemaVersion": "1.0-eval-contour",
+  "evalRunnerLibVersion": "1.5-task23",
+  "git": {
+    "commit": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+    "branch": "backup/sova-portal",
+    "dirty": true,
+    "dirtyLineCount": 108,
+    "interpretResultsAsHeadOnly": false,
+    "note": "Working tree dirty — results may include uncommitted changes not in commit"
+  },
+  "dataset": {
+    "path": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\scripts\\eval\\sdb1560m-generalization-v1.json",
+    "sha256": "38236023a4631691a32a62422066b58fbede2f00aea9ef76f88d6f8d4c4dbcff",
+    "partition": "all"
+  },
+  "run": {
+    "mode": "http",
+    "noProvision": true,
+    "allowHttp": true,
+    "dryRun": false,
+    "authMode": "missing_credentials"
+  },
+  "serverEnvFingerprint": {
+    "RAG_HONEST_EQUIPMENT": "sdb1560m",
+    "RAG_PURE": "1",
+    "SOVA_QUERY_REWRITE": "unknown",
+    "OLLAMA_MODEL": "unknown",
+    "EMBEDDING_MODEL": "unknown",
+    "EVAL_BASE_URL": "http://127.0.0.1:3000",
+    "EVAL_LOGIN": "missing",
+    "EVAL_PASSWORD": "missing"
+  },
+  "indexFingerprint": {
+    "value": "unknown",
+    "method": "not probed (no DB read by default)"
+  },
+  "skipReasons": [],
+  "secretsPolicy": "passwords and .env contents are never stored"
+}

@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0-task39-regression-comparison",
+  "generatedAt": "2026-11-09T06:30:00.000Z",
+  "branch": "backup/sova-portal",
+  "head": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+  "evalRunnerLibVersion": "1.8-task39",
+  "task38": {
+    "evalRunnerLibVersion": "1.7-task33",
+    "priorityB10": { "pass": 7, "fail": 3, "infrastructure_error": 0, "path": "logs/baseline-task38/targeted-http/priority-b-10/report.json" },
+    "task27": { "total": 32, "pass": 32, "fail": 0, "infrastructure_error": 0, "path": "logs/baseline-task38/task27-regression-http/report.json" },
+    "task28": {
+      "total": 110,
+      "pass": 66,
+      "fail": 40,
+      "not_evaluable": 4,
+      "infrastructure_error": 0,
+      "cross_model_leakage_rate": "0/20",
+      "path": "logs/baseline-task38/task28-generalization-http/report.json"
+    }
+  },
+  "task39": {
+    "httpRuns": [
+      {
+        "name": "priorityB10",
+        "capturedAt": "2026-11-09T05:30:39.574Z",
+        "path": "logs/baseline-task39/targeted-http-priority-b-10",
+        "summary": { "total": 10, "pass": 9, "fail": 1, "infrastructure_error": 0, "not_evaluable": 0 }
+      },
+      {
+        "name": "powerSmoke",
+        "capturedAt": "2026-11-09T05:33:52.840Z",
+        "path": "logs/baseline-task39/targeted-http-power-smoke",
+        "summary": { "total": 3, "pass": 3, "fail": 0, "infrastructure_error": 0 }
+      },
+      {
+        "name": "task27",
+        "capturedAt": "2026-11-09T05:34:22.455Z",
+        "path": "logs/baseline-task39/task27-regression-http",
+        "summary": { "total": 32, "pass": 32, "fail": 0, "infrastructure_error": 0 }
+      },
+      {
+        "name": "task28",
+        "capturedAt": "2026-11-09T05:42:15.312Z",
+        "path": "logs/baseline-task39/task28-generalization-http",
+        "summary": { "total": 110, "pass": 69, "fail": 37, "not_evaluable": 4, "infrastructure_error": 0 },
+        "cross_model_leakage_rate": { "numerator": 0, "denominator": 20, "value": 0 },
+        "regression_pass_rate": { "numerator": 69, "denominator": 106 }
+      }
+    ],
+    "unitTests": {
+      "scripts/test-sdb1560m-task39-priority-b.js": "pass",
+      "scripts/test-sdb1560m-eval-runner-unit.js": "pass",
+      "scripts/test-sdb1560m-task38-regression-recovery.js": "pass",
+      "scripts/test-sdb1560m-task37-contextual-extract.js": "pass",
+      "scripts/test-sdb1560m-task27-extract-routing.js": "pass",
+      "scripts/test-sdb1560m-task35-hallucination-grounding.js": "pass"
+    }
+  },
+  "deltaVsTask38": {
+    "priorityB10_pass_delta": 2,
+    "task27_pass_delta": 0,
+    "task28_pass_delta": 3,
+    "task28_fail_delta": -3,
+    "remainingPriorityBFailures": ["gen.rh.rule-above30"]
+  },
+  "definitionOfDone": {
+    "priorityB10_10of10": false,
+    "task27_32of32": true,
+    "task28_ge_66of110": true,
+    "power_8_40_810_smoke": true,
+    "cross_model_leakage_0of20": true,
+    "infrastructure_error_0": true
+  }
+}

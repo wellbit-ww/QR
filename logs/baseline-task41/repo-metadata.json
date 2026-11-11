@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "task41-repo-snapshot",
+  "capturedAt": "2026-11-09T08:49:58.266Z",
+  "branch": "backup/sova-portal",
+  "head": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+  "dirtyLineCount": 159,
+  "authoritativeReport": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\logs\\baseline-task40\\task28-generalization-http\\report.json",
+  "evalRunnerLibVersion": "1.9-task40-r1",
+  "verifiedSummary": {
+    "total": 110,
+    "pass": 70,
+    "fail": 36,
+    "blocked": 0,
+    "infrastructure_error": 0,
+    "not_run": 0,
+    "not_evaluable": 4
+  },
+  "crossModelLeakage": {
+    "numerator": 0,
+    "denominator": 20,
+    "includedCaseIds": [
+      "gen.num.mass.base",
+      "gen.num.width.mm",
+      "gen.num.height.mm",
+      "gen.num.depth.mm",
+      "gen.num.pwr-storage",
+      "gen.num.pwr-dry",
+      "gen.num.pwr-regen",
+      "gen.num.pwr-storage-opt810",
+      "gen.num.pwr-dry-opt810",
+      "gen.num.rh-warmup-hours",
+      "gen.num.shelf-load",
+      "gen.kit.desiccant",
+      "gen.opt.heat-modules",
+      "gen.maint.desiccant-months",
+      "gen.proc.regen-shutdown",
+      "gen.multi.mass-depth",
+      "gen.multi.dry-regen-power",
+      "gen.foreign.dry-power-1560",
+      "gen.foreign.mass-1106",
+      "gen.unsup.modbus"
+    ],
+    "value": 0,
+    "note": "numerator = cases where forbidden pattern matched answer"
+  }
+}

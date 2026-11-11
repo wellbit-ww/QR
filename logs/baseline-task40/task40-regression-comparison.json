@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "1.0-task40-regression-comparison",
+  "generatedAt": "2026-11-09T08:30:00.000Z",
+  "evalRunnerLibVersion": "1.9-task40-r1",
+  "task39": {
+    "path": "logs/baseline-task39",
+    "priorityB10": { "pass": 9, "fail": 1, "total": 10 },
+    "task27": { "pass": 32, "total": 32 },
+    "task28": { "pass": 69, "fail": 37, "not_evaluable": 4, "total": 110, "leakage": "0/20" },
+    "powerSmoke": { "pass": 3, "total": 3 }
+  },
+  "task40": {
+    "path": "logs/baseline-task40",
+    "httpRuns": [
+      {
+        "name": "rh-above30",
+        "dir": "targeted-http-rh-above30-r24",
+        "capturedAt": "2026-11-09T07:41:46.030Z",
+        "summary": { "total": 1, "pass": 1, "fail": 0, "infrastructure_error": 0 }
+      },
+      {
+        "name": "priorityB10",
+        "dir": "targeted-http-priority-b-10",
+        "capturedAt": "2026-11-09T07:51:07.580Z",
+        "summary": { "total": 10, "pass": 10, "fail": 0, "infrastructure_error": 0 },
+        "leakageInBatch": "0/2"
+      },
+      {
+        "name": "powerSmoke",
+        "dir": "targeted-http-power-smoke",
+        "capturedAt": "2026-11-09T07:57:34.637Z",
+        "summary": { "total": 3, "pass": 3, "fail": 0, "infrastructure_error": 0 }
+      },
+      {
+        "name": "task27",
+        "dir": "task27-regression-http",
+        "capturedAt": "2026-11-09T07:59:00.407Z",
+        "summary": { "total": 32, "pass": 32, "fail": 0, "infrastructure_error": 0 },
+        "leakageInSuite": "0/7"
+      },
+      {
+        "name": "task28",
+        "dir": "task28-generalization-http",
+        "capturedAt": "2026-11-09T08:21:14.308Z",
+        "summary": { "total": 110, "pass": 70, "fail": 36, "not_evaluable": 4, "infrastructure_error": 0 },
+        "cross_model_leakage_rate": { "numerator": 0, "denominator": 20, "value": 0 }
+      }
+    ],
+    "unitTests": "all OK (task40-rh-grounding, task39 priority-b, eval-runner-unit, task38/37/27/35/32)"
+  },
+  "deltaVsTask39": {
+    "priorityB10": "+1 (9→10)",
+    "task27": "0",
+    "task28_pass": "+1 (69→70)",
+    "task28_fail": "-1 (37→36)",
+    "leakage_task28": "0/20 unchanged",
+    "infrastructure_error": "0 unchanged"
+  },
+  "definitionOfDoneTask40": {
+    "gen_rh_rule_above30": true,
+    "priorityB10_10of10": true,
+    "task27_32of32": true,
+    "task28_ge_69of110": true,
+    "power_smoke_3of3": true,
+    "cross_model_leakage_0of20": true,
+    "infrastructure_error_0": true
+  }
+}

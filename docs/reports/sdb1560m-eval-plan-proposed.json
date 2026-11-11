@@ -1,0 +1,193 @@
+{
+  "schemaVersion": "1.0",
+  "equipmentId": "sdb1560m",
+  "description": "Proposed reference eval cases (Task 1). Do NOT run as production tests until fact registry conflicts are resolved. expectedAnswer uses TBD_* tokens where facts are conflict/unverified.",
+  "gitBaseline": {
+    "branch": "backup/sova-portal",
+    "commit": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+    "note": "Working tree had uncommitted RAG changes at audit time"
+  },
+  "assertionKinds": {
+    "exactAnswer": "Regex or literal must match confirmed fact",
+    "forbiddenAnswer": "Must NOT match",
+    "allowedAbstain": "STRICT_ABSTAIN or policy abstain when context lacks fact",
+    "forbiddenAbstain": "Abstain when manual PDF chunk contains answer span",
+    "contextGrounding": "Answer substring must appear in cited chunk text (future)",
+    "sourceWeak": "PDF in sources alone is insufficient"
+  },
+  "cases": [
+    {
+      "test_id": "REF-SHELF-KIT",
+      "question": "Сколько полок в комплекте?",
+      "fact_ids": ["F-SHELF-KIT"],
+      "expectedAnswer": "TBD_CONFLICT_C1",
+      "requiredEvidence": ["PDF table 1.2 item 8.6 for SDB1560M OR approved passport line"],
+      "forbiddenAnswer": ["\\b18\\b.*полк", "параметр не указан"],
+      "allowedAbstain": false,
+      "reason": "Resolve shelf count conflict; reject 1106NM row leakage"
+    },
+    {
+      "test_id": "REF-DESICC-KIT",
+      "question": "Сколько осушителей входит в базовую поставку SDB1560M?",
+      "fact_ids": ["F-DESICC-KIT"],
+      "expectedAnswer": "TBD_CONFLICT_C2",
+      "requiredEvidence": ["PDF table 1.2 item 6.2 for SDB1560M"],
+      "forbiddenAnswer": ["путать с одним осушителем из п. 6.1 для SDB702"],
+      "allowedAbstain": true,
+      "reason": "No current HTTP test; conflict golden 1 vs PDF 2"
+    },
+    {
+      "test_id": "REF-DOORS-COUNT",
+      "question": "Сколько дверей у SDB1560M?",
+      "fact_ids": ["F-DOORS-COUNT"],
+      "expectedAnswer": "TBD_UNVERIFIED_DOORS",
+      "requiredEvidence": ["Explicit RE or passport door count for SDB1560M"],
+      "forbiddenAnswer": ["\\b4\\b.*полк", "число полок из табл. 1.2 п. 8.6"],
+      "allowedAbstain": true,
+      "reason": "Golden 4 doors not found in PDF text layer"
+    },
+    {
+      "test_id": "REF-VOL-INTERNAL",
+      "question": "Какой внутренний объём рабочего пространства?",
+      "fact_ids": ["F-VOL-INT"],
+      "expectedAnswer": "TBD_UNVERIFIED_C4",
+      "requiredEvidence": ["RE/passport volume line scoped to SDB1560M"],
+      "forbiddenAnswer": ["1028", "1560(?!0)", "1926"],
+      "allowedAbstain": true,
+      "reason": "896/1896 not in PDF text extract"
+    },
+    {
+      "test_id": "REF-VOL-FULL",
+      "question": "Какой полный объём шкафа в литрах?",
+      "fact_ids": ["F-VOL-FULL"],
+      "expectedAnswer": "TBD_UNVERIFIED_C4",
+      "requiredEvidence": ["RE/passport full volume for SDB1560M"],
+      "forbiddenAnswer": ["896", "1896"],
+      "allowedAbstain": true,
+      "reason": "2070 not in PDF text extract"
+    },
+    {
+      "test_id": "REF-DRY-PWR-NO-OPT",
+      "question": "Максимальная мощность в режиме осушения без опций азота и подогрева?",
+      "fact_ids": ["F-PWR-DRY"],
+      "expectedAnswer": "40",
+      "requiredEvidence": ["PDF p.6 п.1.1.2.7 в) SDB1560M"],
+      "forbiddenAnswer": ["415", "810", "540"],
+      "allowedAbstain": false,
+      "reason": "Verified; replaces ad-hoc (40|415) on no-options wording"
+    },
+    {
+      "test_id": "REF-DRY-PWR-WITH-OPT",
+      "question": "Максимальная мощность в режиме осушения с установленными системами подачи азота и подогрева воздуха?",
+      "fact_ids": ["F-PWR-DRY-OPT"],
+      "expectedAnswer": "TBD_CONFLICT_C3",
+      "requiredEvidence": ["PDF p.6 п.1.1.2.7 г) line for SDB1560M"],
+      "forbiddenAnswer": ["415.*SDB1560", "40\\s*Вт"],
+      "allowedAbstain": false,
+      "reason": "PDF says 810 W for 1560; golden says 415"
+    },
+    {
+      "test_id": "REF-MASS",
+      "question": "Какой масса (вес) шкафа SDB1560M?",
+      "fact_ids": ["F-MASS"],
+      "expectedAnswer": "260",
+      "requiredEvidence": ["PDF table 1.1 row SDB1560M"],
+      "forbiddenAnswer": ["180", "\\b18\\b\\s*кг"],
+      "allowedAbstain": false,
+      "reason": "Verified baseline"
+    },
+    {
+      "test_id": "REF-IP55",
+      "question": "Класс защиты IP?",
+      "fact_ids": ["F-IP"],
+      "expectedAnswer": "IP55",
+      "requiredEvidence": ["PDF p.7 п.1.1.2.11"],
+      "forbiddenAnswer": [],
+      "allowedAbstain": false,
+      "reason": "Verified baseline"
+    },
+    {
+      "test_id": "REF-MAINT-DESICC",
+      "question": "Как часто менять блок осушения?",
+      "fact_ids": ["F-MAINT-DES"],
+      "expectedAnswer": "36",
+      "requiredEvidence": ["PDF maintenance table p.35"],
+      "forbiddenAnswer": ["параметр не указан"],
+      "forbiddenAbstainWhenPdfInSources": true,
+      "reason": "Verified; keep anti-template abstain"
+    },
+    {
+      "test_id": "REF-N2-TIMER",
+      "question": "Диапазон таймера подачи азота без датчика?",
+      "fact_ids": ["F-N2-TIMER"],
+      "expectedAnswer": "99",
+      "requiredEvidence": ["PDF p.25 0-99,9 min"],
+      "forbiddenAnswer": [],
+      "allowedAbstain": false,
+      "reason": "Verified baseline"
+    },
+    {
+      "test_id": "REF-FAMILY-NEG-SHELF-18",
+      "question": "Сколько перфорированных полок в комплекте SDB1560M?",
+      "fact_ids": ["F-SHELF-KIT"],
+      "expectedAnswer": "TBD_CONFLICT_C1",
+      "forbiddenAnswer": ["\\b18\\b"],
+      "requiredEvidence": ["Must not copy SDB1106NM table 1.2 row 8.1 quantity"],
+      "reason": "Negative: neighbor model row in family manual"
+    },
+    {
+      "test_id": "REF-FAMILY-NEG-MASS-180",
+      "question": "Масса шкафа?",
+      "fact_ids": ["F-MASS"],
+      "expectedAnswer": "260",
+      "forbiddenAnswer": ["180"],
+      "requiredEvidence": ["SDB1560M row not SDB1106NM"],
+      "reason": "Negative: adjacent table 1.1 row"
+    },
+    {
+      "test_id": "REF-NO-CONTEXT-ABSTAIN-VOL",
+      "question": "Какой внутренний объём?",
+      "fact_ids": ["F-VOL-INT"],
+      "simulation": "retrieval_stub_without_volume_chunks",
+      "expectedAnswer": "ALLOW_STRICT_ABSTAIN",
+      "forbiddenAnswer": ["\\d{3,4}\\s*л"],
+      "reason": "Separate missing-context from wrong numeric answer"
+    },
+    {
+      "test_id": "REF-BEEP-DOOR-NORM",
+      "question": "Шкаф пищит при открытой двери — это нормально?",
+      "fact_ids": ["F-BEEP-DOOR"],
+      "expectedAnswer": "штатн|норм|звук|сигнал|1\\.1\\.4\\.3\\.4",
+      "forbiddenAnswer": ["информация отсутствует в документации"],
+      "allowedAbstain": false,
+      "note": "Behavioral; may use PDF section 1.1.4.3.4 without numeric TTX"
+    },
+    {
+      "test_id": "REF-REGEN-SHUTDOWN",
+      "question": "Можно выключить шкаф во время регенерации?",
+      "fact_ids": ["F-SMOKE-REGEN"],
+      "expectedAnswer": "Запрещается|запрещ",
+      "forbiddenAnswer": ["можно выключить"],
+      "allowedAbstain": false,
+      "reason": "Safety wording from RE"
+    }
+  ],
+  "replacementsForLegacySuites": [
+    {
+      "legacy_id": "pure-shelf-count",
+      "action": "Replace (2|4) with TBD_CONFLICT_C1 after doc sign-off"
+    },
+    {
+      "legacy_id": "adhoc-paraphrase-dry-power",
+      "action": "Split into REF-DRY-PWR-NO-OPT and REF-DRY-PWR-WITH-OPT; remove (40|415) on no-options prompt"
+    },
+    {
+      "legacy_id": "pure-internal-volume",
+      "action": "Gate on F-VOL-INT verification or mark expected TBD + allowed abstain"
+    },
+    {
+      "legacy_id": "adhoc-paraphrase-doors",
+      "action": "Hold until F-DOORS-COUNT verified"
+    }
+  ]
+}

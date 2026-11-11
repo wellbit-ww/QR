@@ -1,0 +1,150 @@
+{
+  "equipmentId": "sdb1560m",
+  "description": "Live HTTP regression for RAG PURE SDB1560M (embed+LLM from manual, no extract).",
+  "cases": [
+    {
+      "id": "pure-desiccant-interval",
+      "message": "Осушитель как часто менять?",
+      "mustMatch": ["36", "месяц"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    },
+    {
+      "id": "pure-nitrogen-timer-no-sensor",
+      "message": "Какой таймер подачи азота без датчика?",
+      "mustMatch": ["99", "мин"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    },
+    {
+      "id": "pure-loud-beep",
+      "message": "Шкаф пищит очень громко, это нормально?",
+      "mustMatch": ["звук|сигнал|пищ|громк|двер"],
+      "mustNotMatch": ["параметр не указан", "информация отсутствует в документации"],
+      "requireManualSource": false
+    },
+    {
+      "id": "pure-shelf-count",
+      "message": "Сколько полок в комплекте?",
+      "mustMatch": ["\\b(2|4)\\b", "полк"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    },
+    {
+      "id": "pure-mass",
+      "message": "Какой вес у шкафа?",
+      "mustMatch": ["260"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    },
+    {
+      "id": "pure-blinking-red",
+      "message": "Красный мигает, это уже авария или так и должно?",
+      "mustMatch": ["осушен|мига"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": false
+    },
+    {
+      "id": "pure-getting-started",
+      "message": "Как начать работу с шкафом?",
+      "mustMatch": ["тумблер|220|включ"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": false
+    },
+    {
+      "id": "pure-set-stuck",
+      "message": "SET нажал и ничего не происходит, дальше как?",
+      "mustMatch": ["SET|UP|DN|питан"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": false
+    },
+    {
+      "id": "pure-yellow-regen",
+      "message": "Жёлтый горит уже давно, выключать нельзя же?",
+      "mustMatch": ["регенерац|ж[её]лт"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": false
+    },
+    {
+      "id": "pure-rh-not-drop",
+      "message": "Влажность не снижается что делать",
+      "mustMatch": ["3\\.1|3\\.2|неисправ|уплотнител"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": false
+    },
+    {
+      "id": "pure-w-symbol",
+      "message": "Буква W на дисплее выскочила, это код ошибки?",
+      "mustMatch": ["подогрев|W"],
+      "mustNotMatch": ["параметр не указан", "нет кодов ошибок"],
+      "requireManualSource": false
+    },
+    {
+      "id": "pure-internal-volume",
+      "message": "Какой внутренний объём?",
+      "mustMatch": ["896"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    },
+    {
+      "id": "pure-followup-shelf",
+      "message": "Сломал одну, что делать?",
+      "history": [
+        { "role": "user", "content": "Сколько полок в комплекте?" },
+        { "role": "assistant", "content": "В комплекте 2 полки." }
+      ],
+      "mustMatch": ["полк|техподдерж|замен|комплект"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": false
+    },
+    {
+      "id": "pure-colloquial-mass",
+      "message": "Тяжёлый? вдвоём поднимем или кран нужен",
+      "mustMatch": ["260"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    },
+    {
+      "id": "pure-desiccant-colloquial",
+      "message": "Осушитель когда менять по времени — раз в сколько примерно?",
+      "mustMatch": ["36", "месяц"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    },
+    {
+      "id": "pure-ip-colloquial",
+      "message": "От воды и пыли какой IP у корпуса?",
+      "mustMatch": ["IP55|IP\\s*55"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    },
+    {
+      "id": "pure-full-volume",
+      "message": "Какой полный объём шкафа в литрах?",
+      "mustMatch": ["2070|2\\s*070|2100|2\\s*100"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    },
+    {
+      "id": "pure-regen-forbidden",
+      "message": "Можно выключить шкаф при регенерации?",
+      "mustMatch": ["Запрещается|запрещ"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": false
+    },
+    {
+      "id": "pure-warmup-180",
+      "message": "За сколько выходит на режим влажности после включения?",
+      "mustMatch": ["180", "мин"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    },
+    {
+      "id": "pure-shelf-load",
+      "message": "Нагрузка на стандартную полку?",
+      "mustMatch": ["100", "кг"],
+      "mustNotMatch": ["параметр не указан"],
+      "requireManualSource": true
+    }
+  ]
+}

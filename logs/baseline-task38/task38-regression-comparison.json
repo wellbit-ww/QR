@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "task38-regression-comparison-v2",
+  "capturedAt": "2026-11-06T12:30:00.000Z",
+  "evalRunnerLibVersion": "1.7-task33",
+  "baseline": {
+    "label": "Task 37 HTTP (authoritative)",
+    "task27": { "pass": 31, "total": 32, "report": "logs/baseline-task37/task27-v19/report.json" },
+    "task28": { "pass": 65, "total": 110, "report": "logs/baseline-task37/task28-v1/report.json" },
+    "targetedPriorityB": { "pass": 6, "total": 10, "report": "logs/baseline-task37/targeted-http-v23/report.json" },
+    "note": "Task 37 had fail exp.num.pwr-dry-base-40 (810 W regression)."
+  },
+  "task38": {
+    "http": {
+      "expPwrDryBase40": {
+        "path": "logs/baseline-task38/targeted-http/exp-pwr-dry-base-40/report.json",
+        "manifestCapturedAt": "2026-11-06T08:59:13.553Z",
+        "summary": { "total": 1, "pass": 1, "fail": 0, "infrastructure_error": 0 }
+      },
+      "priorityB10": {
+        "path": "logs/baseline-task38/targeted-http/priority-b-10/report.json",
+        "manifestCapturedAt": "2026-11-06T08:59:42.446Z",
+        "summary": { "total": 10, "pass": 7, "fail": 3, "infrastructure_error": 0 },
+        "passCaseIds": [
+          "gen.num.dim-tolerance",
+          "gen.num.pwr-dry-opt810",
+          "gen.kit.feet-height",
+          "gen.opt.n2-timer-max",
+          "gen.opt.n2-sensor-max",
+          "gen.multi.ambient-temp-rh",
+          "gen.multi.n2-flow-range"
+        ],
+        "failCaseIds": ["gen.multi.dry-regen-power", "gen.note.height-signal", "gen.rh.rule-above30"]
+      },
+      "task27Full": {
+        "path": "logs/baseline-task38/task27-regression-http/report.json",
+        "manifestCapturedAt": "2026-11-06T09:12:23.676Z",
+        "summary": { "total": 32, "pass": 32, "fail": 0, "infrastructure_error": 0 }
+      },
+      "task28Full": {
+        "path": "logs/baseline-task38/task28-generalization-http/report.json",
+        "manifestCapturedAt": "2026-11-06T09:39:59.588Z",
+        "summary": {
+          "total": 110,
+          "pass": 66,
+          "fail": 40,
+          "not_evaluable": 4,
+          "infrastructure_error": 0
+        },
+        "failCaseIds": [
+          "gen.num.pwr-regen",
+          "gen.num.rh-range-high",
+          "gen.num.rh-accuracy",
+          "gen.env.pressure-kpa-min",
+          "gen.env.pressure-kpa-max",
+          "gen.num.ral",
+          "gen.kit.wheels",
+          "gen.kit.shelves-perf",
+          "gen.kit.power-cord",
+          "gen.opt.feeder-basket-min",
+          "gen.opt.feeder-basket-max",
+          "gen.maint.dust-months",
+          "gen.maint.power-cable",
+          "gen.proc.sound-door",
+          "gen.proc.door-fan-off",
+          "gen.multi.mass-depth",
+          "gen.multi.dry-regen-power",
+          "gen.para.storage-w",
+          "gen.para.desiccant-qty",
+          "gen.para.36m",
+          "gen.disc.storage-vs-dry",
+          "gen.disc.810-storage-vs-dry",
+          "gen.foreign.mass-1106",
+          "gen.unsup.bluetooth",
+          "gen.unsup.sdb151-mass-for-1560",
+          "gen.unsup.warehouse-humidity-setpoint",
+          "gen.insuf.n2-without-option",
+          "gen.std.esd",
+          "gen.spare.lock-excluded",
+          "gen.note.height-signal",
+          "gen.rh.rule-below30",
+          "gen.rh.rule-above30",
+          "gen.spare.fuse-heating",
+          "gen.env.pressure-mmhg-min",
+          "gen.env.pressure-mmhg-max",
+          "gen.ind.green-only-storage",
+          "gen.unsup.blockchain",
+          "gen.unsup.serial-format",
+          "gen.proc.open-door-symbol",
+          "gen.proc.fan-symbol"
+        ],
+        "notEvaluableCaseIds": ["gen.num.ip55", "gen.ind.red-door", "gen.sym.n2", "gen.para.ip"],
+        "crossModelLeakageRate": { "numerator": 0, "denominator": 20 }
+      },
+      "obsoleteAuthMissingBatch": "logs/baseline-task38/targeted-http/report.json (early run; infrastructure_error — superseded)"
+    },
+    "deltaVsTask37": {
+      "task27": "+1 pass (32/32 vs 31/32); regressed case exp.num.pwr-dry-base-40 restored",
+      "task28": "+1 net pass (66 vs 65 of 110 scored; +4 not_evaluable unchanged)",
+      "targetedPriorityB": "+1 pass (7/10 vs 6/10); recovered gen.opt.n2-sensor-max on HTTP"
+    }
+  }
+}

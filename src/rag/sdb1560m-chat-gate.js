@@ -8,8 +8,20 @@ const { buildPortalContactSupportAnswer } = require("./portal-contact-support-an
 const EQUIPMENT = { id: "sdb1560m", name: "SDB1560 M" };
 const CHATTER_RE = /^(?:спасибо|благодар(?:ю|им)?|понятно|ясно|окей|ок|хорошо|отлично|принято|да|нет|ага|угу)\s*[.!?…]*$/iu;
 const GREETING_RE = /^(?:привет|здравствуй(?:те)?|добрый\s+(?:день|вечер|утро)|hello|hi)\s*[!?.…]*$/iu;
-const OFF_TOPIC_RE =
-  /(?:wattsan|sdb1560|1560|лазерн|токарн|сварк|сварить|bitcoin|биткоин|напиши\s+(?:код|программ|стих|стихотворен)|рецепт|приготов|борщ|политик|крипт|футбол|анекдот|сказк|python|javascript|java\b|typescript|chatgpt|gpt\b|нейросет|искусственн[\p{L}]*\s+интеллект)/iu;
+const OFF_TOPIC_ALWAYS_RE =
+  /(?:wattsan|лазерн|токарн|сварк|сварить|bitcoin|биткоин|напиши\s+(?:код|программ|стих|стихотворен)|рецепт|приготов|борщ|политик|крипт|футбол|анекдот|сказк|python|javascript|java\b|typescript|chatgpt|gpt\b|нейросет|искусственн[\p{L}]*\s+интеллект)/iu;
+/** Laser/Wattsan spam tokens; excluded on equipment-scoped chat so SDB1560M spec questions are not rejected. */
+const OFF_TOPIC_UNSCOPED_EXTRA_RE = /(?:sdb1560|1560)/iu;
+
+function matchesOffTopic(text, equipmentChatScoped) {
+  if (OFF_TOPIC_ALWAYS_RE.test(text)) {
+    return true;
+  }
+  if (!equipmentChatScoped && OFF_TOPIC_UNSCOPED_EXTRA_RE.test(text)) {
+    return true;
+  }
+  return false;
+}
 
 function classifySdb1560mMessage(message, { history = [], equipmentChatScoped = false } = {}) {
   const text = String(message || "").trim();
@@ -37,7 +49,7 @@ function classifySdb1560mMessage(message, { history = [], equipmentChatScoped = 
       reply: "Принято. Задайте вопрос по шкафу SDB1560NM: ТТХ, эксплуатации, режимам, неисправностям или безопасности по руководству.",
     };
   }
-  if (GREETING_RE.test(text) || OFF_TOPIC_RE.test(text)) {
+  if (GREETING_RE.test(text) || matchesOffTopic(text, equipmentChatScoped)) {
     return {
       action: "OFF_TOPIC",
       reason: "off_topic",
@@ -48,7 +60,6 @@ function classifySdb1560mMessage(message, { history = [], equipmentChatScoped = 
     return { action: "SAFETY", reason: "safety_topic" };
   }
   void history;
-  void equipmentChatScoped;
   return { action: "IN_SCOPE", reason: "equipment_chat_scoped" };
 }
 

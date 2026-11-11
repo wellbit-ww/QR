@@ -1,0 +1,341 @@
+{
+  "capturedAt": "2026-10-28T11:28:50.046Z",
+  "ragPure": true,
+  "passed": 22,
+  "total": 30,
+  "minRequired": 27,
+  "auditLinesBefore": 252,
+  "auditLinesAfter": 273,
+  "traces": [
+    {
+      "id": "adhoc-paraphrase-inner-volume",
+      "message": "Какой объём рабочего пространства у шкафа?",
+      "pass": false,
+      "error": "adhoc-paraphrase-inner-volume: expected /896/ in: Объём рабочего пространства шкафа SDB1560M составляет 1560 литров.",
+      "answerPreview": "Объём рабочего пространства шкафа SDB1560M составляет 1560 литров.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-full-volume",
+      "message": "Полный объём камеры сколько литров?",
+      "pass": false,
+      "error": "adhoc-paraphrase-full-volume: expected /2070|2\\s*070|2100|2\\s*100/ in: Информации о полном объёме камеры для модели SDB1560M не указано в предоставленных фрагментах.",
+      "answerPreview": "Информации о полном объёме камеры для модели SDB1560M не указано в предоставленных фрагментах.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-shelf-kit",
+      "message": "Сколько полок кладут в базовую поставку?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "В базовой поставке шкафа SDB1560М имеется 4 перфорированные полки.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-doors",
+      "message": "А дверей сколько у этой модели?",
+      "pass": false,
+      "error": "adhoc-paraphrase-doors: expected /\\b4\\b/ in: Модель SDB1560M имеет две двери.",
+      "answerPreview": "Модель SDB1560M имеет две двери.",
+      "sources": [
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-dims",
+      "message": "Габариты в мм подскажите — ширина высота глубина",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Ширина, высота и глубина Шкафа SDB1560М составляют 1202 мм, 1693 мм и 1028 мм соответственно.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-colloquial-weight",
+      "message": "Влезет в лифт? сколько килограмм весит",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Шкаф SDB1560M весит 260 кг. Влезет ли он в лифт, зависит от габаритов лифта, но по массе это необходимо учитывать при транспортировке.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-storage-power",
+      "message": "Мощность в режиме хранения какая?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Максимальная потребляемая мощность шкафа SDB1560M в режиме хранения не более 810 Вт.",
+      "sources": [
+        "Руководство SDB1560NM.pdf",
+        "golden-facts-sdb1560m.md"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-dry-power",
+      "message": "Сколько жрёт когда активно сушит без опций?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Максимальная потребляемая мощность Шкафа SDB1560М в режиме осушения без установленных систем подачи азота и подогрева воздуха составляет не более 40 Вт.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-regen-power",
+      "message": "Регенерация — максимальная мощность?",
+      "pass": false,
+      "error": "adhoc-paraphrase-regen-power: expected /540/ in: В предоставленном контексте для модели SDB1560M не указано конкретное значение максимальной мощности в режиме регенерации. Информация о режиме регенерации включает временные интервалы и процессы, но н",
+      "answerPreview": "В предоставленном контексте для модели SDB1560M не указано конкретное значение максимальной мощности в режиме регенерации. Информация о режиме регенерации включает временные интервалы и процессы, но не содержит сведений о мощности.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-mains",
+      "message": "От какой сети питается — 220?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Шкаф SDB1560NM питается от сети 220 В.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-rh-range",
+      "message": "Какой диапазон влажности держит?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Шкаф SDB1560M поддерживает влажность внутри рабочего объема в диапазоне [0 - 80RH%] ± 2RH%.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-shelf-load",
+      "message": "Сколько килограмм на стандартную полку можно?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Суммарная, распределенная нагрузка на каждую стандартную полку шкафа SDB1560M не должна превышать 100 кг.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-n2-pressure",
+      "message": "Максимальное давление азота на входе опции",
+      "pass": false,
+      "error": "adhoc-paraphrase-n2-pressure: expected /бар/ in: В предоставленном контексте не указано конкретное значение максимального давления азота на входе для опции «Система автоматической подачи азота» для модели SDB1560M.",
+      "answerPreview": "В предоставленном контексте не указано конкретное значение максимального давления азота на входе для опции «Система автоматической подачи азота» для модели SDB1560M.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-warmup-time",
+      "message": "Через сколько после включения выходит на влажность?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Максимальное давление азота на входе опции шкафа SDB1560M составляет 6 Бар. Шкаф SDB1560M выходит на заданную влажность не более чем за 180 минут с момента включения.",
+      "sources": [
+        "retrieval-cards/humidity-time.md",
+        "Руководство SDB1560NM.pdf",
+        "golden-facts-sdb1560m.md"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-desiccant-interval",
+      "message": "Блок осушения когда менять по графику?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Шкаф SDB1560M выходит на заданную влажность не более чем за 180 минут с момента включения. Замена блока осушения требуется каждые 36 месяцев.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-n2-timer",
+      "message": "N2Ton без датчика — сколько минут ставят?",
+      "pass": false,
+      "error": "adhoc-paraphrase-n2-timer: expected /99/ in: В предоставленном контексте нет информации о конкретном времени, на которое устанавливается режим N2Ton без датчика для модели SDB1560M. Необходимо обратиться к дополнительным источникам или документа",
+      "answerPreview": "В предоставленном контексте нет информации о конкретном времени, на которое устанавливается режим N2Ton без датчика для модели SDB1560M. Необходимо обратиться к дополнительным источникам или документации для получения этой информации.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-sorbent",
+      "message": "Чем внутри осушитель влагу забирает?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Внутри осушитель влагу забирает с помощью цеолита.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-humidity-menu",
+      "message": "Как в меню выставить влажность?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Для выставления влажности в меню на модели SDB1560NM выполните следующие шаги:\n\n- Войти в меню можно с помощью кнопки **SET**.\n- Для установки порога влажности используйте кнопки **UP/DN**. Кнопки **◄/►** помогут выбрать разрядность значения.\n- Диапазон установки влажности: **00.0–99.9 RH%**.\n- После установки необходи",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "retrieval-cards/humidity-time.md",
+        "retrieval-cards/set-menu.md"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-ip-colloquial",
+      "message": "От воды и пыли какой там IP у корпуса, не помню",
+      "pass": false,
+      "error": "adhoc-paraphrase-ip-colloquial: expected /IP55|IP\\s*55/ in: В предоставленном контексте не указан класс защиты корпуса от воды и пыли (IP-класс).",
+      "answerPreview": "В предоставленном контексте не указан класс защиты корпуса от воды и пыли (IP-класс).",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-regen-off",
+      "message": "Можно ли отключить шкаф во время регенерации?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "**Запрещается выключать шкаф SDB1560NM при работе в режиме «Регенерации».**",
+      "sources": []
+    },
+    {
+      "id": "adhoc-colloquial-climate",
+      "message": "Климат какой по паспорту — УХЛ или что там",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Климатическое исполнение по паспорту для модели SDB1560М указано как УХЛ.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-colloquial-rh-precision",
+      "message": "С какой точностью держит установленную влажность?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Точность поддержания установленного значения влажности составляет ± 1RH%.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-colloquial-red-blink",
+      "message": "Красный мигает — это норма или паника?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Информация о мигании красного индикатора не приведена в таблицах 1.1-1.2 для модели SDB1560 M. Однако, согласно общим эксплуатационным ограничениям, необычное мигание индикаторов может указывать на необходимость проверки работы шкафа.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-colloquial-first-start",
+      "message": "Только купил шкаф, с чего начать?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Поздравляю с покупкой шкафа SDB1560NM! Вот шаги, которые помогут вам подготовить его к использованию:\n\n1. Убедитесь, что шкаф установлен в подходящем месте, как указано в таблице эксплуатационных ограничений (см. Таблица 2.1 в разделе 2.1 Эксплуатационные ограничения).\n2. Подключите шкаф к источнику питания и убедитесь",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf",
+        "retrieval-cards/yellow-and-w.md",
+        "retrieval-cards/red-lamp.md"
+      ]
+    },
+    {
+      "id": "adhoc-colloquial-rh-stuck",
+      "message": "Влажность не падает — что делать?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Шкаф SDB1560M предназначен для поддержания влажности внутри рабочего объема в диапазоне [0 - 80RH%] ± 2RH%, с точностью поддержания установленного диапазона влажности ± 1RH%. Если влажность не падает, проверьте, соответствует ли установленное значение влажности требованиям по относительной влажности окружающего воздуха",
+      "sources": [
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-colloquial-w-display",
+      "message": "На экране W горит — что это",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Если шкаф SDB1560M не выходит на заданный режим влажности и горит символ W, проверьте уплотнители дверей на повреждения и плотность закрытия дверей замками, так как возможные причины неисправности — повреждение уплотнителей или неисправен блок осушения. Время выхода на установленную влажность не должно превышать 180 ми",
+      "sources": [
+        "Руководство SDB1560NM.pdf",
+        "golden-facts-sdb1560m.md"
+      ]
+    },
+    {
+      "id": "adhoc-colloquial-yellow-long",
+      "message": "Жёлтый горит уже давно, выключать нельзя же?",
+      "pass": false,
+      "error": "adhoc-colloquial-yellow-long: abstain-like answer with PDF in sources",
+      "answerPreview": "Желтый индикатор на передней панели Блока управления и индикации Шкафа светится в режиме «Регенерации». В этом режиме запрещено выключать шкаф. Если желтый индикатор горит давно, это может указывать на то, что шкаф продолжает работать в режиме регенерации, что является нормальным, если влажность внутри шкафа выше устан",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-colloquial-beep",
+      "message": "Очень громко пищит когда дверь открыта — так и должно?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "Согласно п. 3.1.4, когда дверь шкафа SDB1560NM открыта, шкаф издает звуковой сигнал. Метод устранения: закрыть дверь.",
+      "sources": [
+        "Руководство SDB1560NM.pdf"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-heating-max",
+      "message": "Какая максимальная температура подогрева опции?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "При открытой двери шкафа SDB1560M датчик двери издает звуковой сигнал. Максимальная температура подогрева опции составляет +40 °C.",
+      "sources": [
+        "retrieval-cards/nitrogen-option.md",
+        "Руководство SDB1560NM.pdf",
+        "golden-facts-sdb1560m.md"
+      ]
+    },
+    {
+      "id": "adhoc-paraphrase-sensor-vendor",
+      "message": "Кто производитель встроенного датчика влажности?",
+      "pass": true,
+      "error": null,
+      "answerPreview": "В предоставленном контексте не указано конкретное название производителя встроенного датчика влажности для модели SDB1560 M.",
+      "sources": [
+        "golden-facts-sdb1560m.md",
+        "Руководство SDB1560NM.pdf"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,376 @@
+{
+  "manifest": {
+    "capturedAt": "2026-10-29T07:06:45.284Z",
+    "schemaVersion": "1.0-eval-contour",
+    "evalRunnerLibVersion": "1.2-task6",
+    "git": {
+      "commit": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+      "branch": "backup/sova-portal",
+      "dirty": true,
+      "dirtyLineCount": 64,
+      "interpretResultsAsHeadOnly": false,
+      "note": "Working tree dirty — results may include uncommitted changes not in commit"
+    },
+    "dataset": {
+      "path": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\docs\\reports\\sdb1560m-eval-suite-draft-v1.json",
+      "sha256": "5bab36e3114852d3154fec6182b53352e0700650e396e4a439d8e25a40afe695",
+      "partition": "verified"
+    },
+    "run": {
+      "mode": "http",
+      "noProvision": true,
+      "allowHttp": true,
+      "dryRun": false,
+      "authMode": "login_failed"
+    },
+    "serverEnvFingerprint": {
+      "RAG_HONEST_EQUIPMENT": "sdb1560m",
+      "RAG_PURE": "unknown",
+      "SOVA_QUERY_REWRITE": "unknown",
+      "OLLAMA_MODEL": "unknown",
+      "EMBEDDING_MODEL": "unknown",
+      "EVAL_BASE_URL": "http://127.0.0.1:3000",
+      "EVAL_LOGIN": "(set)",
+      "EVAL_PASSWORD": "(set)"
+    },
+    "indexFingerprint": {
+      "value": "unknown",
+      "method": "not probed (no DB read by default)"
+    },
+    "skipReasons": [],
+    "secretsPolicy": "passwords and .env contents are never stored"
+  },
+  "caseResults": [
+    {
+      "case": {
+        "id": "num.mass.verified",
+        "category": "numeric_spec",
+        "message": "Какой вес шкафа SDB1560M?",
+        "factIds": [
+          "F-MASS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "unit": "kg",
+            "factId": "F-MASS",
+            "sourceHint": "PDF table 1.1 SDB1560M"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "180",
+            "reason": "SDB1106NM mass row",
+            "leakageModel": "sdb1106-nm"
+          }
+        ],
+        "retrievalExpectations": {
+          "mustIncludeSourceDocPatterns": [
+            "SDB1560NM\\.pdf|Руководство\\s+SDB1560"
+          ],
+          "mustNotRelyOnSourceAlone": true
+        },
+        "scoring": {
+          "countsToward": [
+            "retrieval_recall_at_k",
+            "answer_factual_accuracy",
+            "cross_model_leakage_rate",
+            "regression_pass_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "login failed: fetch failed"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "login failed: fetch failed"
+      ]
+    },
+    {
+      "case": {
+        "id": "num.dry-power-base.verified",
+        "category": "numeric_spec",
+        "message": "Мощность в режиме осушения без опций?",
+        "factIds": [
+          "F-PWR-DRY"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "40",
+            "unit": "W",
+            "factId": "F-PWR-DRY"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "415",
+            "reason": "415 W is for SDB151-702 group with options, not base 1560 dry"
+          },
+          {
+            "pattern": "810",
+            "reason": "810 W is with-options line for 1560"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "cross_model_leakage_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "login failed: fetch failed"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "login failed: fetch failed"
+      ]
+    },
+    {
+      "case": {
+        "id": "mode.regen-shutdown.verified",
+        "category": "operating_mode",
+        "message": "Можно выключить шкаф при регенерации?",
+        "factIds": [
+          "F-SMOKE-REGEN"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Запрещается|запрещ",
+            "factId": "F-SMOKE-REGEN"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "regression_pass_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "login failed: fetch failed"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "login failed: fetch failed"
+      ]
+    },
+    {
+      "case": {
+        "id": "maint.desicc-interval.verified",
+        "category": "maintenance",
+        "message": "Как часто менять блок осушения?",
+        "factIds": [
+          "F-MAINT-DES"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "36",
+            "unit": "months",
+            "factId": "F-MAINT-DES"
+          }
+        ],
+        "abstentionRules": {
+          "forbiddenHedgingPatterns": [
+            "параметр не указан"
+          ],
+          "forbiddenAbstainWhen": {
+            "chunkContainsPatterns": [
+              "36\\s+месяц"
+            ],
+            "note": "Needs chunk text in trace"
+          }
+        },
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "answerable_abstention_rate",
+            "correct_abstention_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "login failed: fetch failed"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "login failed: fetch failed"
+      ]
+    },
+    {
+      "case": {
+        "id": "alarm.beep-door.verified",
+        "category": "alarm_troubleshooting",
+        "message": "Пищит при открытой двери — норма?",
+        "factIds": [
+          "F-BEEP-DOOR"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "звук|сигнал|штатн|норм|1\\.1\\.4\\.3\\.4",
+            "factId": "F-BEEP-DOOR"
+          }
+        ],
+        "abstentionRules": {
+          "forbiddenAbstainWhen": {
+            "note": "Behavior in RE; abstain only if no 1.1.4.3.4 in context"
+          }
+        },
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "grounded_claim_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "login failed: fetch failed"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "login failed: fetch failed"
+      ]
+    },
+    {
+      "case": {
+        "id": "para.mass-colloquial.verified",
+        "category": "paraphrase",
+        "message": "Тяжёлый? вдвоём поднимем?",
+        "factIds": [
+          "F-MASS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "factId": "F-MASS"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "retrieval_recall_at_k"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "login failed: fetch failed"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "login failed: fetch failed"
+      ]
+    }
+  ],
+  "metrics": {
+    "answer_factual_accuracy": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "value": null,
+      "zeroDenominatorBehavior": "value is null; do not report as 100%",
+      "note": "Deterministic number/text heuristic on answer text — not semantic factual accuracy or PDF grounding"
+    },
+    "cross_model_leakage_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "value": null,
+      "note": "numerator = cases where forbidden pattern matched answer"
+    },
+    "regression_pass_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "includedCaseIds": [],
+      "value": null,
+      "note": "pass only when all required layers for the case passed; not_evaluable excluded from denominator"
+    },
+    "retrieval_recall_at_k": {
+      "value": null,
+      "reason": "not computed: requires chunk-level recall evidence"
+    },
+    "grounded_claim_rate": {
+      "value": null,
+      "reason": "not computed unless chunk texts present in payload"
+    },
+    "correct_abstention_rate": {
+      "value": null,
+      "reason": "not aggregated: abstention scoring only per-case when allowedAbstainPatterns set"
+    },
+    "answerable_abstention_rate": {
+      "value": null,
+      "reason": "not computed: requires chunk grounding for answerable context"
+    }
+  },
+  "summary": {
+    "total": 6,
+    "pass": 0,
+    "fail": 0,
+    "blocked": 0,
+    "infrastructure_error": 6,
+    "not_run": 0,
+    "not_evaluable": 0
+  }
+}

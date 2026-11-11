@@ -1,0 +1,2690 @@
+{
+  "manifest": {
+    "capturedAt": "2026-10-29T09:31:26.310Z",
+    "schemaVersion": "1.0-eval-contour",
+    "evalRunnerLibVersion": "1.4-task18",
+    "git": {
+      "commit": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+      "branch": "backup/sova-portal",
+      "dirty": true,
+      "dirtyLineCount": 87,
+      "interpretResultsAsHeadOnly": false,
+      "note": "Working tree dirty — results may include uncommitted changes not in commit"
+    },
+    "dataset": {
+      "path": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\docs\\reports\\sdb1560m-eval-suite-expanded-v1.json",
+      "sha256": "0ea1ccf790ec5dfb8f2caaa9aeb5e665a00cf55d2a07228b258aab78c69d8b36",
+      "partition": "verified"
+    },
+    "run": {
+      "mode": "http",
+      "noProvision": true,
+      "allowHttp": true,
+      "dryRun": false,
+      "authMode": "eval_login"
+    },
+    "serverEnvFingerprint": {
+      "RAG_HONEST_EQUIPMENT": "unknown",
+      "RAG_PURE": "unknown",
+      "SOVA_QUERY_REWRITE": "unknown",
+      "OLLAMA_MODEL": "unknown",
+      "EMBEDDING_MODEL": "unknown",
+      "EVAL_BASE_URL": "http://127.0.0.1:3000",
+      "EVAL_LOGIN": "(set)",
+      "EVAL_PASSWORD": "(set)"
+    },
+    "indexFingerprint": {
+      "value": "unknown",
+      "method": "not probed (no DB read by default)"
+    },
+    "skipReasons": [],
+    "secretsPolicy": "passwords and .env contents are never stored"
+  },
+  "caseResults": [
+    {
+      "case": {
+        "id": "exp.num.mass.direct",
+        "category": "numeric_spec",
+        "message": "Какой вес шкафа SDB1560M?",
+        "factIds": [
+          "F-MASS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "unit": "kg",
+            "factId": "F-MASS",
+            "sourceHint": "PDF table 1.1 p.7"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "180",
+            "reason": "SDB1106NM mass row",
+            "leakageModel": "sdb1106-nm"
+          }
+        ],
+        "retrievalExpectations": {
+          "mustIncludeSourceDocPatterns": [
+            "SDB1560NM\\\\.pdf|Руководство\\\\s+SDB1560"
+          ],
+          "mustNotRelyOnSourceAlone": true
+        },
+        "notes": "Same intent as num.mass.verified; deterministic+HTTP ref",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "cross_model_leakage_rate",
+            "regression_pass_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "retrieval"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "fail",
+          "detail": "expected source doc not in sources[]",
+          "weakSourceListOnly": true
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "**Масса** шкафа SDB1560NM — **260 кг** (табл. 1.1).",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.dims.table11",
+        "category": "numeric_spec",
+        "message": "Какие габариты SDB1560M?",
+        "factIds": [
+          "F-DIMS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1202",
+            "factId": "F-DIMS"
+          },
+          {
+            "claimPattern": "1693",
+            "factId": "F-DIMS"
+          },
+          {
+            "claimPattern": "1028",
+            "factId": "F-DIMS"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "772",
+            "reason": "Other model depth from table 1.1"
+          }
+        ],
+        "notes": "PDF table 1.1 p.7 SDB1560M row",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Габаритные размеры модели SDB1560M: ширина 1202 мм, высота 1693 мм, глубина 1028 мм. Масса модели составляет 260 кг.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.ip55",
+        "category": "numeric_spec",
+        "message": "Какой класс защиты IP у шкафа?",
+        "factIds": [
+          "F-IP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "IP\\\\s*55|IP55",
+            "factId": "F-IP"
+          }
+        ],
+        "notes": "PDF p.7 para 1.1.2.11",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Класс защиты, не ниже – IP55.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.pwr-storage-8",
+        "category": "numeric_spec",
+        "message": "Сколько ватт в режиме хранения?",
+        "factIds": [
+          "F-PWR-STOR"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "8",
+            "unit": "W",
+            "factId": "F-PWR-STOR"
+          }
+        ],
+        "notes": "PDF p.5 1.1.2.7a",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "layers": {
+        "factual": {
+          "status": "fail",
+          "detail": "missing or contradicted required facts",
+          "missing": [
+            {
+              "claimPattern": "8",
+              "factId": "F-PWR-STOR",
+              "status": "fail",
+              "reason": "missing_or_negated"
+            }
+          ]
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Максимальная потребляемая мощность Шкафа SDB1560М в режиме хранения не более 810 Вт.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.pwr-dry-base-40",
+        "category": "numeric_spec",
+        "message": "Мощность в режиме осушения без опций?",
+        "factIds": [
+          "F-PWR-DRY"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "40",
+            "unit": "W",
+            "factId": "F-PWR-DRY"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "415",
+            "reason": "151-702 group with options"
+          },
+          {
+            "pattern": "810",
+            "reason": "with-options line for 1560"
+          }
+        ],
+        "notes": "PDF p.6 1.1.2.7v",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "cross_model_leakage_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Максимальная потребляемая мощность Шкафа SDB1560М в режиме осушения без установленных систем подачи азота и подогрева воздуха составляет не более 40 Вт.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.pwr-regen-540",
+        "category": "numeric_spec",
+        "message": "Максимальная мощность при регенерации?",
+        "factIds": [
+          "F-PWR-REG"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "540",
+            "unit": "W",
+            "factId": "F-PWR-REG"
+          }
+        ],
+        "notes": "PDF p.6 1.1.2.7d",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Максимальная мощность при регенерации составляет не более 540 Вт.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "Руководство SDB1560NM.pdf",
+          "golden-facts-sdb1560m.md"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.mains-220",
+        "category": "numeric_spec",
+        "message": "Какое напряжение питания шкафа?",
+        "factIds": [
+          "F-MAINS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "220",
+            "factId": "F-MAINS"
+          }
+        ],
+        "notes": "PDF p.5 1.1.2.6; unit V implicit in question",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Напряжение питания шкафа составляет 220 В.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.rh-range",
+        "category": "numeric_spec",
+        "message": "Какой диапазон влажности поддерживает шкаф?",
+        "factIds": [
+          "F-RH-RANGE"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "0",
+            "factId": "F-RH-RANGE"
+          },
+          {
+            "claimPattern": "80",
+            "factId": "F-RH-RANGE"
+          }
+        ],
+        "notes": "PDF p.4 1.1.2.1; checker bounded numbers only",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "layers": {
+        "factual": {
+          "status": "fail",
+          "detail": "missing or contradicted required facts",
+          "missing": [
+            {
+              "claimPattern": "0",
+              "factId": "F-RH-RANGE",
+              "status": "fail",
+              "reason": "missing_or_negated"
+            },
+            {
+              "claimPattern": "80",
+              "factId": "F-RH-RANGE",
+              "status": "fail",
+              "reason": "missing_or_negated"
+            }
+          ]
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Шкаф не поддерживает активно влажность внутри рабочего объема, но максимальная относительная влажность воздуха внутри шкафа не должна превышать 30%.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.rh-step",
+        "category": "numeric_spec",
+        "message": "С каким шагом можно выставить влажность?",
+        "factIds": [
+          "F-RH-STEP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "0[,.]1|0\\\\.1",
+            "factId": "F-RH-STEP"
+          }
+        ],
+        "notes": "PDF p.4 1.1.2.2",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Шаг установки диапазона поддержания влажности составляет 0,1RH%.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.rh-accuracy",
+        "category": "numeric_spec",
+        "message": "Какая точность поддержания влажности?",
+        "factIds": [
+          "F-RH-ACC"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "±\\\\s*1|1\\\\s*RH",
+            "factId": "F-RH-ACC"
+          }
+        ],
+        "notes": "PDF p.4 1.1.2.3",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "layers": {
+        "factual": {
+          "status": "fail",
+          "detail": "missing or contradicted required facts",
+          "missing": [
+            {
+              "claimPattern": "±\\\\s*1|1\\\\s*RH",
+              "factId": "F-RH-ACC",
+              "status": "fail",
+              "reason": "missing_or_negated"
+            }
+          ]
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Точность поддержания установленного диапазона влажности: ± 1RH%.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.warmup-180",
+        "category": "numeric_spec",
+        "message": "Через сколько минут выходит на режим после включения?",
+        "factIds": [
+          "F-WARMUP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "180|3\\\\s*ч",
+            "factId": "F-WARMUP"
+          }
+        ],
+        "notes": "PDF p.4 1.1.2.4",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Время выхода на установленную влажность составляет не более 180 минут (3 часа).",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "Руководство SDB1560NM.pdf",
+          "golden-facts-sdb1560m.md"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.shelf-load-100",
+        "category": "numeric_spec",
+        "message": "Какая максимальная нагрузка на стандартную полку?",
+        "factIds": [
+          "F-SHELF-LOAD"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "100",
+            "unit": "kg",
+            "factId": "F-SHELF-LOAD"
+          }
+        ],
+        "notes": "PDF section 2.1 / table 1.4",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Суммарная, распределенная нагрузка на каждую стандартную полку для шкафов SDB1560M не должна превышать 100 кг.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.n2-timer-99",
+        "category": "numeric_spec",
+        "message": "Какой максимум у таймера подачи азота без датчика?",
+        "factIds": [
+          "F-N2-TIMER"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "99",
+            "factId": "F-N2-TIMER"
+          }
+        ],
+        "notes": "PDF p.25 / menu; golden 99.9 min",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "layers": {
+        "factual": {
+          "status": "fail",
+          "detail": "missing or contradicted required facts",
+          "missing": [
+            {
+              "claimPattern": "99",
+              "factId": "F-N2-TIMER",
+              "status": "fail",
+              "reason": "missing_or_negated"
+            }
+          ]
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Максимальное значение времени подачи азота во внутренний рабочий объем Шкафа без датчика азота составляет 99.9 минут.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.wheels-kit-4",
+        "category": "kit_completeness",
+        "message": "Сколько колёс в комплекте для SDB1560M?",
+        "factIds": [
+          "F-WHEELS-KIT"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "4",
+            "factId": "F-WHEELS-KIT"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "4\\\\s*двер",
+            "reason": "Confuse doors with wheels"
+          }
+        ],
+        "notes": "PDF table 1.2 item 2 p.10 — wheels not doors",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Модель SDB1560M комплектуется 4 колесами для транспортирования.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "retrieval-cards/rh-below-setpoint.md",
+          "Руководство SDB1560NM.pdf",
+          "golden-facts-sdb1560m.md"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.feet-kit-4",
+        "category": "kit_completeness",
+        "message": "Сколько регулируемых ножек в комплекте?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "4",
+            "factId": "F-FEET-KIT"
+          }
+        ],
+        "notes": "PDF table 1.2 item 3 p.10",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "В комплекте поставки Шкафа SDB1560М включены 4 регулируемые по высоте ножки, максимальная высота которых составляет 50 мм.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.multi.mass-and-width",
+        "category": "numeric_spec",
+        "message": "Масса и ширина шкафа SDB1560M?",
+        "factIds": [
+          "F-MASS",
+          "F-DIMS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "unit": "kg",
+            "factId": "F-MASS"
+          },
+          {
+            "claimPattern": "1202",
+            "factId": "F-DIMS"
+          }
+        ],
+        "notes": "Multi-fact; model token + kg checker regression risk",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Масса шкафа SDB1560M составляет 260 кг, а ширина — 1202 мм.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.para.mass-heavy",
+        "category": "paraphrase",
+        "message": "Тяжёлый? вдвоём поднимем?",
+        "factIds": [
+          "F-MASS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "factId": "F-MASS"
+          }
+        ],
+        "notes": "Colloquial; suite lacks unit:kg — asymmetry vs direct mass",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Масса Шкафа SDB1560М составляет 260 кг. Так что вдвоём будет сложно поднимать его без помощи подъёмного устройства.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.para.dims-typo",
+        "category": "paraphrase",
+        "message": "габариты шкафа 1560?",
+        "factIds": [
+          "F-DIMS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1202",
+            "factId": "F-DIMS"
+          }
+        ],
+        "notes": "Omitted model name",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Габаритные размеры шкафа SDB1560М: ширина 1202 мм, высота 1693 мм, глубина 1028 мм. Масса шкафа составляет 260 кг.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.para.ip-bryzgi",
+        "category": "paraphrase",
+        "message": "От брызг защищён? Какой IP?",
+        "factIds": [
+          "F-IP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "IP\\\\s*55|IP55",
+            "factId": "F-IP"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Класс защиты, не ниже – IP55.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.para.dry-no-options",
+        "category": "paraphrase",
+        "message": "Сколько жрёт при осушении если без азота и подогрева?",
+        "factIds": [
+          "F-PWR-DRY"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "40",
+            "unit": "W",
+            "factId": "F-PWR-DRY"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "810",
+            "reason": "with-options"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Мощность Шкафа SDB1560M в режиме осушения без системы подачи азота и подогрева воздуха составляет не более 40 Вт.\n\nШаги для определения потребляемой мощности в режиме осушения без азота и подогрева:\n1. Убедитесь, что система подачи азота отключена.\n2. Убедитесь, что система подогрева воздуха отключена.\n3. Включите режи",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "Руководство SDB1560NM.pdf",
+          "golden-facts-sdb1560m.md"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.para.warmup-plain",
+        "category": "paraphrase",
+        "message": "Долго выходит на влажность после включения?",
+        "factIds": [
+          "F-WARMUP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "180|3\\\\s*ч",
+            "factId": "F-WARMUP"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "layers": {
+        "factual": {
+          "status": "fail",
+          "detail": "must_answer but answer is empty or abstain-like"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "В документации не указано конкретное время, за которое шкаф выходит на заданную влажность после включения. Однако, для обеспечения эффективной работы шкафа следует придерживаться всех указанных рекомендаций и эксплуатационных ограничений.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.mode.regen-no-shutdown",
+        "category": "operating_mode",
+        "message": "Можно выключить шкаф при регенерации?",
+        "factIds": [
+          "F-SMOKE-REGEN"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Запрещается|запрещ",
+            "factId": "F-SMOKE-REGEN"
+          }
+        ],
+        "notes": "Safety norm PDF 2.4",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "regression_pass_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "**Запрещается выключать шкаф SDB1560NM при работе в режиме «Регенерации».**",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.env.temp-range",
+        "category": "numeric_spec",
+        "message": "При какой температуре помещения можно эксплуатировать шкаф?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "15",
+            "factId": "F-ENV-TEMP"
+          },
+          {
+            "claimPattern": "35",
+            "factId": "F-ENV-TEMP"
+          }
+        ],
+        "notes": "PDF p.7 1.1.2.12 +15..+35 C",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "layers": {
+        "factual": {
+          "status": "fail",
+          "detail": "must_answer but answer is empty or abstain-like"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "В документации указано, что шкаф изготавливается в климатическом исполнении УХЛ 4.2 по ГОСТ 15150 с ограничением по нижней границе рабочей температуры плюс 15 ºС. Верхняя граница температуры не указана, но можно сделать вывод, что шкаф можно эксплуатировать при температуре от +15 ºС и выше, в пределах допустимого клима",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.env.rh-ambient-max",
+        "category": "numeric_spec",
+        "message": "Какая максимальная относительная влажность окружающего воздуха допускается?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "80",
+            "factId": "F-ENV-RH"
+          }
+        ],
+        "notes": "PDF p.7 1.1.2.12 not more 80%",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Максимальная относительная влажность окружающего воздуха, допускаемая для SDB1560M, составляет 80RH%.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf",
+          "retrieval-cards/set-menu.md"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.maint.desicc-36mo",
+        "category": "maintenance",
+        "message": "Как часто менять блок осушения?",
+        "factIds": [
+          "F-MAINT-DES"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "36",
+            "unit": "months",
+            "factId": "F-MAINT-DES"
+          }
+        ],
+        "notes": "PDF p.35 table 3.1",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Блок осушения следует заменять каждые 36 месяцев.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf",
+          "retrieval-cards/nitrogen-option.md",
+          "retrieval-cards/power-on.md"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.alarm.beep-open-door",
+        "category": "alarm_troubleshooting",
+        "message": "Пищит при открытой двери — это норма?",
+        "factIds": [
+          "F-BEEP-DOOR"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "звук|сигнал|штатн|норм|1\\\\.1\\\\.4\\\\.3\\\\.4",
+            "factId": "F-BEEP-DOOR"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Да, это норма. При открытии двери Шкафа звучит звуковой сигнал, который отключается при закрытии двери.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.alarm.red-lamp",
+        "category": "alarm_troubleshooting",
+        "message": "Красная лампа мигает — что означает?",
+        "factIds": [
+          "F-RED-LAMP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Осушен|1\\\\.1\\\\.4\\\\.3",
+            "factId": "F-RED-LAMP"
+          }
+        ],
+        "notes": "Card red-lamp + PDF 1.1.4.3.3",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "layers": {
+        "factual": {
+          "status": "fail",
+          "detail": "must_answer but answer is empty or abstain-like"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "В предоставленных фрагментах нет конкретной информации о значении мигания красной лампы для модели SDB1560M. Однако, в общем контексте упоминается звуковой сигнал, который может указывать на проблемы с датчиками закрытия двери или неисправность датчика дверей. Для точного определения значения мигания красной лампы реко",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.alarm.rh-rise-loading",
+        "category": "alarm_troubleshooting",
+        "message": "После загрузки влажность выросла — это нормально?",
+        "factIds": [
+          "F-RH-RISE-DOOR"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1\\\\.1\\\\.4\\\\.4\\\\.1|вентилятор|открыт",
+            "factId": "F-RH-RISE-DOOR"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "layers": {
+        "factual": {
+          "status": "fail",
+          "detail": "missing or contradicted required facts",
+          "missing": [
+            {
+              "claimPattern": "1\\\\.1\\\\.4\\\\.4\\\\.1|вентилятор|открыт",
+              "factId": "F-RH-RISE-DOOR",
+              "status": "fail",
+              "reason": "missing_or_negated"
+            }
+          ]
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Да, это нормально. Влажность внутри рабочего объема Шкафа может увеличиться после загрузки элементов, но Шкаф предназначен для поддержания установленного значения влажности с точностью ± 1RH%. Шкаф обеспечивает осушение воздуха внутри своего рабочего объема и поддержание установленного значения влажности, поэтому он ве",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.alarm.w-display",
+        "category": "alarm_troubleshooting",
+        "message": "На дисплее W — это ошибка?",
+        "factIds": [
+          "F-W-DISPLAY"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "подогрев|W",
+            "factId": "F-W-DISPLAY"
+          }
+        ],
+        "notes": "Option heating symbol; card yellow-and-w",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "factual"
+      },
+      "layers": {
+        "factual": {
+          "status": "fail",
+          "detail": "must_answer but answer is empty or abstain-like"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "На дисплее символ \"W\" не является ошибкой. В данном контексте информации о том, что \"W\" обозначает ошибку, нет. Вероятно, это индикатор текущего режима работы или параметра, но для точного определения потребуется дополнительная информация из руководства пользователя или технической документации по данному шкафу. \n\nЕсли",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.leak.mass-180",
+        "category": "numeric_spec",
+        "message": "Какая масса SDB1560M?",
+        "factIds": [
+          "F-MASS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "unit": "kg",
+            "factId": "F-MASS"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "180",
+            "leakageModel": "sdb1106-nm"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "cross_model_leakage_rate",
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "**Масса** шкафа SDB1560NM — **260 кг** (табл. 1.1).",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.identity.manual-name",
+        "category": "paraphrase",
+        "message": "Как в руководстве называется модель шкафа?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "SDB1560",
+            "factId": "F-IDENTITY"
+          }
+        ],
+        "notes": "Manual uses SDB1560M/NM; portal id sdb1560m",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "pass",
+        "reason": "required layers ok"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "pass",
+          "detail": "no forbidden match",
+          "matches": []
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Модель шкафа называется SDB1560М.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "golden-facts-sdb1560m.md",
+          "Руководство SDB1560NM.pdf"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    },
+    {
+      "case": {
+        "id": "exp.num.pwr-storage-with-opt-810",
+        "category": "numeric_spec",
+        "message": "Мощность в режиме хранения с азотом и подогревом?",
+        "factIds": [
+          "F-PWR-STOR-OPT"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "810",
+            "unit": "W",
+            "factId": "F-PWR-STOR-OPT"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "8",
+            "reason": "base storage only — checker may need careful phrasing"
+          }
+        ],
+        "notes": "PDF p.5 1.1.2.7b SDB1560M 810W; conflict with bare 8W if both asserted",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "fail",
+        "reason": "cross_model or forbidden claim"
+      },
+      "layers": {
+        "factual": {
+          "status": "pass",
+          "detail": "requiredFacts passed deterministic checks (not semantic accuracy)"
+        },
+        "forbiddenLeakage": {
+          "status": "fail",
+          "detail": "forbidden pattern in answer",
+          "matches": [
+            {
+              "pattern": "8",
+              "reason": "base storage only — checker may need careful phrasing"
+            }
+          ]
+        },
+        "abstention": {
+          "status": "not_evaluable",
+          "detail": "correct abstention not auto-scored without chunk grounding"
+        },
+        "retrieval": {
+          "status": "not_evaluable",
+          "detail": "chunk text / trace required for recall_at_k"
+        },
+        "grounding": {
+          "status": "not_evaluable",
+          "detail": "grounding requires chunk bodies, not sources list alone"
+        },
+        "_chunkTextCount": 0
+      },
+      "answerPreview": "Максимальная потребляемая мощность Шкафа SDB1560М в режиме хранения, с установленными системами подачи азота и подогрева воздуха, не более 810 Вт.",
+      "checksExecuted": [
+        "factual",
+        "forbiddenLeakage",
+        "abstention",
+        "retrieval",
+        "grounding",
+        "_chunkTextCount"
+      ],
+      "errors": [],
+      "evidenceUsed": {
+        "sourceDocs": [
+          "Руководство SDB1560NM.pdf",
+          "golden-facts-sdb1560m.md"
+        ],
+        "chunkTextCount": 0,
+        "hasDebugTrace": true
+      }
+    }
+  ],
+  "metrics": {
+    "answer_factual_accuracy": {
+      "numerator": 23,
+      "denominator": 32,
+      "includedCaseIds": [
+        "exp.num.mass.direct",
+        "exp.num.dims.table11",
+        "exp.num.ip55",
+        "exp.num.pwr-storage-8",
+        "exp.num.pwr-dry-base-40",
+        "exp.num.pwr-regen-540",
+        "exp.num.mains-220",
+        "exp.num.rh-range",
+        "exp.num.rh-step",
+        "exp.num.rh-accuracy",
+        "exp.num.warmup-180",
+        "exp.num.shelf-load-100",
+        "exp.num.n2-timer-99",
+        "exp.num.wheels-kit-4",
+        "exp.num.feet-kit-4",
+        "exp.multi.mass-and-width",
+        "exp.para.mass-heavy",
+        "exp.para.dims-typo",
+        "exp.para.ip-bryzgi",
+        "exp.para.dry-no-options",
+        "exp.para.warmup-plain",
+        "exp.mode.regen-no-shutdown",
+        "exp.env.temp-range",
+        "exp.env.rh-ambient-max",
+        "exp.maint.desicc-36mo",
+        "exp.alarm.beep-open-door",
+        "exp.alarm.red-lamp",
+        "exp.alarm.rh-rise-loading",
+        "exp.alarm.w-display",
+        "exp.leak.mass-180",
+        "exp.identity.manual-name",
+        "exp.num.pwr-storage-with-opt-810"
+      ],
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "value": 0.71875,
+      "zeroDenominatorBehavior": "value is null; do not report as 100%",
+      "note": "Deterministic number/text heuristic on answer text — not semantic factual accuracy or PDF grounding"
+    },
+    "cross_model_leakage_rate": {
+      "numerator": 1,
+      "denominator": 7,
+      "includedCaseIds": [
+        "exp.num.mass.direct",
+        "exp.num.dims.table11",
+        "exp.num.pwr-dry-base-40",
+        "exp.num.wheels-kit-4",
+        "exp.para.dry-no-options",
+        "exp.leak.mass-180",
+        "exp.num.pwr-storage-with-opt-810"
+      ],
+      "value": 0.14285714285714285,
+      "note": "numerator = cases where forbidden pattern matched answer"
+    },
+    "regression_pass_rate": {
+      "numerator": 21,
+      "denominator": 32,
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "includedCaseIds": [
+        "exp.num.mass.direct",
+        "exp.num.dims.table11",
+        "exp.num.ip55",
+        "exp.num.pwr-storage-8",
+        "exp.num.pwr-dry-base-40",
+        "exp.num.pwr-regen-540",
+        "exp.num.mains-220",
+        "exp.num.rh-range",
+        "exp.num.rh-step",
+        "exp.num.rh-accuracy",
+        "exp.num.warmup-180",
+        "exp.num.shelf-load-100",
+        "exp.num.n2-timer-99",
+        "exp.num.wheels-kit-4",
+        "exp.num.feet-kit-4",
+        "exp.multi.mass-and-width",
+        "exp.para.mass-heavy",
+        "exp.para.dims-typo",
+        "exp.para.ip-bryzgi",
+        "exp.para.dry-no-options",
+        "exp.para.warmup-plain",
+        "exp.mode.regen-no-shutdown",
+        "exp.env.temp-range",
+        "exp.env.rh-ambient-max",
+        "exp.maint.desicc-36mo",
+        "exp.alarm.beep-open-door",
+        "exp.alarm.red-lamp",
+        "exp.alarm.rh-rise-loading",
+        "exp.alarm.w-display",
+        "exp.leak.mass-180",
+        "exp.identity.manual-name",
+        "exp.num.pwr-storage-with-opt-810"
+      ],
+      "value": 0.65625,
+      "note": "pass only when all required layers for the case passed; not_evaluable excluded from denominator"
+    },
+    "retrieval_recall_at_k": {
+      "value": null,
+      "reason": "not computed: requires chunk-level recall evidence"
+    },
+    "grounded_claim_rate": {
+      "value": null,
+      "reason": "not computed unless chunk texts present in payload"
+    },
+    "correct_abstention_rate": {
+      "value": null,
+      "reason": "not aggregated: abstention scoring only per-case when allowedAbstainPatterns set"
+    },
+    "answerable_abstention_rate": {
+      "value": null,
+      "reason": "not computed: requires chunk grounding for answerable context"
+    }
+  },
+  "summary": {
+    "total": 32,
+    "pass": 21,
+    "fail": 11,
+    "blocked": 0,
+    "infrastructure_error": 0,
+    "not_run": 0,
+    "not_evaluable": 0
+  }
+}

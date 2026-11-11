@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sovtest.local/schemas/sdb1560m-eval-case-v1.json",
+  "title": "SDB1560M eval case (v1 draft)",
+  "description": "Draft schema for reliable RAG eval. Does not replace data/live-user-regression-sdb1560m.json. Use blocked_pending_source_resolution for conflict facts from docs/reports/sdb1560m-facts-and-eval-audit.md.",
+  "type": "object",
+  "required": ["schemaVersion", "equipmentId", "cases"],
+  "properties": {
+    "schemaVersion": { "const": "1.0-eval-contour" },
+    "equipmentId": { "const": "sdb1560m" },
+    "suiteMeta": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "blockedFactIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Cases referencing these facts are excluded from answer_factual_accuracy denominator until resolved"
+        }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evalCase" }
+    }
+  },
+  "$defs": {
+    "evalCase": {
+      "type": "object",
+      "required": ["id", "equipmentId", "message", "category", "expectedOutcome"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,64}$" },
+        "equipmentId": { "type": "string", "default": "sdb1560m" },
+        "message": { "type": "string", "minLength": 1 },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["role", "content"],
+            "properties": {
+              "role": { "enum": ["user", "assistant"] },
+              "content": { "type": "string" }
+            }
+          }
+        },
+        "category": {
+          "enum": [
+            "numeric_spec",
+            "kit_completeness",
+            "operating_mode",
+            "maintenance",
+            "alarm_troubleshooting",
+            "unsupported_by_manual",
+            "foreign_model",
+            "paraphrase",
+            "dialog_followup",
+            "contradictory_context"
+          ]
+        },
+        "factIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Links to fact registry (F-* in facts-and-eval-audit.md)"
+        },
+        "resolutionStatus": {
+          "enum": [
+            "ready",
+            "blocked_pending_source_resolution",
+            "informational_only"
+          ],
+          "default": "ready",
+          "description": "blocked_* cases contribute only to leakage/abstention metrics, not factual accuracy"
+        },
+        "expectedOutcome": {
+          "type": "object",
+          "required": ["mode"],
+          "properties": {
+            "mode": {
+              "enum": ["must_answer", "must_abstain", "either_abstain_or_answer_if_grounded"]
+            },
+            "abstainReason": {
+              "type": "string",
+              "description": "Human-readable: why abstain is correct when mode=must_abstain"
+            }
+          }
+        },
+        "requiredFacts": {
+          "type": "array",
+          "description": "Only when resolutionStatus=ready. Each entry is a grounded claim expectation.",
+          "items": {
+            "type": "object",
+            "required": ["claimPattern"],
+            "properties": {
+              "claimPattern": {
+                "type": "string",
+                "description": "RE2 regex; must match answer when mode=must_answer"
+              },
+              "unit": {
+                "type": "string",
+                "description": "When set with a numeric claimPattern, runner requires unit token near the number (kg, W, months aliases). Does not prove semantic correctness."
+              },
+              "factId": { "type": "string" },
+              "sourceHint": {
+                "type": "string",
+                "description": "e.g. PDF table 1.1 row SDB1560M — not auto-pass from sources list"
+              },
+              "appliesWhenPattern": {
+                "type": "string",
+                "description": "Optional RE2: requiredFact is scored only if this matches the answer (e.g. base kit vs with-options). Not implemented in runner v1.2 — document-only extension for kit-scoped facts."
+              }
+            }
+          }
+        },
+        "forbiddenClaims": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pattern": { "type": "string" },
+              "reason": { "type": "string" },
+              "leakageModel": { "type": "string" }
+            }
+          }
+        },
+        "retrievalExpectations": {
+          "type": "object",
+          "properties": {
+            "mustIncludeSourceDocPatterns": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "mustIncludeChunkPatterns": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Substring/regex that must appear in at least one retrieved chunk body (future: from ragTrace)"
+            },
+            "mustNotRelyOnSourceAlone": {
+              "type": "boolean",
+              "default": true,
+              "description": "PDF in sources does not imply pass"
+            },
+            "minPromptChunks": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "abstentionRules": {
+          "type": "object",
+          "properties": {
+            "allowedAbstainPatterns": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "e.g. exact STRICT_ABSTAIN text"
+            },
+            "forbiddenAbstainWhen": {
+              "type": "object",
+              "properties": {
+                "chunkContainsPatterns": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "note": {
+                  "type": "string",
+                  "description": "Requires trace export; not equivalent to legacy requireManualSource"
+                }
+              }
+            },
+            "forbiddenHedgingPatterns": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "scoring": {
+          "type": "object",
+          "properties": {
+            "countsToward": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "retrieval_recall_at_k",
+                  "answer_factual_accuracy",
+                  "grounded_claim_rate",
+                  "correct_abstention_rate",
+                  "answerable_abstention_rate",
+                  "cross_model_leakage_rate",
+                  "regression_pass_rate"
+                ]
+              }
+            },
+            "weight": { "type": "number", "minimum": 0, "default": 1 }
+          }
+        },
+        "legacyCompat": {
+          "type": "object",
+          "description": "Optional mapping to old evaluateHttpCase fields — for migration only",
+          "properties": {
+            "mustMatch": { "type": "array", "items": { "type": "string" } },
+            "mustNotMatch": { "type": "array", "items": { "type": "string" } },
+            "requireManualSource": { "type": "boolean" },
+            "allowAbstainWithPdf": { "type": "boolean" }
+          }
+        },
+        "notes": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "resolutionStatus": { "const": "blocked_pending_source_resolution" } }
+          },
+          "then": {
+            "not": { "required": ["requiredFacts"] },
+            "properties": {
+              "requiredFacts": { "maxItems": 0 }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

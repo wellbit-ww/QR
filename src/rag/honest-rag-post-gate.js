@@ -1,11 +1,19 @@
 const { getRagConfig } = require("./config");
 const { runGuardrails } = require("./guardrails/guardrail-engine");
-const { shouldUseHonestRag, isNumericTtxRetrievalQuery } = require("./honest-rag-mode");
+const {
+  shouldUseHonestRag,
+  isNumericTtxRetrievalQuery,
+  shouldUseRagPure,
+  contextHasSdb1560AnswerableData,
+  isSpuriousModelAbstainAnswer,
+  ragPureSdb1560AnswerLooksOnTopic,
+} = require("./honest-rag-mode");
 const {
   buildValidationIntent,
   resolveAbstainAnswer,
 } = require("./sdb1106nm-post-gate");
 const { validateSdb1560mAnswerAgainstContext } = require("./sdb1560m-answer-validation");
+const { resolveEffectiveUserQuestion } = require("./query-rewriting");
 const { STRICT_ABSTAIN } = require("./prompts");
 
 const ragConfig = getRagConfig();
@@ -27,6 +35,7 @@ function applyHonestRagPostGate({
   validationProfile = "sdb1560",
 }) {
   void history;
+  const effectiveMessage = resolveEffectiveUserQuestion(message, history);
   const answerText = String(answer || "").trim();
   if (deliveryMethod === "rag_deterministic" || deliveryMethod === "direct_deterministic") {
     return {
@@ -45,7 +54,7 @@ function applyHonestRagPostGate({
   }
 
   const intent = buildValidationIntent({
-    message,
+    message: effectiveMessage,
     equipment,
     gateAction,
     routerDecision,
@@ -54,6 +63,7 @@ function applyHonestRagPostGate({
 
   const equipmentId = equipment?.id || "sdb1560m";
   const honestRag = shouldUseHonestRag(equipmentId);
+  const ragPure = shouldUseRagPure(equipmentId);
   const guardrails = runGuardrails({
     answer,
     retrievalContext: context,
@@ -62,25 +72,57 @@ function applyHonestRagPostGate({
       deliveryMethod,
       semanticSimilarity,
       semanticRescueThreshold: ragConfig.semanticRescueThreshold,
-      originalQuery: message,
+      originalQuery: effectiveMessage,
       validationProfile,
       equipmentId,
       honestRag,
-      skipGoldenFacts: honestRag && isNumericTtxRetrievalQuery(message, intent),
+      skipGoldenFacts:
+        ragPure || (honestRag && isNumericTtxRetrievalQuery(effectiveMessage, intent)),
+      ragPure,
     },
   });
 
-  const candidate =
+  const rawAnswer = String(answer || "").trim();
+  let candidate =
     guardrails.action === "ALLOW" && guardrails.passed
       ? String(guardrails.outputText || answer || "").trim()
       : resolveAbstainAnswer(message, intent, equipment, history);
+
+  if (
+    ragPure &&
+    contextHasSdb1560AnswerableData(context) &&
+    guardrails.action !== "ALLOW" &&
+    rawAnswer.length >= 16 &&
+    !isSpuriousModelAbstainAnswer(rawAnswer) &&
+    ragPureSdb1560AnswerLooksOnTopic(effectiveMessage, rawAnswer)
+  ) {
+    candidate = rawAnswer;
+  }
 
   const validation =
     validationProfile === "sdb1560"
       ? validateSdb1560mAnswerAgainstContext(candidate, context, intent)
       : { ok: true, failures: [], warnings: [] };
 
-  const finalAnswer = validation.ok ? candidate : resolveAbstainAnswer(message, intent, equipment, history);
+  let finalAnswer = validation.ok ? candidate : resolveAbstainAnswer(message, intent, equipment, history);
+
+  if (
+    ragPure &&
+    contextHasSdb1560AnswerableData(context) &&
+    !validation.ok &&
+    !isSpuriousModelAbstainAnswer(candidate) &&
+    ragPureSdb1560AnswerLooksOnTopic(effectiveMessage, candidate)
+  ) {
+    finalAnswer = candidate;
+  }
+
+  if (
+    ragPure &&
+    !contextHasSdb1560AnswerableData(context) &&
+    isSpuriousModelAbstainAnswer(finalAnswer)
+  ) {
+    finalAnswer = STRICT_ABSTAIN;
+  }
 
   return {
     answer: finalAnswer,
@@ -97,6 +139,7 @@ function applyHonestRagPostGate({
       validationOk: validation.ok,
       validationFailureCodes: (validation.failures || []).map((f) => f.code).filter(Boolean),
       skippedDeterministicRecovery: true,
+      ragPure,
     },
   };
 }

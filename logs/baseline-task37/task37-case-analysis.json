@@ -1,0 +1,911 @@
+{
+  "task": 37,
+  "generatedAt": "2026-11-05T05:42:20.551Z",
+  "branch": "backup/sova-portal",
+  "head": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+  "evalRunner": "1.7-task33",
+  "baselineReference": "logs/baseline-task36/task28-generalization-http-v14/report.json",
+  "sharedDefects": [
+    {
+      "id": "misrouting_generic_kind",
+      "cases": [
+        "gen.num.dim-tolerance",
+        "gen.kit.feet-height",
+        "gen.note.height-signal",
+        "gen.num.pwr-dry-opt810",
+        "gen.multi.n2-flow-range",
+        "gen.rh.rule-above30"
+      ],
+      "category": "INTENT_ROUTING"
+    },
+    {
+      "id": "partial_prior_blocks_replace",
+      "cases": [
+        "gen.num.dim-tolerance",
+        "gen.kit.feet-height",
+        "gen.note.height-signal",
+        "gen.multi.ambient-temp-rh"
+      ],
+      "category": "EXTRACT_SELECTION"
+    },
+    {
+      "id": "multi_fact_single_extract",
+      "cases": [
+        "gen.multi.dry-regen-power",
+        "gen.multi.ambient-temp-rh"
+      ],
+      "category": "MULTI_FACT_COMPLETENESS"
+    },
+    {
+      "id": "n2_satisfaction_false_positive",
+      "cases": [
+        "gen.opt.n2-timer-max",
+        "gen.opt.n2-sensor-max"
+      ],
+      "category": "EXTRACT_SATISFACTION"
+    }
+  ],
+  "productionFixesTask37": [
+    {
+      "file": "src/rag/honest-contextual-extract.js",
+      "summary": "New semantic kinds (dim_tolerance, kit_feet, height_table_note, power_drying_opt, power_dry_regen, ambient_temp_rh, rh_setpoint_rule); n2 satisfaction fixes; priorAnswerFullyAnswersQuery"
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "gen.num.dim-tolerance",
+      "baselineResult": "fail",
+      "baselineReason": "factual",
+      "expectedFacts": [
+        {
+          "claimPattern": "5",
+          "sourceHint": "PDF table 1.1 note p.7",
+          "unit": "mm"
+        }
+      ],
+      "actualAnswer": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "sourceStatus": "PDF_CONFIRMED",
+      "sourceEvidence": [
+        "PDF table 1.1 note p.7"
+      ],
+      "retrievedSourceIds": [
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 1,
+          "contentLen": 1430
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 0,
+          "contentLen": 354
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 2,
+          "contentLen": 360
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 68,
+          "contentLen": 102
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 69,
+          "contentLen": 102
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 70,
+          "contentLen": 102
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 71,
+          "contentLen": 100
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 6,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 9,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 32,
+          "contentLen": 1520
+        }
+      ],
+      "extractKind": "dimensions",
+      "extractCandidate": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "extractSatisfiesQuery": null,
+      "replacementDecision": "should_not_replace",
+      "llmOutput": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "postGateOutcome": null,
+      "rootCause": "INTENT_ROUTING",
+      "rootCauseConfidence": "high",
+      "fixRecommended": "dim_tolerance kind + priorAnswerFullyAnswersQuery guard",
+      "verificationResult": {
+        "unitTest": "scripts/test-sdb1560m-task37-contextual-extract.js",
+        "httpTask36Baseline": "fail",
+        "httpTask37": "not_run_portal_down"
+      },
+      "hypothesis": "Tolerance question routed to dimensions; extract emitted 1202×1693×1028; prior LLM answer matched dimensions satisfaction → should_not_replace; missing ±5 mm."
+    },
+    {
+      "caseId": "gen.num.pwr-dry-opt810",
+      "baselineResult": "fail",
+      "baselineReason": "factual",
+      "expectedFacts": [
+        {
+          "claimPattern": "810",
+          "sourceHint": "PDF p.6 п.1.1.2.7г",
+          "unit": "W"
+        }
+      ],
+      "actualAnswer": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+      "sourceStatus": "PDF_CONFIRMED",
+      "sourceEvidence": [
+        "PDF p.6 п.1.1.2.7г"
+      ],
+      "retrievedSourceIds": [
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 1,
+          "contentLen": 1430
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 2,
+          "contentLen": 360
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 0,
+          "contentLen": 354
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 6,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 33,
+          "contentLen": 1513
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 4,
+          "contentLen": 1360
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 32,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 9,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 30,
+          "contentLen": 1474
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 31,
+          "contentLen": 1520
+        }
+      ],
+      "extractKind": "n2_option",
+      "extractCandidate": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+      "extractSatisfiesQuery": null,
+      "replacementDecision": "should_not_replace",
+      "llmOutput": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+      "postGateOutcome": null,
+      "rootCause": "INTENT_ROUTING",
+      "rootCauseConfidence": "high",
+      "fixRecommended": "dryingPowerWithOptions routing before n2_option; power_drying_opt extract",
+      "verificationResult": {
+        "unitTest": "scripts/test-sdb1560m-task37-contextual-extract.js",
+        "httpTask36Baseline": "fail",
+        "httpTask37": "not_run_portal_down"
+      },
+      "hypothesis": "Power-with-options drying question matched isSdb1560mN2TechnicalQuery (азот+опци) before power extract → n2_option «не входит» answer."
+    },
+    {
+      "caseId": "gen.kit.feet-height",
+      "baselineResult": "fail",
+      "baselineReason": "factual",
+      "expectedFacts": [
+        {
+          "claimPattern": "50",
+          "sourceHint": "PDF table 1.2 p.10",
+          "unit": "mm"
+        }
+      ],
+      "actualAnswer": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "sourceStatus": "PDF_CONFIRMED",
+      "sourceEvidence": [
+        "PDF table 1.2 p.10"
+      ],
+      "retrievedSourceIds": [
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 1,
+          "contentLen": 1430
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 69,
+          "contentLen": 102
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 68,
+          "contentLen": 102
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 70,
+          "contentLen": 102
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 31,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 6,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 9,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 22,
+          "contentLen": 1500
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 30,
+          "contentLen": 1474
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 8,
+          "contentLen": 1140
+        }
+      ],
+      "extractKind": "dimensions",
+      "extractCandidate": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "extractSatisfiesQuery": null,
+      "replacementDecision": "should_not_replace",
+      "llmOutput": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "postGateOutcome": null,
+      "rootCause": "INTENT_ROUTING",
+      "rootCauseConfidence": "high",
+      "fixRecommended": "kit_feet kind from table 1.2 corpus",
+      "verificationResult": {
+        "unitTest": "scripts/test-sdb1560m-task37-contextual-extract.js",
+        "httpTask36Baseline": "fail",
+        "httpTask37": "not_run_portal_down"
+      },
+      "hypothesis": "Feet height question matched dimensions (высот); no kit_feet extract."
+    },
+    {
+      "caseId": "gen.opt.n2-timer-max",
+      "baselineResult": "fail",
+      "baselineReason": "factual",
+      "expectedFacts": [
+        {
+          "claimPattern": "99[,.]9",
+          "sourceHint": "PDF p.25 п.1.2.2.1"
+        }
+      ],
+      "actualAnswer": "Время включения автоматической подачи азота может быть установлено от 0 до 99 минут.",
+      "sourceStatus": "PDF_CONFIRMED",
+      "sourceEvidence": [
+        "PDF p.25 п.1.2.2.1"
+      ],
+      "retrievedSourceIds": [
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 0,
+          "contentLen": 354
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 1,
+          "contentLen": 1430
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 3,
+          "contentLen": 1359
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 30,
+          "contentLen": 1474
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 31,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 32,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 33,
+          "contentLen": 1513
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 15,
+          "contentLen": 449
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 29,
+          "contentLen": 1446
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 42,
+          "contentLen": 1520
+        }
+      ],
+      "extractKind": "n2_option",
+      "extractCandidate": "С **датчиком азота** порог концентрации — **78–98,0 %** с точностью **±1 %** (п. 1.2.2).",
+      "extractSatisfiesQuery": null,
+      "replacementDecision": "should_not_replace",
+      "llmOutput": "Время включения автоматической подачи азота может быть установлено от 0 до 99 минут.",
+      "postGateOutcome": null,
+      "rootCause": "EXTRACT_SATISFACTION",
+      "rootCauseConfidence": "high",
+      "fixRecommended": "Timer-specific satisfaction + «без датчика» guard; timer routing on «время подач»",
+      "verificationResult": {
+        "unitTest": "scripts/test-sdb1560m-task37-contextual-extract.js",
+        "httpTask36Baseline": "fail",
+        "httpTask37": "not_run_portal_down"
+      },
+      "hypothesis": "«без датчика» triggered sensor branch in extractSatisfiesQuery; prior «99 мин» falsely treated as satisfying via generic azot fallback."
+    },
+    {
+      "caseId": "gen.opt.n2-sensor-max",
+      "baselineResult": "fail",
+      "baselineReason": "factual",
+      "expectedFacts": [
+        {
+          "claimPattern": "98",
+          "sourceHint": "PDF p.25 п.1.2.2.1"
+        }
+      ],
+      "actualAnswer": "С **датчиком азота** порог концентрации — **78–98,0 %** с точностью **±1 %** (п. 1.2.2).",
+      "sourceStatus": "PDF_CONFIRMED",
+      "sourceEvidence": [
+        "PDF p.25 п.1.2.2.1"
+      ],
+      "retrievedSourceIds": [
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 0,
+          "contentLen": 354
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 3,
+          "contentLen": 1359
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 31,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 32,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 30,
+          "contentLen": 1474
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 42,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 29,
+          "contentLen": 1446
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 15,
+          "contentLen": 449
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 33,
+          "contentLen": 1513
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 9,
+          "contentLen": 1520
+        }
+      ],
+      "extractKind": "n2_option",
+      "extractCandidate": "С **датчиком азота** порог концентрации — **78–98,0 %** с точностью **±1 %** (п. 1.2.2).",
+      "extractSatisfiesQuery": null,
+      "replacementDecision": "should_not_replace",
+      "llmOutput": "С **датчиком азота** порог концентрации — **78–98,0 %** с точностью **±1 %** (п. 1.2.2).",
+      "postGateOutcome": null,
+      "rootCause": "EXTRACT_SATISFACTION",
+      "rootCauseConfidence": "medium",
+      "fixRecommended": "Sensor max branch requires \\b98\\b in answer",
+      "verificationResult": {
+        "unitTest": "scripts/test-sdb1560m-task37-contextual-extract.js",
+        "httpTask36Baseline": "fail",
+        "httpTask37": "not_run_portal_down"
+      },
+      "hypothesis": "Max-sensor questions satisfied by 78-only check; eval requires explicit 98."
+    },
+    {
+      "caseId": "gen.multi.dry-regen-power",
+      "baselineResult": "fail",
+      "baselineReason": "factual",
+      "expectedFacts": [
+        {
+          "claimPattern": "40",
+          "sourceHint": "PDF p.6",
+          "unit": "W"
+        },
+        {
+          "claimPattern": "540",
+          "sourceHint": "PDF p.6",
+          "unit": "W"
+        }
+      ],
+      "actualAnswer": "Для модели SDB1560М максимальная потребляемая мощность в режиме осушения не более 40 Вт,而在再生模式下，最大功耗不超过540瓦。",
+      "sourceStatus": "PDF_CONFIRMED",
+      "sourceEvidence": [
+        "PDF p.6",
+        "PDF p.6"
+      ],
+      "retrievedSourceIds": [
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 30,
+          "contentLen": 1474
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 5,
+          "contentLen": 934
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 6,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 1,
+          "contentLen": 1430
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 9,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 25,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 2,
+          "contentLen": 360
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 4,
+          "contentLen": 1360
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 32,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 22,
+          "contentLen": 1500
+        }
+      ],
+      "extractKind": "power_regen",
+      "extractCandidate": "Мощность в режиме **регенерации** для SDB1560NM — **не более 540 Вт** (раздел 1.1).",
+      "extractSatisfiesQuery": null,
+      "replacementDecision": "should_not_replace",
+      "llmOutput": "Для модели SDB1560М максимальная потребляемая мощность в режиме осушения не более 40 Вт,而在再生模式下，最大功耗不超过540瓦。",
+      "postGateOutcome": null,
+      "rootCause": "MULTI_FACT_COMPLETENESS",
+      "rootCauseConfidence": "high",
+      "fixRecommended": "power_dry_regen combined extract",
+      "verificationResult": {
+        "unitTest": "scripts/test-sdb1560m-task37-contextual-extract.js",
+        "httpTask36Baseline": "fail",
+        "httpTask37": "not_run_portal_down"
+      },
+      "hypothesis": "power_regen extract only 540 W; LLM partial answers blocked replacement; missing paired 40 W dry."
+    },
+    {
+      "caseId": "gen.multi.ambient-temp-rh",
+      "baselineResult": "fail",
+      "baselineReason": "factual",
+      "expectedFacts": [
+        {
+          "claimPattern": "15",
+          "sourceHint": "PDF p.7"
+        },
+        {
+          "claimPattern": "35",
+          "sourceHint": "PDF p.7"
+        },
+        {
+          "claimPattern": "80",
+          "sourceHint": "PDF p.7"
+        }
+      ],
+      "actualAnswer": "SDB1560NM допускает эксплуатацию при температуре окружающего воздуха **от +15 до +35 °C** (п. 1.1.2.12).",
+      "sourceStatus": "PDF_CONFIRMED",
+      "sourceEvidence": [
+        "PDF p.7",
+        "PDF p.7",
+        "PDF p.7"
+      ],
+      "retrievedSourceIds": [
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 0,
+          "contentLen": 354
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 2,
+          "contentLen": 360
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 1,
+          "contentLen": 1430
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 32,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 7,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 30,
+          "contentLen": 1474
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 9,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 31,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 3,
+          "contentLen": 1359
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 4,
+          "contentLen": 1360
+        }
+      ],
+      "extractKind": "ambient_temp",
+      "extractCandidate": "SDB1560NM допускает эксплуатацию при температуре окружающего воздуха **от +15 до +35 °C** (п. 1.1.2.12).",
+      "extractSatisfiesQuery": null,
+      "replacementDecision": "should_not_replace",
+      "llmOutput": "SDB1560NM допускает эксплуатацию при температуре окружающего воздуха **от +15 до +35 °C** (п. 1.1.2.12).",
+      "postGateOutcome": null,
+      "rootCause": "MULTI_FACT_COMPLETENESS",
+      "rootCauseConfidence": "high",
+      "fixRecommended": "ambient_temp_rh combined extract",
+      "verificationResult": {
+        "unitTest": "scripts/test-sdb1560m-task37-contextual-extract.js",
+        "httpTask36Baseline": "fail",
+        "httpTask37": "not_run_portal_down"
+      },
+      "hypothesis": "ambient_temp extract only +15…+35; RH 80 % missing; partial prior blocked replace."
+    },
+    {
+      "caseId": "gen.multi.n2-flow-range",
+      "baselineResult": "fail",
+      "baselineReason": "factual",
+      "expectedFacts": [
+        {
+          "claimPattern": "3",
+          "sourceHint": "PDF p.25"
+        },
+        {
+          "claimPattern": "30",
+          "sourceHint": "PDF p.25"
+        }
+      ],
+      "actualAnswer": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+      "sourceStatus": "PDF_CONFIRMED",
+      "sourceEvidence": [
+        "PDF p.25",
+        "PDF p.25"
+      ],
+      "retrievedSourceIds": [
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 0,
+          "contentLen": 354
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 1,
+          "contentLen": 1430
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 30,
+          "contentLen": 1474
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 3,
+          "contentLen": 1359
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 32,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 31,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 33,
+          "contentLen": 1513
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 29,
+          "contentLen": 1446
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 9,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 42,
+          "contentLen": 1520
+        }
+      ],
+      "extractKind": "n2_option",
+      "extractCandidate": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+      "extractSatisfiesQuery": null,
+      "replacementDecision": "should_not_replace",
+      "llmOutput": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+      "postGateOutcome": null,
+      "rootCause": "INTENT_ROUTING",
+      "rootCauseConfidence": "high",
+      "fixRecommended": "isN2FlowRangeQuery + range extract",
+      "verificationResult": {
+        "unitTest": "scripts/test-sdb1560m-task37-contextual-extract.js",
+        "httpTask36Baseline": "fail",
+        "httpTask37": "not_run_portal_down"
+      },
+      "hypothesis": "Flow-range question hit n2_option «не входит in base» branch instead of 3–30 l/min."
+    },
+    {
+      "caseId": "gen.note.height-signal",
+      "baselineResult": "fail",
+      "baselineReason": "factual",
+      "expectedFacts": [
+        {
+          "claimPattern": "без\\s+учета|не\\s+учитыва",
+          "sourceHint": "PDF table 1.1 note p.7"
+        }
+      ],
+      "actualAnswer": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "sourceStatus": "PDF_CONFIRMED",
+      "sourceEvidence": [
+        "PDF table 1.1 note p.7"
+      ],
+      "retrievedSourceIds": [
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 1,
+          "contentLen": 1430
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 0,
+          "contentLen": 354
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 2,
+          "contentLen": 360
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 48,
+          "contentLen": 1374
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 67,
+          "contentLen": 761
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 61,
+          "contentLen": 186
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 6,
+          "contentLen": 1520
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 30,
+          "contentLen": 1474
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 3,
+          "contentLen": 1359
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 27,
+          "contentLen": 1520
+        }
+      ],
+      "extractKind": "dimensions",
+      "extractCandidate": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "extractSatisfiesQuery": null,
+      "replacementDecision": "should_not_replace",
+      "llmOutput": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "postGateOutcome": null,
+      "rootCause": "INTENT_ROUTING",
+      "rootCauseConfidence": "high",
+      "fixRecommended": "height_table_note extract from table 1.1 footnote",
+      "verificationResult": {
+        "unitTest": "scripts/test-sdb1560m-task37-contextual-extract.js",
+        "httpTask36Baseline": "fail",
+        "httpTask37": "not_run_portal_down"
+      },
+      "hypothesis": "Height note question routed to dimensions sizes."
+    },
+    {
+      "caseId": "gen.rh.rule-above30",
+      "baselineResult": "fail",
+      "baselineReason": "factual",
+      "expectedFacts": [
+        {
+          "claimPattern": "20",
+          "sourceHint": "PDF p.4–5 ВНИМАНИЕ п.2"
+        }
+      ],
+      "actualAnswer": "Максимальная относительная влажность окружающего воздуха для эксплуатации SDB1560NM — **не более 80 %RH** (п. 1.1.2.12).",
+      "sourceStatus": "PDF_CONFIRMED",
+      "sourceEvidence": [
+        "PDF p.4–5 ВНИМАНИЕ п.2"
+      ],
+      "retrievedSourceIds": [
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 48,
+          "contentLen": 1374
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 63,
+          "contentLen": 194
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 67,
+          "contentLen": 761
+        },
+        {
+          "sourceDoc": "retrieval-cards/humidity-time.md",
+          "chunkIndex": 0,
+          "contentLen": 718
+        },
+        {
+          "sourceDoc": "retrieval-cards/set-menu.md",
+          "chunkIndex": 0,
+          "contentLen": 554
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 64,
+          "contentLen": 188
+        },
+        {
+          "sourceDoc": "golden-facts-sdb1560m.md",
+          "chunkIndex": 2,
+          "contentLen": 360
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 57,
+          "contentLen": 242
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 22,
+          "contentLen": 1500
+        },
+        {
+          "sourceDoc": "Руководство SDB1560NM.pdf",
+          "chunkIndex": 24,
+          "contentLen": 1023
+        }
+      ],
+      "extractKind": "rh_ambient_max",
+      "extractCandidate": "Максимальная относительная влажность окружающего воздуха для эксплуатации SDB1560NM — **не более 80 %RH** (п. 1.1.2.12).",
+      "extractSatisfiesQuery": null,
+      "replacementDecision": "should_not_replace",
+      "llmOutput": "Максимальная относительная влажность окружающего воздуха для эксплуатации SDB1560NM — **не более 80 %RH** (п. 1.1.2.12).",
+      "postGateOutcome": null,
+      "rootCause": "INTENT_ROUTING",
+      "rootCauseConfidence": "high",
+      "fixRecommended": "rh_setpoint_rule kind",
+      "verificationResult": {
+        "unitTest": "scripts/test-sdb1560m-task37-contextual-extract.js",
+        "httpTask36Baseline": "fail",
+        "httpTask37": "not_run_portal_down"
+      },
+      "hypothesis": "Setpoint rule question matched rh_ambient_max (80 %RH ambient) instead of RH%окр−20 rule."
+    }
+  ]
+}

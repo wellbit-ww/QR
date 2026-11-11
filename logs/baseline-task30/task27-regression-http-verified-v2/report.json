@@ -1,0 +1,1413 @@
+{
+  "manifest": {
+    "capturedAt": "2026-11-02T07:50:04.719Z",
+    "schemaVersion": "1.0-eval-contour",
+    "evalRunnerLibVersion": "1.5-task23",
+    "git": {
+      "commit": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+      "branch": "backup/sova-portal",
+      "dirty": true,
+      "dirtyLineCount": 116,
+      "interpretResultsAsHeadOnly": false,
+      "note": "Working tree dirty — results may include uncommitted changes not in commit"
+    },
+    "dataset": {
+      "path": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\docs\\reports\\sdb1560m-eval-suite-expanded-v2.json",
+      "sha256": "c628bf86d22405f4408f76e5c5a18ff720c44f395f1c72bee20f3183095b2f3a",
+      "partition": "verified"
+    },
+    "run": {
+      "mode": "http",
+      "noProvision": true,
+      "allowHttp": true,
+      "dryRun": false,
+      "authMode": "missing_credentials"
+    },
+    "serverEnvFingerprint": {
+      "RAG_HONEST_EQUIPMENT": "sdb1560m",
+      "RAG_PURE": "1",
+      "SOVA_QUERY_REWRITE": "unknown",
+      "OLLAMA_MODEL": "unknown",
+      "EMBEDDING_MODEL": "unknown",
+      "EVAL_BASE_URL": "http://127.0.0.1:3000",
+      "EVAL_LOGIN": "missing",
+      "EVAL_PASSWORD": "missing"
+    },
+    "indexFingerprint": {
+      "value": "unknown",
+      "method": "not probed (no DB read by default)"
+    },
+    "skipReasons": [],
+    "secretsPolicy": "passwords and .env contents are never stored"
+  },
+  "caseResults": [
+    {
+      "case": {
+        "id": "exp.num.mass.direct",
+        "category": "numeric_spec",
+        "message": "Какой вес шкафа SDB1560M?",
+        "factIds": [
+          "F-MASS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "unit": "kg",
+            "factId": "F-MASS",
+            "sourceHint": "PDF table 1.1 p.7"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "180",
+            "reason": "SDB1106NM mass row",
+            "leakageModel": "sdb1106-nm"
+          }
+        ],
+        "retrievalExpectations": {
+          "mustIncludeSourceDocPatterns": [
+            "SDB1560NM\\.pdf|Руководство\\s+SDB1560"
+          ],
+          "mustNotRelyOnSourceAlone": true
+        },
+        "notes": "Same intent as num.mass.verified; deterministic+HTTP ref",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "cross_model_leakage_rate",
+            "regression_pass_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.dims.table11",
+        "category": "numeric_spec",
+        "message": "Какие габариты SDB1560M?",
+        "factIds": [
+          "F-DIMS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1202",
+            "factId": "F-DIMS"
+          },
+          {
+            "claimPattern": "1693",
+            "factId": "F-DIMS"
+          },
+          {
+            "claimPattern": "1028",
+            "factId": "F-DIMS"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "772",
+            "reason": "Other model depth from table 1.1"
+          }
+        ],
+        "notes": "PDF table 1.1 p.7 SDB1560M row",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.ip55",
+        "category": "numeric_spec",
+        "message": "Какой класс защиты IP у шкафа?",
+        "factIds": [
+          "F-IP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "IP\\\\s*55|IP55",
+            "factId": "F-IP"
+          }
+        ],
+        "notes": "PDF p.7 para 1.1.2.11",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.pwr-storage-8",
+        "category": "numeric_spec",
+        "message": "Сколько ватт в режиме хранения?",
+        "factIds": [
+          "F-PWR-STOR"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "8",
+            "unit": "W",
+            "factId": "F-PWR-STOR"
+          }
+        ],
+        "notes": "PDF p.5 1.1.2.7a",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.pwr-dry-base-40",
+        "category": "numeric_spec",
+        "message": "Мощность в режиме осушения без опций?",
+        "factIds": [
+          "F-PWR-DRY"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "40",
+            "unit": "W",
+            "factId": "F-PWR-DRY"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "415",
+            "reason": "151-702 group with options"
+          },
+          {
+            "pattern": "810",
+            "reason": "with-options line for 1560"
+          }
+        ],
+        "notes": "PDF p.6 1.1.2.7v",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "cross_model_leakage_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.pwr-regen-540",
+        "category": "numeric_spec",
+        "message": "Максимальная мощность при регенерации?",
+        "factIds": [
+          "F-PWR-REG"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "540",
+            "unit": "W",
+            "factId": "F-PWR-REG"
+          }
+        ],
+        "notes": "PDF p.6 1.1.2.7d",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.mains-220",
+        "category": "numeric_spec",
+        "message": "Какое напряжение питания шкафа?",
+        "factIds": [
+          "F-MAINS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "220",
+            "factId": "F-MAINS"
+          }
+        ],
+        "notes": "PDF p.5 1.1.2.6; unit V implicit in question",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.rh-range",
+        "category": "numeric_spec",
+        "message": "Какой диапазон влажности поддерживает шкаф?",
+        "factIds": [
+          "F-RH-RANGE"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "0",
+            "factId": "F-RH-RANGE"
+          },
+          {
+            "claimPattern": "80",
+            "factId": "F-RH-RANGE"
+          }
+        ],
+        "notes": "PDF p.4 1.1.2.1; checker bounded numbers only",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.rh-step",
+        "category": "numeric_spec",
+        "message": "С каким шагом можно выставить влажность?",
+        "factIds": [
+          "F-RH-STEP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "0[,.]1|0\\\\.1",
+            "factId": "F-RH-STEP"
+          }
+        ],
+        "notes": "PDF p.4 1.1.2.2",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.rh-accuracy",
+        "category": "numeric_spec",
+        "message": "Какая точность поддержания влажности?",
+        "factIds": [
+          "F-RH-ACC"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "±\\s*1\\s*RH|±\\s*1\\s*%\\s*RH|1\\s*RH\\s*%",
+            "factId": "F-RH-ACC"
+          }
+        ],
+        "notes": "PDF p.4 1.1.2.3",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.warmup-180",
+        "category": "numeric_spec",
+        "message": "Через сколько минут выходит на режим после включения?",
+        "factIds": [
+          "F-WARMUP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "180|3\\\\s*ч",
+            "factId": "F-WARMUP"
+          }
+        ],
+        "notes": "PDF p.4 1.1.2.4",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.shelf-load-100",
+        "category": "numeric_spec",
+        "message": "Какая максимальная нагрузка на стандартную полку?",
+        "factIds": [
+          "F-SHELF-LOAD"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "100",
+            "unit": "kg",
+            "factId": "F-SHELF-LOAD"
+          }
+        ],
+        "notes": "PDF section 2.1 / table 1.4",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.n2-timer-99",
+        "category": "numeric_spec",
+        "message": "Какой максимум у таймера подачи азота без датчика?",
+        "factIds": [
+          "F-N2-TIMER"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "99.9",
+            "factId": "F-N2-TIMER",
+            "unit": "min"
+          }
+        ],
+        "notes": "PDF p.25 / menu; golden 99,9 min — explicit decimal required",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.wheels-kit-4",
+        "category": "kit_completeness",
+        "message": "Сколько колёс в комплекте для SDB1560M?",
+        "factIds": [
+          "F-WHEELS-KIT"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "4",
+            "factId": "F-WHEELS-KIT"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "4\\\\s*двер",
+            "reason": "Confuse doors with wheels"
+          }
+        ],
+        "notes": "PDF table 1.2 item 2 p.10 — wheels not doors",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.feet-kit-4",
+        "category": "kit_completeness",
+        "message": "Сколько регулируемых ножек в комплекте?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "4",
+            "factId": "F-FEET-KIT"
+          }
+        ],
+        "notes": "PDF table 1.2 item 3 p.10",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.multi.mass-and-width",
+        "category": "numeric_spec",
+        "message": "Масса и ширина шкафа SDB1560M?",
+        "factIds": [
+          "F-MASS",
+          "F-DIMS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "unit": "kg",
+            "factId": "F-MASS"
+          },
+          {
+            "claimPattern": "1202",
+            "factId": "F-DIMS"
+          }
+        ],
+        "notes": "Multi-fact; model token + kg checker regression risk",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.para.mass-heavy",
+        "category": "paraphrase",
+        "message": "Тяжёлый? вдвоём поднимем?",
+        "factIds": [
+          "F-MASS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "factId": "F-MASS"
+          }
+        ],
+        "notes": "Colloquial; suite lacks unit:kg — asymmetry vs direct mass",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.para.dims-typo",
+        "category": "paraphrase",
+        "message": "габариты шкафа 1560?",
+        "factIds": [
+          "F-DIMS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1202",
+            "factId": "F-DIMS"
+          }
+        ],
+        "notes": "Omitted model name",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.para.ip-bryzgi",
+        "category": "paraphrase",
+        "message": "От брызг защищён? Какой IP?",
+        "factIds": [
+          "F-IP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "IP\\\\s*55|IP55",
+            "factId": "F-IP"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.para.dry-no-options",
+        "category": "paraphrase",
+        "message": "Сколько жрёт при осушении если без азота и подогрева?",
+        "factIds": [
+          "F-PWR-DRY"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "40",
+            "unit": "W",
+            "factId": "F-PWR-DRY"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "810",
+            "reason": "with-options"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.para.warmup-plain",
+        "category": "paraphrase",
+        "message": "Долго выходит на влажность после включения?",
+        "factIds": [
+          "F-WARMUP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "180|3\\\\s*ч",
+            "factId": "F-WARMUP"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.mode.regen-no-shutdown",
+        "category": "operating_mode",
+        "message": "Можно выключить шкаф при регенерации?",
+        "factIds": [
+          "F-SMOKE-REGEN"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Запрещается|запрещ",
+            "factId": "F-SMOKE-REGEN"
+          }
+        ],
+        "notes": "Safety norm PDF 2.4",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy",
+            "regression_pass_rate"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.env.temp-range",
+        "category": "numeric_spec",
+        "message": "При какой температуре помещения можно эксплуатировать шкаф?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "15",
+            "factId": "F-ENV-TEMP"
+          },
+          {
+            "claimPattern": "35",
+            "factId": "F-ENV-TEMP"
+          }
+        ],
+        "notes": "PDF p.7 1.1.2.12 +15..+35 C",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.env.rh-ambient-max",
+        "category": "numeric_spec",
+        "message": "Какая максимальная относительная влажность окружающего воздуха допускается?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "80",
+            "factId": "F-ENV-RH"
+          }
+        ],
+        "notes": "PDF p.7 1.1.2.12 not more 80%",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.maint.desicc-36mo",
+        "category": "maintenance",
+        "message": "Как часто менять блок осушения?",
+        "factIds": [
+          "F-MAINT-DES"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "36",
+            "unit": "months",
+            "factId": "F-MAINT-DES"
+          }
+        ],
+        "notes": "PDF p.35 table 3.1",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.alarm.beep-open-door",
+        "category": "alarm_troubleshooting",
+        "message": "Пищит при открытой двери — это норма?",
+        "factIds": [
+          "F-BEEP-DOOR"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "звук|сигнал|штатн|норм|1\\\\.1\\\\.4\\\\.3\\\\.4",
+            "factId": "F-BEEP-DOOR"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.alarm.red-lamp",
+        "category": "alarm_troubleshooting",
+        "message": "Красная лампа мигает — что означает?",
+        "factIds": [
+          "F-RED-LAMP"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "Осушен|1\\\\.1\\\\.4\\\\.3",
+            "factId": "F-RED-LAMP"
+          }
+        ],
+        "notes": "Card red-lamp + PDF 1.1.4.3.3",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.alarm.rh-rise-loading",
+        "category": "alarm_troubleshooting",
+        "message": "После загрузки влажность выросла — это нормально?",
+        "factIds": [
+          "F-RH-RISE-DOOR"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "1\\\\.1\\\\.4\\\\.4\\\\.1|вентилятор|открыт",
+            "factId": "F-RH-RISE-DOOR"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.alarm.w-display",
+        "category": "alarm_troubleshooting",
+        "message": "На дисплее W — это ошибка?",
+        "factIds": [
+          "F-W-DISPLAY"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "подогрев|W",
+            "factId": "F-W-DISPLAY"
+          }
+        ],
+        "notes": "Option heating symbol; card yellow-and-w",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.leak.mass-180",
+        "category": "numeric_spec",
+        "message": "Какая масса SDB1560M?",
+        "factIds": [
+          "F-MASS"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "260",
+            "unit": "kg",
+            "factId": "F-MASS"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "180",
+            "leakageModel": "sdb1106-nm"
+          }
+        ],
+        "scoring": {
+          "countsToward": [
+            "cross_model_leakage_rate",
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.identity.manual-name",
+        "category": "paraphrase",
+        "message": "Как в руководстве называется модель шкафа?",
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "SDB1560",
+            "factId": "F-IDENTITY"
+          }
+        ],
+        "notes": "Manual uses SDB1560M/NM; portal id sdb1560m",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": [],
+        "forbiddenClaims": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    },
+    {
+      "case": {
+        "id": "exp.num.pwr-storage-with-opt-810",
+        "category": "numeric_spec",
+        "message": "Мощность в режиме хранения с азотом и подогревом?",
+        "factIds": [
+          "F-PWR-STOR-OPT"
+        ],
+        "resolutionStatus": "ready",
+        "expectedOutcome": {
+          "mode": "must_answer"
+        },
+        "requiredFacts": [
+          {
+            "claimPattern": "810",
+            "unit": "W",
+            "factId": "F-PWR-STOR-OPT"
+          }
+        ],
+        "forbiddenClaims": [
+          {
+            "pattern": "8",
+            "reason": "base storage only — checker may need careful phrasing"
+          }
+        ],
+        "notes": "PDF p.5 1.1.2.7b SDB1560M 810W; conflict with bare 8W if both asserted",
+        "scoring": {
+          "countsToward": [
+            "answer_factual_accuracy"
+          ]
+        },
+        "equipmentId": "sdb1560m",
+        "history": []
+      },
+      "overall": {
+        "status": "infrastructure_error",
+        "reason": "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      },
+      "layers": {},
+      "answerPreview": null,
+      "checksExecuted": [],
+      "errors": [
+        "EVAL_LOGIN and EVAL_PASSWORD must be set (runner never creates users)"
+      ]
+    }
+  ],
+  "metrics": {
+    "answer_factual_accuracy": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "value": null,
+      "zeroDenominatorBehavior": "value is null; do not report as 100%",
+      "note": "Deterministic number/text heuristic on answer text — not semantic factual accuracy or PDF grounding"
+    },
+    "cross_model_leakage_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "includedCaseIds": [],
+      "value": null,
+      "note": "numerator = cases where forbidden pattern matched answer"
+    },
+    "regression_pass_rate": {
+      "numerator": 0,
+      "denominator": 0,
+      "excludedBlockedCaseIds": [],
+      "excludedNotEvaluableCaseIds": [],
+      "includedCaseIds": [],
+      "value": null,
+      "note": "pass only when all required layers for the case passed; not_evaluable excluded from denominator"
+    },
+    "retrieval_recall_at_k": {
+      "value": null,
+      "reason": "not computed: requires chunk-level recall evidence"
+    },
+    "grounded_claim_rate": {
+      "value": null,
+      "reason": "not computed unless chunk texts present in payload"
+    },
+    "correct_abstention_rate": {
+      "value": null,
+      "reason": "not aggregated: abstention scoring only per-case when allowedAbstainPatterns set"
+    },
+    "answerable_abstention_rate": {
+      "value": null,
+      "reason": "not computed: requires chunk grounding for answerable context"
+    }
+  },
+  "summary": {
+    "total": 32,
+    "pass": 0,
+    "fail": 0,
+    "blocked": 0,
+    "infrastructure_error": 32,
+    "not_run": 0,
+    "not_evaluable": 0
+  },
+  "diagnosticsByCaseId": {}
+}

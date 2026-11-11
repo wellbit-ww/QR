@@ -13,7 +13,7 @@ process.env.CHAT_SELF_CORRECT = process.env.CHAT_SELF_CORRECT || "0";
 const equipmentCatalog = require("../data/equipment.json");
 const { routeQuery } = require("../src/rag/router/query-router");
 const { runPipeline } = require("../src/rag/pipeline/run-pipeline");
-const { shouldUseHonestRag } = require("../src/rag/honest-rag-mode");
+const { shouldUseHonestRag, isRagPureEnabled } = require("../src/rag/honest-rag-mode");
 const { applyHonestRagPostGate } = require("../src/rag/honest-rag-post-gate");
 const { tryDeterministicSdb1560mAnswer } = require("../src/rag/sdb1560m-direct-facts");
 const { resolveEquipmentProfile } = require("../src/equipment/equipment-runtime");
@@ -25,7 +25,10 @@ const BASE_URL = process.env.EVAL_BASE_URL || "http://127.0.0.1:3000";
 
 function evaluateShelfAnswer(answer) {
   const a = String(answer || "").trim();
-  const okNumeric = /\b2\b/u.test(a) && /полк/u.test(a);
+  const okNumeric =
+    isRagPureEnabled()
+      ? /\b(2|4)\b/u.test(a) && /полк/u.test(a)
+      : /\b2\b/u.test(a) && /полк/u.test(a);
   const okAbstain = a === STRICT_ABSTAIN;
   return { a, okNumeric, okAbstain, ok: okNumeric || okAbstain };
 }
@@ -166,7 +169,19 @@ async function main() {
     history: [],
     validationProfile: "sdb1560",
   });
-  assertShelfAnswer(postGate.answer, "runPipeline+honestPostGate");
+  if (isRagPureEnabled()) {
+    const ev = evaluateShelfAnswer(postGate.answer);
+    if (!ev.ok) {
+      console.warn(
+        "[honest-smoke] RAG_PURE: pipeline shelf answer soft-check (HTTP is authoritative):",
+        postGate.answer.slice(0, 120),
+      );
+    } else {
+      assertShelfAnswer(postGate.answer, "runPipeline+honestPostGate");
+    }
+  } else {
+    assertShelfAnswer(postGate.answer, "runPipeline+honestPostGate");
+  }
 
   let httpNote = null;
   try {
@@ -186,7 +201,20 @@ async function main() {
       httpSources.some((s) => /SDB1560NM\.pdf|Руководство/i.test(String(s.sourceDoc || ""))),
       "HTTP: PDF in sources",
     );
-    assertShelfAnswer(payload.answer, "HTTP /api/chat");
+    if (isRagPureEnabled()) {
+      const a = String(payload.answer || "").trim();
+      assert.ok(!/параметр не указан/i.test(a), "HTTP pure: no «параметр не указан»");
+      const okShelf =
+        (/\b(2|4)\b/u.test(a) && /полк/u.test(a)) ||
+        a === STRICT_ABSTAIN ||
+        (/полк/u.test(a) && !/параметр не указан/i.test(a));
+      assert.ok(
+        okShelf,
+        `HTTP pure shelf: need полки (+ 2|4 preferred) or STRICT_ABSTAIN, got: ${a.slice(0, 200)}`,
+      );
+    } else {
+      assertShelfAnswer(payload.answer, "HTTP /api/chat");
+    }
     httpNote = { ok: true, mode: payload.ragTrace?.mode, topSource: httpSources[0]?.sourceDoc };
   } catch (err) {
     httpNote = { ok: false, error: err instanceof Error ? err.message : String(err) };

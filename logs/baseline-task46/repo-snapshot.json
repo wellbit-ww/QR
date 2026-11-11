@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "task46-read-only-snapshot",
+  "capturedAt": "2026-11-11",
+  "git": {
+    "branch": "backup/sova-portal",
+    "head": "8523954fadcc4f31b92305f81b8dfc09f3e61a14",
+    "readOnly": true
+  },
+  "baselineArtifact": "logs/baseline-task44/task28-generalization-http/",
+  "evalRunnerLibVersion": "1.11-task43-r1",
+  "summary": { "pass": 74, "fail": 32, "not_evaluable": 4, "infrastructure_error": 0, "leakageDen": 20, "leakageFail": 0 }
+}

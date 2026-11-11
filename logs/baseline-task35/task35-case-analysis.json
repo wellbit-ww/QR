@@ -1,0 +1,63 @@
+{
+  "task": 35,
+  "baselineTask33": {
+    "task27": "logs/baseline-task33/task27-regression-http-v10",
+    "task28": "logs/baseline-task33/task28-generalization-http-v9"
+  },
+  "confirmedRootCauses": [
+    {
+      "id": "gen.unsup.internal-volume-liters",
+      "priority": "P0",
+      "cause": "honest-contextual-extract inner_volume parsed 1896/896 from golden-facts table in retrieval context; contextual extract replaced LLM answer with formatted volume.",
+      "evidence": [
+        "Task33 v9 answerPreview: «**Внутренний объём** SDB1560NM — **1 896 л**.»",
+        "extractKind: inner_volume, contextualExtractApplied: true"
+      ],
+      "fix": [
+        "isUnverifiedVolumeLiterQuery → chat UNSUPPORTED_SPEC (MODEL_PARAM_NOT_SPECIFIED)",
+        "extractInnerVolumeL/extractFullVolumeL return null (C4 policy)",
+        "post-gate strips volume-liter claims on matching queries"
+      ],
+      "tests": ["scripts/test-sdb1560m-task35-hallucination-grounding.js"],
+      "httpTask35": "pass (v12)"
+    },
+    {
+      "id": "gen.unsup.full-volume-liters",
+      "priority": "P0",
+      "cause": "Same pipeline as inner volume; extractFullVolumeL matched 2070 in golden/index text.",
+      "fix": "Same as internal volume",
+      "tests": ["scripts/test-sdb1560m-task35-hallucination-grounding.js"],
+      "httpTask35": "pass (v12)"
+    },
+    {
+      "id": "gen.num.mass.base",
+      "priority": "P1",
+      "cause": "resolveExtractKind did not match «Какова масса» (only «какая масса»); contextualExtract skipped with no_kind while LLM emitted spurious context abstain.",
+      "evidence": ["Task33 v9 ragTrace contextualExtract.skipped: no_kind"],
+      "fix": "messageRequestsMass includes «Какова»; mass extract applies on spurious abstain",
+      "tests": ["scripts/test-sdb1560m-task35-hallucination-grounding.js"],
+      "httpTask35": "pass (v12)"
+    },
+    {
+      "id": "gen.num.voltage",
+      "priority": "P1",
+      "cause": "No mains voltage extract kind under honest RAG (deterministic direct-facts disabled).",
+      "fix": "mains_power extract kind + extractMainsPowerAnswer from table context",
+      "httpTask35": "fail (v12) — unit test passes; needs pipeline diagnosis",
+      "tests": ["scripts/test-sdb1560m-task35-hallucination-grounding.js"]
+    },
+    {
+      "id": "gen.num.freq",
+      "priority": "P1",
+      "cause": "Same as voltage — no extract path for frequency-only questions.",
+      "fix": "mains_power extract (50 Гц in combined answer)",
+      "httpTask35": "fail (v12)",
+      "tests": ["scripts/test-sdb1560m-task35-hallucination-grounding.js"]
+    }
+  ],
+  "deferredStages": {
+    "stage3_contextualExtract": "Not changed in Task 35 code pass (IDs from Task34 plan remain for follow-up).",
+    "stage4_retrieval": "Not changed — requires full-chunk verification per case.",
+    "stage5_mustAbstainRemaining": "Six non-volume cases unchanged pending HTTP verification."
+  }
+}

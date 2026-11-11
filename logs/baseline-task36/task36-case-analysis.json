@@ -1,0 +1,544 @@
+{
+  "task": 36,
+  "sourceReport": "logs/baseline-task35/task28-generalization-http-v12/report.json",
+  "generatedAt": "2026-11-03T06:42:44.757Z",
+  "priorityGroups": {
+    "A": [
+      "gen.num.voltage",
+      "gen.num.freq"
+    ],
+    "B": [
+      "gen.num.dim-tolerance",
+      "gen.num.pwr-dry-opt810",
+      "gen.kit.feet-height",
+      "gen.opt.n2-timer-max",
+      "gen.opt.n2-sensor-max",
+      "gen.multi.dry-regen-power",
+      "gen.multi.ambient-temp-rh",
+      "gen.multi.n2-flow-range",
+      "gen.note.height-signal",
+      "gen.rh.rule-above30"
+    ],
+    "C": [
+      "gen.num.rh-range-high",
+      "gen.env.pressure-kpa-min",
+      "gen.env.pressure-kpa-max",
+      "gen.num.ral",
+      "gen.std.esd",
+      "gen.rh.rule-below30",
+      "gen.spare.fuse-heating",
+      "gen.env.pressure-mmhg-min",
+      "gen.env.pressure-mmhg-max",
+      "gen.ind.green-only-storage",
+      "gen.proc.open-door-symbol",
+      "gen.proc.fan-symbol"
+    ],
+    "D": [
+      "gen.unsup.bluetooth",
+      "gen.unsup.sdb151-mass-for-1560",
+      "gen.unsup.warehouse-humidity-setpoint",
+      "gen.insuf.n2-without-option",
+      "gen.unsup.blockchain",
+      "gen.unsup.serial-format"
+    ]
+  },
+  "cases": [
+    {
+      "caseId": "gen.num.voltage",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "В документации на данную модель этот параметр не указан.",
+      "extractKind": "mains_power",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "POSTPROCESSING_FAILURE",
+        "detail": "mains_power extract produced ± tolerances not in PDF grounding context; post-gate validation failed → MODEL_PARAM_NOT_SPECIFIED",
+        "confidence": "high",
+        "fixJustified": true
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.num.voltage"
+    },
+    {
+      "caseId": "gen.num.freq",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "В документации на данную модель этот параметр не указан.",
+      "extractKind": "mains_power",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "POSTPROCESSING_FAILURE",
+        "detail": "mains_power extract produced ± tolerances not in PDF grounding context; post-gate validation failed → MODEL_PARAM_NOT_SPECIFIED",
+        "confidence": "high",
+        "fixJustified": true
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.num.freq"
+    },
+    {
+      "caseId": "gen.num.dim-tolerance",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "extractKind": "dimensions",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "EXTRACT_SELECTION_FAILURE",
+        "detail": "should_not_replace",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.num.dim-tolerance"
+    },
+    {
+      "caseId": "gen.num.pwr-dry-opt810",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+      "extractKind": "n2_option",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "EXTRACT_SELECTION_FAILURE",
+        "detail": "should_not_replace",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.num.pwr-dry-opt810"
+    },
+    {
+      "caseId": "gen.kit.feet-height",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "extractKind": "dimensions",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "EXTRACT_SELECTION_FAILURE",
+        "detail": "should_not_replace",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.kit.feet-height"
+    },
+    {
+      "caseId": "gen.opt.n2-timer-max",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Время включения автоматической подачи азота может быть установлено от 0 до 99 минут.",
+      "extractKind": "n2_option",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "EXTRACT_SELECTION_FAILURE",
+        "detail": "should_not_replace",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.opt.n2-timer-max"
+    },
+    {
+      "caseId": "gen.opt.n2-sensor-max",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "С **датчиком азота** порог концентрации — **78–98,0 %** с точностью **±1 %** (п. 1.2.2).",
+      "extractKind": "n2_option",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "EXTRACT_SELECTION_FAILURE",
+        "detail": "should_not_replace",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.opt.n2-sensor-max"
+    },
+    {
+      "caseId": "gen.multi.dry-regen-power",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Для модели SDB1560М максимальная потребляемая мощность в режиме осушения не более 40 Вт,而在再生模式下，最大功耗不超过540瓦。",
+      "extractKind": "power_regen",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "EXTRACT_SELECTION_FAILURE",
+        "detail": "should_not_replace",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.multi.dry-regen-power"
+    },
+    {
+      "caseId": "gen.multi.ambient-temp-rh",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "SDB1560NM допускает эксплуатацию при температуре окружающего воздуха **от +15 до +35 °C** (п. 1.1.2.12).",
+      "extractKind": "ambient_temp",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "EXTRACT_SELECTION_FAILURE",
+        "detail": "should_not_replace",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.multi.ambient-temp-rh"
+    },
+    {
+      "caseId": "gen.multi.n2-flow-range",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+      "extractKind": "n2_option",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "EXTRACT_SELECTION_FAILURE",
+        "detail": "should_not_replace",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.multi.n2-flow-range"
+    },
+    {
+      "caseId": "gen.note.height-signal",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "**Габариты** SDB1560NM (Ш×В×Г) — **1202 × 1693 × 1028 мм** (табл. 1.1).",
+      "extractKind": "dimensions",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "EXTRACT_SELECTION_FAILURE",
+        "detail": "should_not_replace",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.note.height-signal"
+    },
+    {
+      "caseId": "gen.rh.rule-above30",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Максимальная относительная влажность окружающего воздуха для эксплуатации SDB1560NM — **не более 80 %RH** (п. 1.1.2.12).",
+      "extractKind": "rh_ambient_max",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "EXTRACT_SELECTION_FAILURE",
+        "detail": "should_not_replace",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.rh.rule-above30"
+    },
+    {
+      "caseId": "gen.num.rh-range-high",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Верхняя граница диапазона поддержания относительной влажности (RH%) внутри рабочего объема шкафа не должна превышать значение относительной влажности окружающей среды.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.num.rh-range-high"
+    },
+    {
+      "caseId": "gen.env.pressure-kpa-min",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "В предоставленном контексте не указано значение нижней границы атмосферного давления для эксплуатации шкафа SDB1560 M. Данные о давлении отсутствуют в таблицах и описаниях условий эксплуатации.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.env.pressure-kpa-min"
+    },
+    {
+      "caseId": "gen.env.pressure-kpa-max",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "В предоставленном контексте не указано значение верхней границы атмосферного давления (кПа) для модели SDB1560 M. Все упомянутые параметры и условия относятся к температуре, влажности и условиям хранения и транспортировки, но не содержат информацию об атмосферном давлении.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.env.pressure-kpa-max"
+    },
+    {
+      "caseId": "gen.num.ral",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Цвет корпуса Шкафа указан как RAL7035.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.num.ral"
+    },
+    {
+      "caseId": "gen.std.esd",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Шкаф снабжен антистатическим тканевым браслетом с кнопкой (STUD) диаметром 4 мм и проводом для подключения, что соответствует требованиям по защите от статического электричества (ESD).",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.std.esd"
+    },
+    {
+      "caseId": "gen.rh.rule-below30",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Для уставки 0–30 RH%, влажность внутри рабочего объема Шкафа поддерживается не выше окружающей влажности.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.rh.rule-below30"
+    },
+    {
+      "caseId": "gen.spare.fuse-heating",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "В предоставленном контексте не указано конкретное значение предохранителя для модели SDB1560M с системой подогрева воздуха. Для получения точной информации рекомендуется обратиться к соответствующему разделу руководства пользователя или техническому описанию модели SDB1560M.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.spare.fuse-heating"
+    },
+    {
+      "caseId": "gen.env.pressure-mmhg-min",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "В документации на данную модель этот параметр не указан.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.env.pressure-mmhg-min"
+    },
+    {
+      "caseId": "gen.env.pressure-mmhg-max",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "В документации на данную модель этот параметр не указан.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.env.pressure-mmhg-max"
+    },
+    {
+      "caseId": "gen.ind.green-only-storage",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Если горит только зелёный индикатор (без красного и жёлтого), то Шкаф работает в режиме осушения.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.ind.green-only-storage"
+    },
+    {
+      "caseId": "gen.proc.open-door-symbol",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "Символ, который показывает открытую дверь на LCD индикаторе, не указан явно в предоставленном контексте. Однако, в описании индицируемых символов на LCD индикаторе есть пункт:\n\nг) символ - дверь Шкафа открыта;\n\nТаким образом, для модели SDB1560M существует символ, обозначающий открытую дверь, но конкретный вид символа ",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.proc.open-door-symbol"
+    },
+    {
+      "caseId": "gen.proc.fan-symbol",
+      "baselineStatus": "fail",
+      "baselineReason": "factual",
+      "expectedMode": "must_answer",
+      "answerPreview": "В предоставленном контексте не указан символ, который означает включённый вентилятор осушителя. Информация об этом не представлена в фрагментах.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "EXTRACT_ROUTING_FAILURE",
+        "detail": "no extract kind in trace",
+        "confidence": "low",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.proc.fan-symbol"
+    },
+    {
+      "caseId": "gen.unsup.bluetooth",
+      "baselineStatus": "fail",
+      "baselineReason": "abstention",
+      "expectedMode": "must_abstain",
+      "answerPreview": "В документации не упоминается использование Bluetooth для настройки Шкафа SDB1560NM. Подключение осуществляется через кабель Ethernet и панель управления.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "ABSTENTION_POLICY_OR_GATE",
+        "detail": "В документации не упоминается использование Bluetooth для настройки Шкафа SDB1560NM. Подключение осуществляется через ка",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.unsup.bluetooth"
+    },
+    {
+      "caseId": "gen.unsup.sdb151-mass-for-1560",
+      "baselineStatus": "fail",
+      "baselineReason": "abstention",
+      "expectedMode": "must_abstain",
+      "answerPreview": "Я специализируюсь только на модели SDB1560 M. Могу подсказать параметры и эксплуатацию именно этого устройства.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "ABSTENTION_POLICY_OR_GATE",
+        "detail": "Я специализируюсь только на модели SDB1560 M. Могу подсказать параметры и эксплуатацию именно этого устройства.",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.unsup.sdb151-mass-for-1560"
+    },
+    {
+      "caseId": "gen.unsup.warehouse-humidity-setpoint",
+      "baselineStatus": "fail",
+      "baselineReason": "abstention",
+      "expectedMode": "must_abstain",
+      "answerPreview": "Установленное значение относительной влажности внутри рабочего объема Шкафа для диапазона от 30RH% и выше должно быть не более RH%окр.ср. - 20RH%.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "ABSTENTION_POLICY_OR_GATE",
+        "detail": "Установленное значение относительной влажности внутри рабочего объема Шкафа для диапазона от 30RH% и выше должно быть не",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.unsup.warehouse-humidity-setpoint"
+    },
+    {
+      "caseId": "gen.insuf.n2-without-option",
+      "baselineStatus": "fail",
+      "baselineReason": "abstention",
+      "expectedMode": "must_abstain",
+      "answerPreview": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+      "extractKind": "n2_option",
+      "extractRejectReason": "should_not_replace",
+      "classification": {
+        "rootCause": "ABSTENTION_POLICY_OR_GATE",
+        "detail": "Система **подачи азота** в базовый состав SDB1560NM **не входит** — **опция**, приобретается отдельно (табл. 1.2).",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.insuf.n2-without-option"
+    },
+    {
+      "caseId": "gen.unsup.blockchain",
+      "baselineStatus": "fail",
+      "baselineReason": "abstention",
+      "expectedMode": "must_abstain",
+      "answerPreview": "В предоставленном контексте нет информации о том, что шкаф SDB1560M записывает данные в блокчейн. Все упомянутые функции и характеристики шкафа не включают работу с блокчейн-технологиями.",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "ABSTENTION_POLICY_OR_GATE",
+        "detail": "В предоставленном контексте нет информации о том, что шкаф SDB1560M записывает данные в блокчейн. Все упомянутые функции",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.unsup.blockchain"
+    },
+    {
+      "caseId": "gen.unsup.serial-format",
+      "baselineStatus": "fail",
+      "baselineReason": "abstention",
+      "expectedMode": "must_abstain",
+      "answerPreview": "**Серийный номер** шкафа **SDB1560NM** указан на **заводском знаке (табличке изделия)** (раздел **«Маркировка»**, рис. 1.2 РЭ).\n\nНа табличке также указаны: изготовитель, наименование и модель шкафа, напряжение питания, дата изготовления, страна-изготовитель, сведения о сертификатах.\n\n**Формат серийного номера** (п. «Ма",
+      "extractKind": null,
+      "extractRejectReason": null,
+      "classification": {
+        "rootCause": "ABSTENTION_POLICY_OR_GATE",
+        "detail": "**Серийный номер** шкафа **SDB1560NM** указан на **заводском знаке (табличке изделия)** (раздел **«Маркировка»**, рис. 1",
+        "confidence": "medium",
+        "fixJustified": false
+      },
+      "traceRef": "logs/baseline-task35/task28-generalization-http-v12/report.json diagnosticsByCaseId.gen.unsup.serial-format"
+    }
+  ],
+  "confirmedFixTask36": {
+    "cases": ["gen.num.voltage", "gen.num.freq"],
+    "rootCause": "POSTPROCESSING_FAILURE",
+    "mechanism": [
+      "Extract used ±10%/±0,4 Гц from golden/table corpus → grounding_numeric_fail vs PDF «220 В, частотой 50 Гц».",
+      "Combined 220+50 answer triggers parameter_leakage on single-field voltage/frequency questions.",
+      "Post-gate resolveAbstainAnswer → MODEL_PARAM despite extractPreview in trace."
+    ],
+    "fix": "src/rag/honest-contextual-extract.js — query-aware nominal 220 V / 50 Гц extract; unit post-gate test passes",
+    "httpVerification": {
+      "authoritativeTask28Run": "logs/baseline-task36/task28-generalization-http-v14",
+      "voltagePass": true,
+      "freqPass": true,
+      "extractPreviewVoltage": "**Электропитание SDB1560NM** — **220 В**.",
+      "extractPreviewFreq": "**Частота питающей сети SDB1560NM** — **50 Гц**."
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0-task40-case-analysis",
+  "generatedAt": "2026-11-09T07:00:00.000Z",
+  "caseId": "gen.rh.rule-above30",
+  "sourceTruth": {
+    "manual": "Руководство SDB1560NM.pdf",
+    "location": "п. 1.1.1 — ВНИМАНИЕ, пункт 2; audit text: docs/reports/sdb1560m-audit-pdf-pages/page-005.txt",
+    "wordingExcerpt": "ДЛЯ ДИАПАЗОНА ОТ 30RH% И ВЫШЕ – НЕ БОЛЕЕ RH%окр.ср. - 20RH%.",
+    "offsetMeaning": "subtraction from ambient RH (RH%окр.ср.), 20 percentage points",
+    "below30Rule": "0–30 RH%: не более RH%окр.ср. - 10 RH%",
+    "retrievalCard": "knowledge/sdb1560m/retrieval-cards/setpoint-vs-ambient.md (faithful paraphrase of manual)"
+  },
+  "task39FailureRootCause": {
+    "factual": "pass (answer contained «минус 20 RH%»)",
+    "grounding": "fail — prompt chunks had no «20» in RH setpoint context (TROUBLESHOOTING route, card at fused rank 12 not in top-10 sources)",
+    "provenance": "grounding contract used contextual_extract_early but eval trace had applied:false and groundingCorpusExcerpt:null"
+  },
+  "task40Fixes": [
+    "query-router: RH above-30 → REASONING_QA + hybrid_wide + sectionHints 1.1.1/ВНИМАНИЕ (exclude from troubleshooting)",
+    "grounding-contract: traceOut on honest extract → contextualExtract with groundingCorpusExcerpt for eval",
+    "run-pipeline: merge groundingContract contextualExtract; append retrieval card to sources[] when extract kind applied",
+    "eval-runner 1.9-task40: scoped RH offset grounding (20 requires 30 RH / RH%окр context); provenance from groundingContract.contextualExtract"
+  ],
+  "httpVerification": {
+    "status": "pass",
+    "authoritativePath": "logs/baseline-task40/targeted-http-rh-above30-r24/report.json",
+    "capturedAt": "2026-11-09T07:41:46.030Z",
+    "summary": { "pass": 1, "fail": 0, "infrastructure_error": 0 },
+    "factual": "pass",
+    "grounding": "pass"
+  },
+  "fullRegressionTask40": {
+    "priorityB10": { "path": "logs/baseline-task40/targeted-http-priority-b-10", "pass": 10, "total": 10 },
+    "powerSmoke": { "path": "logs/baseline-task40/targeted-http-power-smoke", "pass": 3, "total": 3 },
+    "task27": { "path": "logs/baseline-task40/task27-regression-http", "pass": 32, "total": 32 },
+    "task28": {
+      "path": "logs/baseline-task40/task28-generalization-http",
+      "pass": 70,
+      "fail": 36,
+      "not_evaluable": 4,
+      "total": 110,
+      "leakage": "0/20"
+    },
+    "comparisonJson": "logs/baseline-task40/task40-regression-comparison.json"
+  }
+}

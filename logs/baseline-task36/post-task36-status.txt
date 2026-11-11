@@ -1,0 +1,11 @@
+branch: backup/sova-portal
+HEAD: 8523954fadcc4f31b92305f81b8dfc09f3e61a14
+eval_runner: 1.7-task33
+
+Task 36 HTTP authoritative:
+- logs/baseline-task36/task27-regression-http-v13 — 32/32, infra 0
+- logs/baseline-task36/task28-generalization-http-v14 — 60/46/4, must_abstain 11/17, factual 49/89, leakage 0/20, infra 0
+
+Vs Task 35 v12: +2 pass (gen.num.voltage, gen.num.freq), factual +2
+
+Superseded: task28-generalization-http-v1 (58/110, stale portal)

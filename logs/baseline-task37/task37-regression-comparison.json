@@ -1,0 +1,90 @@
+{
+  "task36Baseline": {
+    "task27": { "path": "logs/baseline-task36/task27-regression-http-v13", "pass": 32, "total": 32 },
+    "task28": {
+      "path": "logs/baseline-task36/task28-generalization-http-v14",
+      "pass": 60,
+      "fail": 46,
+      "not_evaluable": 4,
+      "must_abstain": "11/17",
+      "factual_heuristic": "49/89",
+      "leakage": "0/20",
+      "infrastructure_error": 0
+    }
+  },
+  "task37AuthoritativeHttp": {
+    "task27": {
+      "path": "logs/baseline-task37/task27-v19",
+      "capturedAt": "2026-11-06T05:50:53.484Z",
+      "pass": 31,
+      "fail": 1,
+      "total": 32,
+      "infrastructure_error": 0,
+      "failCaseIds": ["exp.num.pwr-dry-base-40"],
+      "failNote": "Answer used drying+options 810 W extract instead of base dry 40 W"
+    },
+    "task28": {
+      "path": "logs/baseline-task37/task28-v1",
+      "capturedAt": "2026-11-06T06:17:46.312Z",
+      "pass": 65,
+      "fail": 41,
+      "not_evaluable": 4,
+      "must_abstain": "11/17",
+      "factual_heuristic": "55/89",
+      "leakage": "0/20",
+      "infrastructure_error": 0
+    },
+    "targeted": {
+      "path": "logs/baseline-task37/targeted-http-v23",
+      "capturedAt": "2026-11-06T07:31:43.500Z",
+      "pass": 6,
+      "fail": 4,
+      "infrastructure_error": 0,
+      "passCaseIds": [
+        "gen.num.dim-tolerance",
+        "gen.num.pwr-dry-opt810",
+        "gen.kit.feet-height",
+        "gen.opt.n2-timer-max",
+        "gen.multi.ambient-temp-rh",
+        "gen.multi.n2-flow-range"
+      ],
+      "failCaseIds": [
+        "gen.opt.n2-sensor-max",
+        "gen.multi.dry-regen-power",
+        "gen.note.height-signal",
+        "gen.rh.rule-above30"
+      ]
+    },
+    "deltaVsTask36": {
+      "task27": "-1",
+      "task28_pass": "+5",
+      "must_abstain": "0",
+      "factual_heuristic": "+6",
+      "leakage": "0"
+    }
+  },
+  "supersededRuns": {
+    "targeted-http-v1": { "note": "portal down, 10 infra" },
+    "targeted-http-v21": { "pass": 3, "fail": 4, "infrastructure_error": 3 },
+    "task27-v18": { "note": "missing EVAL_LOGIN/EVAL_PASSWORD, 32 infra" }
+  },
+  "unitVerification": {
+    "task37": "scripts/test-sdb1560m-task37-contextual-extract.js — OK",
+    "regressions": [
+      "test-sdb1560m-task36-mains-power-post-gate.js — OK",
+      "test-sdb1560m-task35-hallucination-grounding.js — OK",
+      "test-sdb1560m-task32-grounding.js — OK",
+      "test-sdb1560m-task31-regression.js — OK",
+      "test-sdb1560m-task27-extract-routing.js — OK",
+      "test-sdb1560m-task33-unsupported-firmware.js — OK",
+      "test-sdb1560m-eval-runner-unit.js — OK"
+    ]
+  },
+  "protectionsOnTask28Http": {
+    "voltage": "pass",
+    "freq": "pass",
+    "internal_volume_abstain": "pass",
+    "full_volume_abstain": "pass",
+    "leakage": "0/20"
+  }
+}

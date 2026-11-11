@@ -1,0 +1,56 @@
+{
+  "task35Baseline": {
+    "task27": { "path": "logs/baseline-task35/task27-regression-http-v11", "pass": 32, "total": 32 },
+    "task28": {
+      "path": "logs/baseline-task35/task28-generalization-http-v12",
+      "pass": 58,
+      "fail": 48,
+      "not_evaluable": 4,
+      "must_abstain": "11/17",
+      "factual_heuristic": "47/89",
+      "leakage": "0/20"
+    }
+  },
+  "task36AuthoritativeHttp": {
+    "task27": {
+      "path": "logs/baseline-task36/task27-regression-http-v13",
+      "capturedAt": "2026-11-03T06:45:14.793Z",
+      "pass": 32,
+      "fail": 0,
+      "total": 32,
+      "infrastructure_error": 0
+    },
+    "task28": {
+      "path": "logs/baseline-task36/task28-generalization-http-v14",
+      "capturedAt": "2026-11-03T10:39:26.981Z",
+      "pass": 60,
+      "fail": 46,
+      "not_evaluable": 4,
+      "must_abstain": "11/17",
+      "factual_heuristic": "49/89",
+      "leakage": "0/20",
+      "infrastructure_error": 0
+    },
+    "deltaVsTask35": {
+      "task27": "0",
+      "task28_pass": "+2",
+      "must_abstain": "0",
+      "factual_heuristic": "+2",
+      "newPassCaseIds": ["gen.num.voltage", "gen.num.freq"]
+    }
+  },
+  "supersededRuns": {
+    "task28-generalization-http-v1": {
+      "pass": 58,
+      "note": "Portal not restarted; mains extract still showed ± in trace"
+    }
+  },
+  "productionFixesTask36": [
+    {
+      "file": "src/rag/honest-contextual-extract.js",
+      "change": "extractMainsPowerAnswer: nominal single-field 220 V / 50 Hz",
+      "httpVerified": true,
+      "httpRun": "logs/baseline-task36/task28-generalization-http-v14"
+    }
+  ]
+}

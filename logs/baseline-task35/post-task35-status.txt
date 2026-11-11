@@ -1,0 +1,19 @@
+branch: backup/sova-portal
+HEAD: 8523954fadcc4f31b92305f81b8dfc09f3e61a14
+eval_runner: 1.7-task33 (unchanged)
+commit: none (Task 35)
+
+Task 35 production RAG changes (this session):
+- src/rag/sdb1560m-unsupported-spec.js — C4 volume-liter unsupported gate
+- src/rag/honest-contextual-extract.js — disable volume extract; mass «Какова»; mains_power extract
+- src/rag/sdb1560m-post-gate.js — block volume-liter hallucinations in answers
+- src/rag/honest-rag-mode.js — RAG-pure heuristics no longer force 896/2070 on C4 queries
+- scripts/test-sdb1560m-task35-hallucination-grounding.js — new regression tests
+
+HTTP baselines (operator, 2026-11-03):
+- logs/baseline-task35/task27-regression-http-v11 — 32/32 pass, infra 0
+- logs/baseline-task35/task28-generalization-http-v12 — 58/48/4 pass/fail/N-E, must_abstain 11/17, factual 47/89, leakage 0/20, infra 0
+
+Unit regression: all Task 25–33 scripts + task35 test — PASS
+
+Working tree: still dirty (preserved)

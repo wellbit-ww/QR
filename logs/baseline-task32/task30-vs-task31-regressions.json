@@ -1,0 +1,117 @@
+{
+  "count": 7,
+  "regressions": [
+    {
+      "id": "gen.num.pwr-storage",
+      "task30Reason": "required layers ok",
+      "task31Reason": "grounding",
+      "answerChanged": false,
+      "layerDelta": {
+        "grounding": {
+          "task30": "not_evaluable",
+          "task31": "fail"
+        }
+      },
+      "task30Preview": "Максимальная потребляемая мощность SDB1560NM в режиме **хранения** без опций — **не более 8 Вт** (п. 1.1.2.7).",
+      "task31Preview": "Максимальная потребляемая мощность SDB1560NM в режиме **хранения** без опций — **не более 8 Вт** (п. 1.1.2.7).",
+      "task30ChunkCount": 0,
+      "task31ChunkCount": 10
+    },
+    {
+      "id": "gen.num.pwr-dry",
+      "task30Reason": "required layers ok",
+      "task31Reason": "grounding",
+      "answerChanged": false,
+      "layerDelta": {
+        "grounding": {
+          "task30": "not_evaluable",
+          "task31": "fail"
+        }
+      },
+      "task30Preview": "Максимальная потребляемая мощность Шкафа SDB1560М в режиме осушения не более 40 Вт.",
+      "task31Preview": "Максимальная потребляемая мощность Шкафа SDB1560М в режиме осушения не более 40 Вт.",
+      "task30ChunkCount": 0,
+      "task31ChunkCount": 14
+    },
+    {
+      "id": "gen.num.pwr-regen",
+      "task30Reason": "required layers ok",
+      "task31Reason": "grounding",
+      "answerChanged": false,
+      "layerDelta": {
+        "grounding": {
+          "task30": "not_evaluable",
+          "task31": "fail"
+        }
+      },
+      "task30Preview": "Мощность в режиме **регенерации** для SDB1560NM — **не более 540 Вт** (раздел 1.1).",
+      "task31Preview": "Мощность в режиме **регенерации** для SDB1560NM — **не более 540 Вт** (раздел 1.1).",
+      "task30ChunkCount": 0,
+      "task31ChunkCount": 10
+    },
+    {
+      "id": "gen.num.pwr-storage-opt810",
+      "task30Reason": "required layers ok",
+      "task31Reason": "grounding",
+      "answerChanged": false,
+      "layerDelta": {
+        "grounding": {
+          "task30": "not_evaluable",
+          "task31": "fail"
+        }
+      },
+      "task30Preview": "Максимальная потребляемая мощность SDB1560NM в режиме **хранения** с системами подачи азота и подогрева воздуха — **не более 810 Вт** (п. 1.1.2.7).",
+      "task31Preview": "Максимальная потребляемая мощность SDB1560NM в режиме **хранения** с системами подачи азота и подогрева воздуха — **не более 810 Вт** (п. 1.1.2.7).",
+      "task30ChunkCount": 0,
+      "task31ChunkCount": 10
+    },
+    {
+      "id": "gen.num.shelf-load",
+      "task30Reason": "required layers ok",
+      "task31Reason": "grounding",
+      "answerChanged": false,
+      "layerDelta": {
+        "grounding": {
+          "task30": "not_evaluable",
+          "task31": "fail"
+        }
+      },
+      "task30Preview": "Суммарная, распределенная нагрузка на каждую стандартную полку шкафа SDB1560M не должна превышать 100 кг.",
+      "task31Preview": "Суммарная, распределенная нагрузка на каждую стандартную полку шкафа SDB1560M не должна превышать 100 кг.",
+      "task30ChunkCount": 0,
+      "task31ChunkCount": 10
+    },
+    {
+      "id": "gen.para.storage-w",
+      "task30Reason": "required layers ok",
+      "task31Reason": "grounding",
+      "answerChanged": false,
+      "layerDelta": {
+        "grounding": {
+          "task30": "not_evaluable",
+          "task31": "fail"
+        }
+      },
+      "task30Preview": "Максимальная потребляемая мощность Шкафа SDB1560M в режиме хранения без опций не более 8 Вт.",
+      "task31Preview": "Максимальная потребляемая мощность Шкафа SDB1560M в режиме хранения без опций не более 8 Вт.",
+      "task30ChunkCount": 0,
+      "task31ChunkCount": 10
+    },
+    {
+      "id": "gen.foreign.dry-power-1560",
+      "task30Reason": "required layers ok",
+      "task31Reason": "grounding",
+      "answerChanged": false,
+      "layerDelta": {
+        "grounding": {
+          "task30": "not_evaluable",
+          "task31": "fail"
+        }
+      },
+      "task30Preview": "Для модели SDB1560М максимальная мощность в режиме осушения составляет 40 Вт.",
+      "task31Preview": "Для модели SDB1560М максимальная мощность в режиме осушения составляет 40 Вт.",
+      "task30ChunkCount": 0,
+      "task31ChunkCount": 10
+    }
+  ]
+}

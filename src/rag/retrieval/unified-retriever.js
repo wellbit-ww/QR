@@ -7,7 +7,11 @@ const {
   isSdb1560mKitShelfCountQuery,
   isSdb1560mHumiditySetQuery,
 } = require("../sdb1560m-rag-priority");
-const { isHonestNumericSpecOnlyQuery } = require("../honest-rag-mode");
+const {
+  isHonestNumericSpecOnlyQuery,
+  isNumericTtxRetrievalQuery,
+  shouldUseRagPure,
+} = require("../honest-rag-mode");
 
 function buildIntentForRetrieval(routerDecision, query) {
   const route = routerDecision?.route || "UNKNOWN";
@@ -66,6 +70,8 @@ async function unifiedRetrieve({
       ? Math.max(topCap, ragConfig.technicalRetrievalTopK || 10)
       : topCap;
   const intent = buildIntentForRetrieval(routerDecision, query);
+  const ragPure = shouldUseRagPure(equipmentId);
+  const qStr = String(query || "");
   const hints =
     Array.isArray(sectionHints) && sectionHints.length
       ? sectionHints
@@ -85,8 +91,17 @@ async function unifiedRetrieve({
         regenerationShutdown: isRegenerationShutdownQuery(query),
         humidityStep: routerDecision?.focusParameter === "humidity",
         troubleshootingPossibleFaults: routerDecision?.route === "TROUBLESHOOTING_QA",
-        maintenanceSections: routerDecision?.intent === "MAINTENANCE_QUERY",
-        indicatorNormalMode: Boolean(routerDecision?.indicatorNormalMode),
+        maintenanceSections:
+          routerDecision?.intent === "MAINTENANCE_QUERY" ||
+          (ragPure &&
+            /осушит|техобслуж|36\s*месяц|график\s+обслуж|менять\s+осуш|замен[^\n]{0,24}осуш|блок\s+осуш|как\s+часто\s+менять/i.test(
+              qStr,
+            )),
+        indicatorNormalMode:
+          Boolean(routerDecision?.indicatorNormalMode) ||
+          (ragPure &&
+            equipmentId === "sdb1560m" &&
+            /индикатор|лампоч|красн|ж[её]лт|мига|символ\s*W/i.test(qStr)),
         table11Flatten:
           equipmentId === "sdb151-nm"
             ? false
@@ -104,15 +119,22 @@ async function unifiedRetrieve({
             : routerDecision?.focusParameter === "dimensions" ||
               routerDecision?.focusParameter === "load" ||
               /масс|габарит|ширин|высот|глубин|таблиц[аы]?\s*1\.1|1\.1\.2\.8/i.test(String(query || "")),
+        sdb1560GoldenFacts: equipmentId === "sdb1560m" && ragPure,
         sdb1560KitSupply:
           equipmentId === "sdb1560m" &&
-          (routerDecision?.focusParameter === "kit_shelf_count" || isSdb1560mKitShelfCountQuery(query)),
+          (routerDecision?.focusParameter === "kit_shelf_count" ||
+            isSdb1560mKitShelfCountQuery(query) ||
+            (ragPure && /полок|комплект\s+поставки/i.test(qStr))),
         sdb1560SpecTable:
           equipmentId === "sdb1560m" &&
-          isHonestNumericSpecOnlyQuery(query, intent),
+          (ragPure ||
+            isHonestNumericSpecOnlyQuery(query, intent) ||
+            /36\s*месяц|замен[^\n]{0,20}осуш|N2Ton|99[,.]9\s*мин/i.test(qStr)),
         sdb1560HumidityUi:
           equipmentId === "sdb1560m" &&
-          (isSdb1560mHumiditySetQuery(query) || routerDecision?.focusParameter === "humidity"),
+          (isSdb1560mHumiditySetQuery(query) ||
+            routerDecision?.focusParameter === "humidity" ||
+            (ragPure && /азот|N2|таймер\s+подач/i.test(qStr))),
         p1GoldenFacts:
           equipmentId === "sdb1106-nm" && shouldInjectP1GoldenFacts(query, routerDecision),
         sdb302RetrievalCards:

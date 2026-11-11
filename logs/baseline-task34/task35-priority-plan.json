@@ -1,0 +1,203 @@
+{
+  "generatedFrom": "C:\\Users\\SOVAI\\Documents\\Work\\QR\\logs\\baseline-task33\\task28-generalization-http-v9\\report.json",
+  "task35Candidates": [
+    {
+      "primaryRootCause": "D",
+      "primaryRootCauseLabel": "Abstention / unsupported-spec failure",
+      "secondaryRootCause": "hallucination_or_unsupported_answer",
+      "priority": "P0",
+      "caseIds": [
+        "gen.unsup.internal-volume-liters",
+        "gen.unsup.full-volume-liters"
+      ],
+      "recommendedFix": "RAG: route to unsupported-spec or STRICT_ABSTAIN before LLM numeric claims",
+      "confidenceNotes": [
+        "high"
+      ],
+      "caseCount": 2
+    },
+    {
+      "primaryRootCause": "C",
+      "primaryRootCauseLabel": "Generation / interpretation failure",
+      "secondaryRootCause": "spurious_abstain_despite_grounded_evidence",
+      "priority": "P1",
+      "caseIds": [
+        "gen.num.mass.base",
+        "gen.num.voltage",
+        "gen.num.freq",
+        "gen.kit.wheels",
+        "gen.maint.dust-months",
+        "gen.maint.power-cable",
+        "gen.proc.sound-door",
+        "gen.proc.door-fan-off",
+        "gen.multi.mass-depth",
+        "gen.para.mass",
+        "gen.para.36m",
+        "gen.disc.810-storage-vs-dry",
+        "gen.spare.lock-excluded"
+      ],
+      "recommendedFix": "RAG: honest extract or routing for numeric/paraphrase queries",
+      "confidenceNotes": [
+        "high"
+      ],
+      "caseCount": 13
+    },
+    {
+      "primaryRootCause": "B",
+      "primaryRootCauseLabel": "Contextual extract failure",
+      "secondaryRootCause": "extract_failed_or_wrong_kind",
+      "priority": "P1",
+      "caseIds": [
+        "gen.num.dim-tolerance",
+        "gen.num.pwr-dry-opt810",
+        "gen.kit.feet-height",
+        "gen.opt.n2-timer-max",
+        "gen.opt.n2-sensor-max",
+        "gen.multi.dry-regen-power",
+        "gen.multi.ambient-temp-rh",
+        "gen.multi.n2-flow-range",
+        "gen.note.height-signal",
+        "gen.rh.rule-above30"
+      ],
+      "recommendedFix": "Retrieval/rerank or retrieval cards for this intent",
+      "confidenceNotes": [
+        "medium"
+      ],
+      "caseCount": 10
+    },
+    {
+      "primaryRootCause": "A",
+      "primaryRootCauseLabel": "Retrieval failure",
+      "secondaryRootCause": "fact_not_in_snippet_haystack",
+      "priority": "P1",
+      "caseIds": [
+        "gen.env.pressure-kpa-min",
+        "gen.env.pressure-kpa-max",
+        "gen.num.ral",
+        "gen.spare.fuse-heating",
+        "gen.env.pressure-mmhg-min",
+        "gen.env.pressure-mmhg-max",
+        "gen.proc.open-door-symbol",
+        "gen.proc.fan-symbol"
+      ],
+      "recommendedFix": "RAG: honest extract or routing for numeric/paraphrase queries",
+      "confidenceNotes": [
+        "low"
+      ],
+      "caseCount": 8
+    },
+    {
+      "primaryRootCause": "C",
+      "primaryRootCauseLabel": "Generation / interpretation failure",
+      "secondaryRootCause": "answer_missing_asserted_fact",
+      "priority": "P1",
+      "caseIds": [
+        "gen.num.rh-accuracy",
+        "gen.kit.shelves-perf",
+        "gen.kit.power-cord",
+        "gen.opt.feeder-basket-min",
+        "gen.opt.feeder-basket-max",
+        "gen.para.desiccant-qty"
+      ],
+      "recommendedFix": "RAG generation or extract to assert values present in context",
+      "confidenceNotes": [
+        "medium"
+      ],
+      "caseCount": 6
+    },
+    {
+      "primaryRootCause": "D",
+      "primaryRootCauseLabel": "Abstention / unsupported-spec failure",
+      "secondaryRootCause": "empty_or_unrecognized_abstain",
+      "priority": "P1",
+      "caseIds": [
+        "gen.unsup.bluetooth",
+        "gen.unsup.sdb151-mass-for-1560",
+        "gen.unsup.warehouse-humidity-setpoint",
+        "gen.insuf.n2-without-option",
+        "gen.unsup.serial-format"
+      ],
+      "recommendedFix": "RAG: enforce unsupported/abstain phrasing for this query class",
+      "confidenceNotes": [
+        "medium"
+      ],
+      "caseCount": 5
+    },
+    {
+      "primaryRootCause": "A",
+      "primaryRootCauseLabel": "Retrieval failure",
+      "secondaryRootCause": "required_fact_not_in_retrieved_snippets",
+      "priority": "P1",
+      "caseIds": [
+        "gen.num.rh-range-high",
+        "gen.std.esd",
+        "gen.rh.rule-below30",
+        "gen.ind.green-only-storage"
+      ],
+      "recommendedFix": "Retrieval/rerank or retrieval cards for this intent",
+      "confidenceNotes": [
+        "medium"
+      ],
+      "caseCount": 4
+    },
+    {
+      "primaryRootCause": "F",
+      "primaryRootCauseLabel": "Factual evaluator / dataset issue",
+      "secondaryRootCause": "multi_numeric_W_evaluator_contradiction",
+      "priority": "P1",
+      "caseIds": [
+        "gen.disc.storage-vs-dry"
+      ],
+      "recommendedFix": "Document comparative power answers (8 W storage + 40 W dry); evaluator treats second W as conflict (Task 35 — dataset or checker, not RAG)",
+      "confidenceNotes": [
+        "high"
+      ],
+      "caseCount": 1
+    },
+    {
+      "primaryRootCause": "H",
+      "primaryRootCauseLabel": "Insufficient observability",
+      "secondaryRootCause": "required_fact_not_in_retrieved_snippets",
+      "priority": "P1",
+      "caseIds": [
+        "gen.foreign.mass-1106"
+      ],
+      "recommendedFix": "Retrieval/rerank or retrieval cards for this intent",
+      "confidenceNotes": [
+        "high"
+      ],
+      "caseCount": 1
+    },
+    {
+      "primaryRootCause": "D",
+      "primaryRootCauseLabel": "Abstention / unsupported-spec failure",
+      "secondaryRootCause": "abstain_wording_not_in_allowed_patterns",
+      "priority": "P1",
+      "caseIds": [
+        "gen.unsup.blockchain"
+      ],
+      "recommendedFix": "Align generation with MODEL_PARAM_NOT_SPECIFIED / allowed patterns",
+      "confidenceNotes": [
+        "high"
+      ],
+      "caseCount": 1
+    },
+    {
+      "primaryRootCause": "F",
+      "primaryRootCauseLabel": "Factual evaluator / dataset issue",
+      "secondaryRootCause": "unsafe_or_ambiguous_claimPattern",
+      "priority": "P2",
+      "caseIds": [
+        "gen.num.ip55",
+        "gen.ind.red-door",
+        "gen.sym.n2",
+        "gen.para.ip"
+      ],
+      "recommendedFix": "Document evaluator limit; optional dataset clarification in future (not Task 34)",
+      "confidenceNotes": [
+        "high"
+      ],
+      "caseCount": 4
+    }
+  ]
+}

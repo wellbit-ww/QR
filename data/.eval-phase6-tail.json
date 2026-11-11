@@ -1,0 +1,57 @@
+{
+  "items": [
+    {
+      "id": "live-set-rh",
+      "equipmentId": "sdb1560m",
+      "category": "session",
+      "question": "Как задать порог влажности",
+      "expectedKeywords": [
+        "SET",
+        "UP"
+      ],
+      "mustNotContain": [
+        "1–50"
+      ]
+    },
+    {
+      "id": "spec-volume",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Какой внутренний объём?",
+      "expectedKeywords": [
+        "896"
+      ],
+      "mustNotContain": [
+        "546",
+        "500",
+        "1028"
+      ]
+    },
+    {
+      "id": "spec-full-volume",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Какой полный объём шкафа?",
+      "expectedKeywords": [
+        "2070"
+      ],
+      "mustNotContain": [
+        "1896",
+        "546",
+        "500"
+      ]
+    },
+    {
+      "id": "spec-power-storage",
+      "equipmentId": "sdb1560m",
+      "category": "ttx",
+      "question": "Сколько ватт в режиме хранения?",
+      "expectedKeywords": [
+        "8"
+      ],
+      "mustNotContain": [
+        "810"
+      ]
+    }
+  ]
+}

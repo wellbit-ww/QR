@@ -3,6 +3,8 @@
  * Conversational probes go to RAG: hints + query expansion, not canned answers.
  */
 
+const { isAtmosphericPressureQuery } = require("./sdb1106nm-query-variants");
+
 function isSdb1560mEquipment(equipment) {
   const id = String(equipment?.id || "").toLowerCase();
   return id === "w-700" || id === "sdb1560m";
@@ -79,15 +81,57 @@ function isSdb1560mNitrogenKitQuery(q) {
   return /азот/iu.test(q) && /(?:комплект|опци|докупа|базов|входит|отдельн)/iu.test(q);
 }
 
+/** Атмосферное давление помещения (п. 1.1.2.12), не давление азота (6 бар). */
+function isSdb1560mAtmosphericPressureQuery(q) {
+  const text = String(q || "");
+  if (/азот/iu.test(text) && /(?:\b6\b\s*бар|бар.*вход|вход.*бар)/iu.test(text)) {
+    return false;
+  }
+  return isAtmosphericPressureQuery(text);
+}
+
 function isSdb1560mRegenDurationQuery(q) {
   return /регенерац/iu.test(q) && /(?:сколько\s+(?:мин|длит)|длится|продолжитель|как\s+долго)/iu.test(q);
+}
+
+/** Ускоренное осушение после закрытия двери (60±1 мин) — не таймер N2Ton 99,9 мин. */
+function isSdb1560mDoorCloseTimerMinutesQuery(q) {
+  const s = String(q || "");
+  if (/азот|n2\b|99[,.]9|ротаметр|рпост|ррег|n2ton/i.test(s)) {
+    return false;
+  }
+  if (isSdb1560mRegenDurationQuery(s)) {
+    return false;
+  }
+  return (
+    /60\s*[±+]\s*1/i.test(s) ||
+    (/сколько\s+минут/i.test(s) && /закрыт/i.test(s) && /двер/i.test(s)) ||
+    (/время/i.test(s) && /(?:ускорен|после).{0,32}(?:закрыт|двер)/i.test(s) && /осуш/i.test(s))
+  );
+}
+
+/** Технические параметры опции азота (§1.2.2) — не RH% меню и не 60 мин после двери. */
+function isSdb1560mN2TechnicalQuery(q) {
+  const s = String(q || "");
+  if (!/азот|n2\b|ротаметр|рпост|ррег|n2ton/i.test(s)) {
+    return false;
+  }
+  return /(?:бар|bar|мм|л\s*\/\s*мин|99[,.]9|78|98|расход|давлен|трубк|таймер|датчик|концентрац|опци|комплект|докуп|входит)/iu.test(
+    s,
+  );
 }
 
 function isSdb1560mHumidityWaitQuery(q) {
   if (isSdb1560mRegenDurationQuery(q)) {
     return false;
   }
-  return /(?:влажност.*(?:60|час|не\s+падает|не\s+суши)|не\s+суши|сколько\s+ждать|через\s+как[\p{L}]*\s+время|выйти\s+на\s+(?:установленн[\p{L}]*\s+)?режим|выход.*(?:на\s+)?режим|3\s*час)/iu.test(
+  if (isSdb1560mDoorCloseTimerMinutesQuery(q)) {
+    return false;
+  }
+  if (isSdb1560mN2TechnicalQuery(q) && /таймер|99[,.]9|минут/i.test(q)) {
+    return false;
+  }
+  return /(?:влажност.*(?:60|час|не\s+падает|не\s+суши)|не\s+суши|сколько\s+ждать|через\s+как[\p{L}]*\s+время|выйти\s+на\s+(?:установленн[\p{L}]*\s+)?режим|выход.*(?:на\s+)?(?:режим|влажност)|выходит\s+на\s+влажност|долго\s+выход|после\s+включен|3\s*час)/iu.test(
     q,
   );
 }
@@ -114,8 +158,23 @@ function isSdb1560mFanRestart1RhQuery(q) {
   return (restart && /влажност|rh/iu.test(q)) || (has1Rh && /влажност|rh/iu.test(q) && /включ/iu.test(q));
 }
 
+function isSdb1560mDoorSoundNormalityQuery(q) {
+  const s = String(q || "");
+  if (!/пищ|звуков\s+сигнал|писк|громк.*звук/i.test(s)) {
+    return false;
+  }
+  return /почему|норм|шкаф|громк|это\s+норм/i.test(s) || /^(?:почему\s+)?(?:шкаф\s+)?пищ/i.test(s.trim());
+}
+
 function isSdb1560mLoadHumidityRiseQuery(q) {
-  return /загруз/iu.test(q) && /влажност/iu.test(q) && /повыс|вырос|поднял/iu.test(q);
+  if (!/влажност/iu.test(q) || !/повыс|вырос|поднял|скачок|резко/i.test(q)) {
+    return false;
+  }
+  return (
+    /загруз/iu.test(q) ||
+    /почему|зачем|откуда|при\s+ч/i.test(q) ||
+    /резко/i.test(q)
+  );
 }
 
 function isSdb1560mDoorCloseDryDelayQuery(q) {
@@ -166,6 +225,9 @@ function isSdb1560mAmbientTempQuery(q) {
     return false;
   }
   if (isSdb1560mSetpointVsAmbientQuery(q)) {
+    return false;
+  }
+  if (/влажност|\brh\b/i.test(q) && !/температур|градус|°\s*c/i.test(q)) {
     return false;
   }
   return /(?:цех|холодн|градус|помещен|окружающ[\p{L}]*\s+воздух|температур[\p{L}]*\s+эксплуатац|рабоч[\p{L}]*\s+температур|\+\s*1[25]|1[25]\s*°)/iu.test(
@@ -224,8 +286,18 @@ function conversationalHintsForSdb1560mMessage(q) {
   if (isSdb1560mFanRestart1RhQuery(q)) {
     add("1.1.4.4.1", "RH%п+1RH%", "повторное включение вентилятора");
   }
-  if (isSdb1560mLoadHumidityRiseQuery(q) || isSdb1560mDoorCloseDryDelayQuery(q)) {
-    add("1.1.4.4.1", "закрытии двери", "вентилятор осушителя", "ускоренного осушения");
+  if (
+    isSdb1560mLoadHumidityRiseQuery(q) ||
+    isSdb1560mDoorCloseDryDelayQuery(q) ||
+    isSdb1560mDoorCloseTimerMinutesQuery(q)
+  ) {
+    add("1.1.4.4.1", "закрытии двери", "вентилятор осушителя", "ускоренного осушения", "60 ± 1");
+  }
+  if (isSdb1560mN2TechnicalQuery(q)) {
+    add("1.2.2", "6 бар", "8 мм", "3 л/мин", "30 л/мин", "99,9", "78", "nitrogen-option");
+  }
+  if (isSdb1560mDoorSoundNormalityQuery(q)) {
+    add("1.1.4.3.4", "2.2.2.3", "звуковой сигнал", "открыт", "двер", "штат");
   }
   if (isSdb1560mRhBelowSetpointQuery(q)) {
     add("1.1.4.4.2", "режим «Хранения»", "заслонки осушителя", "RH%п");
@@ -240,6 +312,24 @@ function conversationalHintsForSdb1560mMessage(q) {
 function expandSdb1560mRetrievalSynonyms(query) {
   const q = String(query || "");
   const extras = [];
+
+  if (/тяж[ёe]л|вдво[её]м|кран|подним/i.test(q)) {
+    extras.push("масса", "260", "таблица 1.1", "кг");
+  }
+  if (/внутренн[^\n]{0,12}объ[её]м|объ[её]м\s+рабоч/i.test(q)) {
+    extras.push("1896", "1 896", "таблица 1.1", "внутренний объём");
+  }
+
+  if (
+    /^(?:а\s+)?(?:какой|сколько)\s+(?:вес|масс)|^(?:вес|масса)\s+шкаф|шкаф[^\n]{0,12}(?:вес|масс)/iu.test(
+      q.trim(),
+    )
+  ) {
+    extras.push("масса шкафа", "260", "таблица 1.1", "кг");
+  }
+  if (/габарит|ширин|высот|глубин|размер.*шкаф/i.test(q)) {
+    extras.push("габаритные размеры", "таблица 1.1", "1202", "1693", "1028", "мм");
+  }
 
   if (isSdb1560mGettingStartedQuery(q)) {
     extras.push(
@@ -322,6 +412,15 @@ function expandSdb1560mRetrievalSynonyms(query) {
       "60 ± 1 минут",
     );
   }
+  if (isSdb1560mDoorSoundNormalityQuery(q)) {
+    extras.push(
+      "1.1.4.3.4",
+      "звуковой сигнал",
+      "открытой двери",
+      "штатная работа",
+      "проверка сигнализации",
+    );
+  }
   if (isSdb1560mRhBelowSetpointQuery(q)) {
     extras.push(
       "1.1.4.4.2",
@@ -350,6 +449,9 @@ function sectionHintsForSdb1560mMessage(message) {
   }
   if (isSdb1560mOperatingModesQuery(q)) {
     add("1.1.4", "режим «Хранения»", "режим «Осушения»", "режим «Регенерации»", "1.1.4.3.3");
+  }
+  if (isSdb1560mAtmosphericPressureQuery(q)) {
+    add("1.1.2.12", "условия эксплуатации", "атмосферное давление");
   }
   if (
     /габарит|масса|питан|мощност|влажност|ip65|климат|комплект|поставк|маркировк|конструкц|двер|индикатор|dry\s*storage|производител|совтест|ухл|групп|электробезопас|оператор|наладчик/i.test(
@@ -423,6 +525,9 @@ function retrievalCardFilesForSdb1560mQuery(query) {
   if (isSdb1560mAmbientTempQuery(q) || isSdb1560mHotCaseQuery(q)) {
     add("temp-contrast.md", "ambient-temp.md", "heating-case.md");
   }
+  if (isSdb1560mAtmosphericPressureQuery(q)) {
+    add("ambient-pressure.md", "ambient-temp.md");
+  }
   if (isSdb1560mWheelsQuery(q) || isSdb1560mNitrogenKitQuery(q)) {
     add("feet-wheels.md", "nitrogen-option.md");
   }
@@ -495,12 +600,16 @@ module.exports = {
   isSdb1560mTumblerQuery,
   isSdb1560mNitrogenKitQuery,
   isSdb1560mRegenDurationQuery,
+  isSdb1560mDoorCloseTimerMinutesQuery,
+  isSdb1560mN2TechnicalQuery,
   isSdb1560mHumidityWaitQuery,
   isSdb1560mSetpointVsAmbientQuery,
   isSdb1560mFanRestart1RhQuery,
   isSdb1560mLoadHumidityRiseQuery,
+  isSdb1560mDoorSoundNormalityQuery,
   isSdb1560mDoorCloseDryDelayQuery,
   isSdb1560mRhBelowSetpointQuery,
+  isSdb1560mAtmosphericPressureQuery,
   retrievalCardFilesForSdb1560mQuery,
   expandSdb1560mRetrievalSynonyms,
   directContextHintsForSdb1560mMessage,
