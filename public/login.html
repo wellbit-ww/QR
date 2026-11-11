@@ -8,21 +8,10 @@
     />
     <title>Вход — портал сервисной поддержки SOVTEST</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="/styles.css?v=20261111d" />
+    <link rel="stylesheet" href="/styles.css?v=20261111l" />
   </head>
   <body class="layout-login">
     <main class="login-shell">
-      <div class="login-shell__visual" aria-hidden="true">
-        <img
-          class="login-owl"
-          src="/sova-owl-decor.png"
-          alt=""
-          width="720"
-          height="900"
-          decoding="async"
-        />
-      </div>
-
       <section class="login-shell__brand" aria-label="О портале">
         <div class="login-shell__logo" id="loginBrand"></div>
         <h1 class="login-shell__title">Портал сервисной поддержки</h1>
@@ -33,9 +22,8 @@
       </section>
 
       <section class="card card--login login-card">
-        <h2 class="login-card__title">Вход</h2>
         <p class="login-hint" id="loginHint">
-          Введите логин и пароль для доступа к порталу
+          Введите логин и пароль с наклейки для доступа к порталу
         </p>
 
         <form class="login-form" id="loginForm" novalidate>
@@ -69,7 +57,32 @@
                 aria-label="Показать пароль"
                 aria-pressed="false"
               >
-                Показать
+                <svg
+                  class="login-password-toggle__icon login-password-toggle__icon--show"
+                  viewBox="0 0 24 24"
+                  width="22"
+                  height="22"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M12 5c-5.5 0-9.5 4.5-10.8 6.2a1.2 1.2 0 0 0 0 1.6C2.5 14.5 6.5 19 12 19s9.5-4.5 10.8-6.2a1.2 1.2 0 0 0 0-1.6C21.5 9.5 17.5 5 12 5zm0 12c-3.9 0-7.1-3.1-8.5-5C4.9 10.1 8.1 7 12 7s7.1 3.1 8.5 5c-1.4 1.9-4.6 5-8.5 5zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"
+                  />
+                </svg>
+                <svg
+                  class="login-password-toggle__icon login-password-toggle__icon--hide"
+                  viewBox="0 0 24 24"
+                  width="22"
+                  height="22"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M3.3 2.3 2 3.6l3.1 3.1C3.5 8.1 2.3 9.6 1.2 11a1.2 1.2 0 0 0 0 1.6C2.5 14.5 6.5 19 12 19c2 0 3.8-.6 5.3-1.4l3.1 3.1 1.3-1.3L3.3 2.3zM12 17c-3.9 0-7.1-3.1-8.5-5 .8-1.1 2.2-2.6 4.1-3.6l1.7 1.7A3 3 0 0 0 12 15c.5 0 1-.1 1.4-.3l1.6 1.6c-.9.4-1.9.7-3 .7zm8.8-4.2c-.5.7-1.2 1.5-2.1 2.3l-1.5-1.5c.8-.6 1.5-1.3 2-2.1C16.9 9.6 14.6 7 12 7c-.5 0-1 .1-1.5.2L8.9 5.6C9.8 5.2 10.9 5 12 5c5.5 0 9.5 4.5 10.8 6.2a1.2 1.2 0 0 1 0 1.6z"
+                  />
+                </svg>
               </button>
             </span>
           </label>
@@ -93,6 +106,6 @@
 
     <script src="/cookie-consent.js?v=20260811"></script>
     <script src="/site-brand.js"></script>
-    <script src="/login.js?v=20261111d"></script>
+    <script src="/login.js?v=20261111i"></script>
   </body>
 </html>

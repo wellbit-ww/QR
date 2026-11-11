@@ -169,8 +169,8 @@ if (-not `$ok) {
   Log 'WARNING: portal did not answer on :3000 within 30s — check logs\deploy-stderr.log'
   throw 'Portal restart did not become ready on :3000'
 }
-`$hasDesc = `$r.Content.Contains('login-portal-desc')
-Log ('Portal ready on :3000; login-portal-desc=' + `$hasDesc)
+`$hasLogin = `$r.Content.Contains('login-shell') -or `$r.Content.Contains('login-card')
+Log ('Portal ready on :3000; login-shell=' + `$hasLogin)
 Write-Host 'Portal restart OK'
 "@
     $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($restart))

@@ -26,7 +26,6 @@ if (passwordInput && passwordToggle) {
   passwordToggle.addEventListener("click", () => {
     const showPassword = passwordInput.type === "password";
     passwordInput.type = showPassword ? "text" : "password";
-    passwordToggle.textContent = showPassword ? "Скрыть" : "Показать";
     passwordToggle.setAttribute(
       "aria-label",
       showPassword ? "Скрыть пароль" : "Показать пароль"
