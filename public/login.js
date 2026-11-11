@@ -9,9 +9,13 @@ const loginSubmit = document.getElementById("loginSubmit");
 const loginBrand = document.getElementById("loginBrand");
 const passwordInput = document.getElementById("passwordInput");
 const passwordToggle = document.getElementById("passwordToggle");
+const submitLabel = loginSubmit?.querySelector(".login-submit__label");
 
 if (loginBrand && window.SovaBrand) {
-  loginBrand.innerHTML = window.SovaBrand.renderSiteLogo({ linked: false });
+  loginBrand.innerHTML = window.SovaBrand.renderSiteLogo({
+    linked: false,
+    className: "site-logo--login",
+  });
 }
 
 if (equipmentHint && loginHint) {
@@ -23,7 +27,10 @@ if (passwordInput && passwordToggle) {
     const showPassword = passwordInput.type === "password";
     passwordInput.type = showPassword ? "text" : "password";
     passwordToggle.textContent = showPassword ? "Скрыть" : "Показать";
-    passwordToggle.setAttribute("aria-label", showPassword ? "Скрыть пароль" : "Показать пароль");
+    passwordToggle.setAttribute(
+      "aria-label",
+      showPassword ? "Скрыть пароль" : "Показать пароль"
+    );
     passwordToggle.setAttribute("aria-pressed", showPassword ? "true" : "false");
   });
 }
@@ -34,6 +41,18 @@ function showError(message) {
   }
   loginError.textContent = message;
   loginError.hidden = !message;
+}
+
+function setLoading(isLoading) {
+  if (!loginSubmit) {
+    return;
+  }
+  loginSubmit.disabled = isLoading;
+  loginSubmit.classList.toggle("is-loading", isLoading);
+  loginSubmit.setAttribute("aria-busy", isLoading ? "true" : "false");
+  if (submitLabel) {
+    submitLabel.textContent = isLoading ? "Вход…" : "Войти";
+  }
 }
 
 loginForm.addEventListener("submit", async (event) => {
@@ -48,7 +67,7 @@ loginForm.addEventListener("submit", async (event) => {
     return;
   }
 
-  loginSubmit.disabled = true;
+  setLoading(true);
 
   try {
     const response = await fetch("/api/auth/login", {
@@ -70,6 +89,7 @@ loginForm.addEventListener("submit", async (event) => {
       return;
     }
 
+    // Default: equipment catalog. Keep equipment deep-link / next from server when provided.
     let target =
       typeof payload.redirectTo === "string" && payload.redirectTo.startsWith("/")
         ? payload.redirectTo
@@ -77,6 +97,7 @@ loginForm.addEventListener("submit", async (event) => {
           ? `/equipment/${equipmentHint}`
           : "/";
 
+    // Avoid landing on chat as an intermediate screen after login.
     if (target.startsWith("/chat")) {
       const eq = new URL(target, window.location.origin).searchParams.get("equipment");
       target = eq ? `/equipment/${eq}` : "/";
@@ -86,6 +107,6 @@ loginForm.addEventListener("submit", async (event) => {
   } catch {
     showError("Сервер недоступен. Проверьте подключение к сети.");
   } finally {
-    loginSubmit.disabled = false;
+    setLoading(false);
   }
 });

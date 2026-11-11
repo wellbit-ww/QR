@@ -6,24 +6,36 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <title>Вход — поддержка оборудования</title>
+    <title>Вход — портал сервисной поддержки SOVTEST</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="/styles.css?v=20261111b" />
+    <link rel="stylesheet" href="/styles.css?v=20261111d" />
   </head>
   <body class="layout-login">
-    <main class="page page--login">
-      <header class="login-top-brand" aria-label="SOVTEST">
-        <div id="loginBrand"></div>
-        <p class="login-portal-desc">
-          Портал сервисной поддержки оборудования SOVTEST.
-          Здесь можно быстро получить ответы по эксплуатации, инструкции
-          и связаться с техподдержкой — по логину с наклейки на оборудовании.
+    <main class="login-shell">
+      <div class="login-shell__visual" aria-hidden="true">
+        <img
+          class="login-owl"
+          src="/sova-owl-decor.png"
+          alt=""
+          width="720"
+          height="900"
+          decoding="async"
+        />
+      </div>
+
+      <section class="login-shell__brand" aria-label="О портале">
+        <div class="login-shell__logo" id="loginBrand"></div>
+        <h1 class="login-shell__title">Портал сервисной поддержки</h1>
+        <p class="login-shell__lead">
+          Быстрый доступ к знаниям и технической поддержке вашего оборудования
         </p>
-      </header>
-      <section class="card card--login">
-        <h1>Вход</h1>
+        <span class="login-shell__rule" aria-hidden="true"></span>
+      </section>
+
+      <section class="card card--login login-card">
+        <h2 class="login-card__title">Вход</h2>
         <p class="login-hint" id="loginHint">
-          Введите логин и пароль с наклейки на оборудовании.
+          Введите логин и пароль для доступа к порталу
         </p>
 
         <form class="login-form" id="loginForm" novalidate>
@@ -35,6 +47,7 @@
               name="login"
               type="text"
               autocomplete="username"
+              inputmode="text"
               required
             />
           </label>
@@ -60,17 +73,26 @@
               </button>
             </span>
           </label>
-          <p class="login-error" id="loginError" hidden></p>
-          <button class="action-button login-submit" type="submit" id="loginSubmit">
-            Войти
+          <p class="login-error" id="loginError" role="alert" hidden></p>
+          <button
+            class="action-button login-submit"
+            type="submit"
+            id="loginSubmit"
+          >
+            <span class="login-submit__label">Войти</span>
           </button>
         </form>
       </section>
     </main>
 
-    <footer class="footer"><span class="footer-brand">SOVTEST</span></footer>
+    <footer class="footer footer--login">
+      <span class="footer-brand">SOVTEST</span>
+      <span class="footer-sep" aria-hidden="true">|</span>
+      <span class="footer-note">Сервисный портал</span>
+    </footer>
+
     <script src="/cookie-consent.js?v=20260811"></script>
     <script src="/site-brand.js"></script>
-    <script src="/login.js"></script>
+    <script src="/login.js?v=20261111d"></script>
   </body>
 </html>
