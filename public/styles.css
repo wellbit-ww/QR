@@ -166,14 +166,25 @@ body.page-mode-detail .equipment-root {
 
 .login-top-brand {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   margin: 0 auto 20px;
   width: min(100%, 420px);
+  text-align: center;
 }
 
 .login-top-brand .site-logo__img {
   width: min(100%, 260px);
   max-height: 88px;
+}
+
+.login-portal-desc {
+  margin: 0;
+  max-width: 34em;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .chat-header-logo {
@@ -1540,11 +1551,17 @@ h1 {
 
   .login-top-brand {
     margin-bottom: 16px;
+    gap: 10px;
   }
 
   .login-top-brand .site-logo__img {
     width: min(86vw, 220px);
     max-height: 72px;
+  }
+
+  .login-portal-desc {
+    font-size: 0.9rem;
+    padding-inline: 4px;
   }
 
   .action-button {
