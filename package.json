@@ -14,6 +14,8 @@
     "stack:stop": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop-equipment-stack.ps1",
     "deploy:ssh-setup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-deploy-ssh.ps1",
     "deploy:server": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/deploy-to-server.ps1",
+    "portal:ensure": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/ensure-portal-running.ps1",
+    "portal:autostart": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-portal-autostart.ps1",
     "eval:sdb1560m:phase6-tail": "node scripts/eval-sdb1560m-phase6-tail.js",
     "ingest:knowledge": "node scripts/ingest-knowledge.js",
     "eval:rag": "node scripts/eval-rag.js",
