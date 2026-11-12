@@ -170,6 +170,37 @@ body.page-mode-detail .equipment-root {
   max-height: 64px;
 }
 
+.brand-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.brand-pair--login {
+  gap: 16px;
+}
+
+.sova-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.sova-logo__img {
+  display: block;
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+}
+
+.sova-logo--login .sova-logo__img {
+  width: 92px;
+  height: 92px;
+}
+
 .chat-header-logo {
   margin: 0 auto 4px;
 }
@@ -1837,7 +1868,8 @@ body.layout-login .page {
   margin-bottom: 20px;
 }
 
-.login-shell__logo .site-logo {
+.login-shell__logo .site-logo,
+.login-shell__logo .brand-pair {
   justify-content: flex-start;
 }
 
@@ -2021,17 +2053,17 @@ body.layout-login .page {
 
 .footer--login {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
   width: 100%;
-  max-width: 440px;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   padding: 4px 24px calc(16px + env(safe-area-inset-bottom));
   color: var(--muted);
   font-size: 0.82rem;
-  text-align: left;
+  text-align: center;
 }
 
 .footer--login .footer-brand {
@@ -2052,10 +2084,6 @@ body.layout-login .page {
     gap: 22px;
   }
 
-  .footer--login {
-    padding-inline: 20px;
-  }
-
   .login-shell__title {
     font-size: 1.65rem;
   }
@@ -2067,11 +2095,6 @@ body.layout-login .page {
     max-width: 480px;
     padding: 40px 32px 20px;
     gap: 32px;
-  }
-
-  .footer--login {
-    max-width: 480px;
-    padding-inline: 32px;
   }
 
   .login-shell__title {
@@ -2110,6 +2133,11 @@ body.layout-login .page {
     max-height: 68px;
   }
 
+  .sova-logo--login .sova-logo__img {
+    width: 100px;
+    height: 100px;
+  }
+
   .login-shell__title {
     font-size: clamp(2.1rem, 2.4vw, 2.55rem);
     margin-bottom: 14px;
@@ -2134,8 +2162,6 @@ body.layout-login .page {
   }
 
   .footer--login {
-    max-width: 920px;
-    margin: 0 auto;
     padding: 4px 40px 22px;
   }
 }

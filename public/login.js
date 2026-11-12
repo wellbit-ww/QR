@@ -12,10 +12,15 @@ const passwordToggle = document.getElementById("passwordToggle");
 const submitLabel = loginSubmit?.querySelector(".login-submit__label");
 
 if (loginBrand && window.SovaBrand) {
-  loginBrand.innerHTML = window.SovaBrand.renderSiteLogo({
-    linked: false,
-    className: "site-logo--login",
-  });
+  loginBrand.innerHTML = window.SovaBrand.renderBrandPair
+    ? window.SovaBrand.renderBrandPair({
+        linked: false,
+        className: "brand-pair--login",
+      })
+    : window.SovaBrand.renderSiteLogo({
+        linked: false,
+        className: "site-logo--login",
+      });
 }
 
 if (equipmentHint && loginHint) {
