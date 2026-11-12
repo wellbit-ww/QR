@@ -15,6 +15,7 @@ const {
 const { validateSdb1560mAnswerAgainstContext } = require("./sdb1560m-answer-validation");
 const { resolveEffectiveUserQuestion } = require("./query-rewriting");
 const { STRICT_ABSTAIN } = require("./prompts");
+const { enforceUnsupportedSpecAnswer } = require("./sdb1560m-unsupported-spec");
 
 const ragConfig = getRagConfig();
 
@@ -123,6 +124,8 @@ function applyHonestRagPostGate({
   ) {
     finalAnswer = STRICT_ABSTAIN;
   }
+
+  finalAnswer = enforceUnsupportedSpecAnswer(effectiveMessage, finalAnswer, equipment);
 
   return {
     answer: finalAnswer,

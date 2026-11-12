@@ -535,7 +535,7 @@ function tryDeterministicSdb1560mAnswer(message, options = {}) {
   if (!text) {
     return null;
   }
-  if (isUnsupportedSdb1560mSpecQuery(text)) {
+  if (isUnsupportedSdb1560mSpecQuery(text, { id: "sdb1560m", name: "SDB1560NM" })) {
     return buildUnsupportedSdb1560mSpecReply();
   }
   if (isContactSupportQuery(text)) {

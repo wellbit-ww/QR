@@ -12,6 +12,11 @@ const {
   modelNameFromEquipment,
 } = require("./unsupported-replacement-scope");
 const { shouldUseRagPure } = require("./honest-rag-mode");
+const {
+  isUnsupportedSdb1560mSpecQuery,
+  buildUnsupportedSdb1560mSpecReply,
+} = require("./sdb1560m-unsupported-spec");
+const { tryDeterministicSdb1560mHonestCluster } = require("./sdb1560m-honest-cluster-facts");
 
 const DEFAULT_EQUIPMENT = Object.freeze({ id: "sdb1560m", name: "SDB1560 M" });
 
@@ -22,6 +27,10 @@ function tryHonestWhitelistedDeterministicAnswer(message, ctx = {}, equipment = 
   const text = String(message || "").trim();
   if (!text) {
     return null;
+  }
+
+  if (isUnsupportedSdb1560mSpecQuery(text, equipment)) {
+    return buildUnsupportedSdb1560mSpecReply();
   }
 
   if (foreignSdbModels(text, equipment).length) {
@@ -56,6 +65,11 @@ function tryHonestWhitelistedDeterministicAnswer(message, ctx = {}, equipment = 
         return safetyPath.answer;
       }
     }
+  }
+
+  const cluster = tryDeterministicSdb1560mHonestCluster(text);
+  if (cluster) {
+    return cluster;
   }
 
   return null;

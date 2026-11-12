@@ -166,6 +166,65 @@ function isSdb1560mDoorSoundNormalityQuery(q) {
   return /почему|норм|шкаф|громк|это\s+норм/i.test(s) || /^(?:почему\s+)?(?:шкаф\s+)?пищ/i.test(s.trim());
 }
 
+function isSdb1560mDoorSoundWhenQuery(q) {
+  const s = String(q || "");
+  if (!/звуков|сигнализац|пищ/i.test(s) || !/двер/i.test(s)) {
+    return false;
+  }
+  return /когда|при\s+как|включа|срабатыв/i.test(s) || (!isSdb1560mDoorSoundNormalityQuery(s) && /сигнал/i.test(s));
+}
+
+function isSdb1560mDoorFanWhenOpenQuery(q) {
+  const s = String(q || "");
+  return /вентилятор/i.test(s) && /открыт/i.test(s) && /двер/i.test(s);
+}
+
+function isSdb1560mMaintDustBlowQuery(q) {
+  return /продув|пыл/i.test(String(q || "")) && /поддержан|температур|подогрев/i.test(String(q || ""));
+}
+
+function isSdb1560mMaintPowerCableQuery(q) {
+  const s = String(q || "");
+  return /кабел/i.test(s) && /220|питан|сетев/i.test(s) && /провер|периодич|как\s+часто/i.test(s);
+}
+
+function isSdb1560mMaintDesiccant36Query(q) {
+  const s = String(q || "");
+  return /блок\s+осуш|осушител/i.test(s) && /36|месяц|график|то\b|обслужив/i.test(s);
+}
+
+function isSdb1560mRalColorQuery(q) {
+  return /\bral\b/i.test(String(q || "")) || /цвет\s+корпус/i.test(String(q || ""));
+}
+
+function isSdb1560mSpareLockQuery(q) {
+  const s = String(q || "");
+  return /запасн/i.test(s) && /замок/i.test(s) && /двер/i.test(s);
+}
+
+function isSdb1560mLcdDoorSymbolQuery(q) {
+  const s = String(q || "");
+  return /lcd|диспл/i.test(s) && /символ/i.test(s) && /открыт/i.test(s) && /двер/i.test(s);
+}
+
+function isSdb1560mLcdFanSymbolQuery(q) {
+  const s = String(q || "");
+  if (!/символ/i.test(s) || !/вентилятор/i.test(s)) {
+    return false;
+  }
+  return /lcd|диспл/i.test(s) || /означа|показыва|отображ/i.test(s);
+}
+
+function isSdb1560mPower810ModeQuery(q) {
+  const s = String(q || "");
+  return /\b810\b/.test(s) && /(?:хранен|осуш)/i.test(s);
+}
+
+function isSdb1560mMassDepthTableQuery(q) {
+  const s = String(q || "");
+  return /масс/i.test(s) && /глубин/i.test(s) && /табл|1\.1/i.test(s);
+}
+
 function isSdb1560mLoadHumidityRiseQuery(q) {
   if (!/влажност/iu.test(q) || !/повыс|вырос|поднял|скачок|резко/i.test(q)) {
     return false;
@@ -607,6 +666,17 @@ module.exports = {
   isSdb1560mFanRestart1RhQuery,
   isSdb1560mLoadHumidityRiseQuery,
   isSdb1560mDoorSoundNormalityQuery,
+  isSdb1560mDoorSoundWhenQuery,
+  isSdb1560mDoorFanWhenOpenQuery,
+  isSdb1560mMaintDustBlowQuery,
+  isSdb1560mMaintPowerCableQuery,
+  isSdb1560mMaintDesiccant36Query,
+  isSdb1560mRalColorQuery,
+  isSdb1560mSpareLockQuery,
+  isSdb1560mLcdDoorSymbolQuery,
+  isSdb1560mLcdFanSymbolQuery,
+  isSdb1560mPower810ModeQuery,
+  isSdb1560mMassDepthTableQuery,
   isSdb1560mDoorCloseDryDelayQuery,
   isSdb1560mRhBelowSetpointQuery,
   isSdb1560mAtmosphericPressureQuery,

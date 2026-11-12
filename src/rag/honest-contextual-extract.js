@@ -15,6 +15,16 @@ const {
   isSdb1560mDoorCloseDryDelayQuery,
   isSdb1560mDoorCloseTimerMinutesQuery,
   isSdb1560mDoorSoundNormalityQuery,
+  isSdb1560mDoorSoundWhenQuery,
+  isSdb1560mDoorFanWhenOpenQuery,
+  isSdb1560mMaintDustBlowQuery,
+  isSdb1560mMaintPowerCableQuery,
+  isSdb1560mMaintDesiccant36Query,
+  isSdb1560mRalColorQuery,
+  isSdb1560mSpareLockQuery,
+  isSdb1560mLcdDoorSymbolQuery,
+  isSdb1560mLcdFanSymbolQuery,
+  isSdb1560mPower810ModeQuery,
   isSdb1560mN2TechnicalQuery,
   isSdb1560mAtmosphericPressureQuery,
 } = require("./sdb1560m-rag-priority");
@@ -711,10 +721,20 @@ function extractPowerStorageOpt810(corpus) {
   return null;
 }
 
-function extractMassAndDimensionsAnswer(corpus) {
+function extractMassAndDimensionsAnswer(corpus, message = "") {
   const kg = extractMassKg(corpus);
+  if (kg == null) {
+    return null;
+  }
+  const m = String(message || "");
+  if (/глубин/i.test(m) && !/ширин|высот|габарит/i.test(m)) {
+    const t = String(corpus || "");
+    if (/\b1028\b/.test(t)) {
+      return `**Масса** шкафа SDB1560NM — **${kg} кг**, **глубина** — **1028 мм** (табл. **1.1**).`;
+    }
+  }
   const dimLine = extractDimensionsAnswer(corpus);
-  if (kg == null || !dimLine) {
+  if (!dimLine) {
     return null;
   }
   return `**Масса** шкафа SDB1560NM — **${kg} кг** (табл. 1.1). ${dimLine}`;
@@ -957,8 +977,35 @@ function resolveExtractKind(message, intent) {
   if (isSdb1560mDoorCloseTimerMinutesQuery(m) || isSdb1560mDoorCloseDryDelayQuery(m)) {
     return "door_close_timer";
   }
-  if (isSdb1560mDoorSoundNormalityQuery(m)) {
+  if (isSdb1560mDoorSoundWhenQuery(m) || isSdb1560mDoorSoundNormalityQuery(m)) {
     return "door_sound";
+  }
+  if (isSdb1560mDoorFanWhenOpenQuery(m)) {
+    return "door_fan_open";
+  }
+  if (isSdb1560mRalColorQuery(m)) {
+    return "ral_color";
+  }
+  if (isSdb1560mMaintDustBlowQuery(m)) {
+    return "maint_dust_12";
+  }
+  if (isSdb1560mMaintPowerCableQuery(m)) {
+    return "maint_power_cable";
+  }
+  if (isSdb1560mMaintDesiccant36Query(m)) {
+    return "maint_desiccant_36";
+  }
+  if (isSdb1560mSpareLockQuery(m)) {
+    return "spare_lock_excluded";
+  }
+  if (isSdb1560mLcdDoorSymbolQuery(m)) {
+    return "lcd_door_symbol";
+  }
+  if (isSdb1560mLcdFanSymbolQuery(m)) {
+    return "lcd_fan_symbol";
+  }
+  if (isSdb1560mPower810ModeQuery(m)) {
+    return "power_810_disc";
   }
   if (isSdb1560mN2TechnicalQuery(m)) {
     return "n2_option";
@@ -1107,7 +1154,7 @@ function extractByKind(kind, corpus, message = "") {
     case "rh_ambient_max":
       return extractRhAmbientMaxAnswer(corpus);
     case "mass_and_dimensions":
-      return extractMassAndDimensionsAnswer(corpus);
+      return extractMassAndDimensionsAnswer(corpus, message);
     case "power_regen": {
       const w = extractPowerRegenW(corpus);
       return w != null
@@ -1156,6 +1203,21 @@ function shouldAttemptHonestExtract(equipmentId, message, intent, parameterFactL
     return false;
   }
   if (parameterFactLlm || isNumericTtxRetrievalQuery(message, intent)) {
+    return true;
+  }
+  const m = String(message || "");
+  if (
+    isSdb1560mRalColorQuery(m) ||
+    isSdb1560mMaintDustBlowQuery(m) ||
+    isSdb1560mMaintPowerCableQuery(m) ||
+    isSdb1560mMaintDesiccant36Query(m) ||
+    isSdb1560mDoorSoundWhenQuery(m) ||
+    isSdb1560mDoorFanWhenOpenQuery(m) ||
+    isSdb1560mSpareLockQuery(m) ||
+    isSdb1560mLcdDoorSymbolQuery(m) ||
+    isSdb1560mLcdFanSymbolQuery(m) ||
+    isSdb1560mPower810ModeQuery(m)
+  ) {
     return true;
   }
   if (resolveExtractKind(message, intent)) {
@@ -1233,8 +1295,16 @@ function extractSatisfiesQuery(message, kind, text) {
       return isSdb1560mAmbientTempQuery(m) && /15/.test(a) && /35/.test(a);
     case "rh_range":
       return /\b0\b/.test(a) && /\b80\b/.test(a) && !/шаг/i.test(m);
-    case "mass_and_dimensions":
-      return /\b260\b/.test(a) && /\b1202\b/.test(a);
+    case "mass_and_dimensions": {
+      if (!/\b260\b/.test(a)) {
+        return false;
+      }
+      const dm = String(message || "");
+      if (/глубин/i.test(dm) && !/ширин|высот|габарит/i.test(dm)) {
+        return /\b1028\b/.test(a);
+      }
+      return /\b1202\b/.test(a) || /\b1028\b/.test(a);
+    }
     case "dimensions":
       if (messageRequestsDimensionTolerance(m)) {
         return false;

@@ -6,6 +6,7 @@ const {
   answerAssertsUnverifiedVolumeLiters,
   buildUnsupportedSdb1560mSpecReply,
   isUnverifiedVolumeLiterQuery,
+  enforceUnsupportedSpecAnswer,
 } = require("./sdb1560m-unsupported-spec");
 const {
   buildValidationIntent,
@@ -139,6 +140,7 @@ function applySdb1560mPostGate({
     if (recovery) {
       finalAnswer = recovery.answer;
       recoveryApplied = true;
+      finalAnswer = enforceUnsupportedSpecAnswer(message, finalAnswer, equipment);
       return {
         answer: finalAnswer,
         guardrails,
@@ -157,6 +159,8 @@ function applySdb1560mPostGate({
       };
     }
   }
+
+  finalAnswer = enforceUnsupportedSpecAnswer(message, finalAnswer, equipment);
 
   return {
     answer: finalAnswer,

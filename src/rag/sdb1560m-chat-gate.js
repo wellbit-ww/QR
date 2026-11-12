@@ -25,6 +25,13 @@ function matchesOffTopic(text, equipmentChatScoped) {
 
 function classifySdb1560mMessage(message, { history = [], equipmentChatScoped = false } = {}) {
   const text = String(message || "").trim();
+  if (isUnsupportedSdb1560mSpecQuery(text, EQUIPMENT)) {
+    return {
+      action: "UNSUPPORTED_SPEC",
+      reason: "unsupported_parameter",
+      reply: buildUnsupportedSdb1560mSpecReply(),
+    };
+  }
   if (foreignSdbModels(text, EQUIPMENT).length) {
     return { action: "FOREIGN_MODEL", reason: "foreign_sdb_model", reply: buildForeignModelReply(EQUIPMENT) };
   }
@@ -33,13 +40,6 @@ function classifySdb1560mMessage(message, { history = [], equipmentChatScoped = 
       action: "CONTACT_SUPPORT",
       reason: "portal_contact_support",
       reply: buildPortalContactSupportAnswer(),
-    };
-  }
-  if (isUnsupportedSdb1560mSpecQuery(text)) {
-    return {
-      action: "UNSUPPORTED_SPEC",
-      reason: "unsupported_parameter",
-      reply: buildUnsupportedSdb1560mSpecReply(),
     };
   }
   if (CHATTER_RE.test(text)) {
