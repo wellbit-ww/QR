@@ -302,6 +302,23 @@ function testB2UnsafeTextPattern() {
   assert.equal(r.status, "not_evaluable");
 }
 
+function testTask50MassDepthTableRefNoKgContradiction() {
+  const answer =
+    "По табл. **1.1** SDB1560NM: **масса — 260 кг**, **глубина — 1028 мм**.";
+  const mass = { claimPattern: "260", unit: "kg", factId: "F-MASS" };
+  const depth = { claimPattern: "1028", unit: "mm" };
+  assert.equal(lib.evaluateRequiredFact(mass, answer).status, "pass");
+  assert.equal(lib.evaluateRequiredFact(depth, answer).status, "pass");
+  assert.equal(lib.evaluateRequiredFact(mass, answer).reason, undefined);
+}
+
+function testTask50OpenDoorShortCyrillicClaim() {
+  const door =
+    "На LCD (п. **1.1.4.3.2**): символ **«дверь шкафа открыта»** показывает, что **дверь открыта**.";
+  assert.equal(lib.evaluateRequiredFact({ claimPattern: "двер" }, door).status, "pass");
+  assert.equal(lib.evaluateRequiredFact({ claimPattern: "ab" }, "дверь ab").status, "not_evaluable");
+}
+
 function testB3AllLayersPass() {
   assert.equal(overall(MIN_VALID_CASE, "260 кг").status, "pass");
 }
@@ -453,6 +470,8 @@ function main() {
     testB2MassModelDesignatorNotConflictingKg();
     testB2MissingFact();
     testB2UnsafeTextPattern();
+    testTask50MassDepthTableRefNoKgContradiction();
+    testTask50OpenDoorShortCyrillicClaim();
     testB3AllLayersPass();
     testB3OneLayerFail();
     testB3LayerNotEvaluable();

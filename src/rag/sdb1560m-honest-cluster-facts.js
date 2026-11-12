@@ -5,6 +5,7 @@
 const { isUnsupportedSdb1560mSpecQuery } = require("./sdb1560m-unsupported-spec");
 const {
   isSdb1560mWheelsQuery,
+  isSdb1560mKitFeetCountQuery,
   isSdb1560mDoorSoundWhenQuery,
   isSdb1560mDoorFanWhenOpenQuery,
   isSdb1560mMaintDustBlowQuery,
@@ -20,6 +21,9 @@ const {
 
 const ANSWER_WHEELS_COUNT =
   "В базовой поставке SDB1560M (табл. **1.2**) — **4 колеса** для транспортирования.";
+
+const ANSWER_FEET_KIT_COUNT =
+  "В базовой поставке SDB1560M (табл. **1.2**) — **4 регулируемые по высоте ножки** (max. **50 мм**).";
 
 const ANSWER_RAL =
   "Цвет корпуса шкафов SDB1560NM — **RAL7035** (п. **1.1.2.10**).";
@@ -58,6 +62,9 @@ function tryDeterministicSdb1560mHonestCluster(message) {
   const text = String(message || "").trim();
   if (!text || isUnsupportedSdb1560mSpecQuery(text)) {
     return null;
+  }
+  if (isSdb1560mKitFeetCountQuery(text)) {
+    return ANSWER_FEET_KIT_COUNT;
   }
   if (isSdb1560mWheelsQuery(text) && /сколько\s+кол[её]с|кол[её]с.*транспортир/i.test(text)) {
     return ANSWER_WHEELS_COUNT;

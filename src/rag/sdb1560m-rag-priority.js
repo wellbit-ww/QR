@@ -57,6 +57,14 @@ function isSdb1560mWheelsQuery(q) {
   return /ножк.*кол[её]с|кол[её]с.*ножк|крутить\s+ножк|на\s+кол[её]с/iu.test(q);
 }
 
+function isSdb1560mKitFeetCountQuery(q) {
+  const s = String(q || "");
+  if (!/ножк|регулируем/i.test(s)) {
+    return false;
+  }
+  return /сколько|количеств|числ/i.test(s) || /сколько\s+регулируем/i.test(s);
+}
+
 function isSdb1560mKitShelfCountQuery(q) {
   return /(?:сколько\s+полок|количеств[\p{L}]*\s+полок|полок\s+в\s+комплект|комплект[\p{L}]*\s+полок|стандартн[\p{L}]*\s+полок)/iu.test(
     String(q || ""),
@@ -650,6 +658,7 @@ module.exports = {
   isSdb1560mSetStuckQuery,
   isSdb1560mPuddleQuery,
   isSdb1560mWheelsQuery,
+  isSdb1560mKitFeetCountQuery,
   isSdb1560mKitShelfCountQuery,
   isSdb1560mHumiditySetQuery,
   isSdb1560mOpenDoorQuery,

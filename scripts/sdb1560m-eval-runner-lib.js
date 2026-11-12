@@ -40,10 +40,11 @@ const ABSTAIN_TEMPLATE_RE =
   /параметр не указан|информац(?:ия|ии)\s+.*отсутств|контекст не (?:предостав|содержит)|не\s+указан\w*|нет (?:конкретной )?информации|рекомендуется обратиться/i;
 
 /** Bump when scoring semantics change (see docs/reports/sdb1560m-eval-runner.md). */
-const EVAL_RUNNER_LIB_VERSION = "1.11-task43-r1";
+const EVAL_RUNNER_LIB_VERSION = "1.12-task50-r1";
 
 const UNIT_ALIASES = {
   kg: /(?:кг|kg|kilogram|килограм(?:м|ма|ов)?)/iu,
+  mm: /(?:мм|mm)/iu,
   W: /(?:Вт|W|ватт?)/iu,
   months: /(?:месяц(?:ев|а)?|мес\.?)/iu,
   min: /(?:мин(?:ут(?:ы|а|)?)?|min(?:ute)?s?)/iu,
@@ -215,10 +216,37 @@ function isNonExactNumericContext(text, matchIndex, matchLen) {
 }
 
 function isEquipmentModelDesignatorNumeric(text, matchIndex, matchLen) {
-  const start = Math.max(0, matchIndex - 4);
-  const end = Math.min(text.length, matchIndex + matchLen + 4);
+  const start = Math.max(0, matchIndex - 8);
+  const end = Math.min(text.length, matchIndex + matchLen + 6);
   const local = text.slice(start, end);
   return /SDB[\s-]*\d+(?:NM|M|М|nm|m)?/iu.test(local);
+}
+
+/** Manual §/table indices (табл. 1.1, п. 1.1.2.7) must not false-trigger unit contradiction on a later fact. */
+function isManualTableOrSectionRefNumeric(text, matchIndex, normalized) {
+  const norm = String(normalized || "").replace(",", ".");
+  if (!/^\d+(?:\.\d+)+$/u.test(norm)) {
+    return false;
+  }
+  const before = text.slice(Math.max(0, matchIndex - 48), matchIndex);
+  return /(?:табл(?:ица|\.?)?|п\.|пункт(?:а|е|у)?|раздел|§)[^\d]{0,24}$/iu.test(before);
+}
+
+function isUnsafeShortTextClaimPattern(pattern) {
+  const p = String(pattern || "");
+  if (p.includes("\\b")) {
+    return false;
+  }
+  if (p.length >= 5) {
+    return false;
+  }
+  if (p.length < 4) {
+    return true;
+  }
+  if (/[\p{Script=Cyrillic}]/u.test(p)) {
+    return false;
+  }
+  return true;
 }
 
 function isZeroLowerBoundOfRange(text, altIndex, requiredNorm) {
@@ -350,6 +378,9 @@ function hasConflictingAlternateNumeric(text, requiredPattern, unitRe, options =
     if (isModelGroupCatalogNumeric(text, m.index, m[0].length)) {
       continue;
     }
+    if (isManualTableOrSectionRefNumeric(text, m.index, normalized)) {
+      continue;
+    }
     if (isLikelyEmbeddedModelTokenNumeric(text, m.index, m[0].length)) {
       continue;
     }
@@ -359,7 +390,7 @@ function hasConflictingAlternateNumeric(text, requiredPattern, unitRe, options =
     if (isNonExactNumericContext(text, m.index, m[0].length)) {
       continue;
     }
-    if (hasUnitNear(text, m.index, m[0].length, unitRe)) {
+    if (hasConflictingUnitAdjacent(text, m.index, m[0].length, unitRe)) {
       return true;
     }
   }
@@ -379,6 +410,15 @@ function hasUnitNear(text, numberIndex, numberLen, unitRe) {
     return true;
   }
   const window = text.slice(numberIndex, numberIndex + numberLen + 32);
+  return unitRe.test(window);
+}
+
+/** Same-unit contradiction: unit must sit on the alternate value, not on a later clause. */
+function hasConflictingUnitAdjacent(text, numberIndex, numberLen, unitRe) {
+  if (!unitRe) {
+    return true;
+  }
+  const window = text.slice(numberIndex, numberIndex + numberLen + 12);
   return unitRe.test(window);
 }
 
@@ -464,7 +504,7 @@ function evaluateRequiredFact(rf, answer, options = {}) {
     return { status: "pass", detail: "bounded numeric match" };
   }
 
-  if (pattern.length < 5 && !pattern.includes("\\b")) {
+  if (isUnsafeShortTextClaimPattern(pattern)) {
     return {
       status: "not_evaluable",
       detail: "text pattern too ambiguous for deterministic check",
