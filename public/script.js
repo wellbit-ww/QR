@@ -126,22 +126,22 @@ function getEquipmentCardActions(equipment, isDetail) {
     actions.push(
       `<a class="action-button" href="/equipment/${equipmentId}">Открыть карточку</a>`
     );
+    return actions.join("");
   }
 
-  if (isDetail) {
-    actions.push(
-      `<button
-        type="button"
-        class="action-button support-open-button"
-        data-equipment-id="${escapeHtmlAttr(equipment.id)}"
-        data-equipment-name="${escapeHtmlAttr(equipment.name)}"
-      >Техподдержка</button>`
-    );
-  }
-
+  // Detail: Спросить SOVA → Характеристики → Руководство → Техподдержка
   actions.push(
-    `<a class="action-button" href="/chat?equipment=${equipmentId}">Задать вопрос</a>`
+    `<a class="action-button" href="/chat?equipment=${equipmentId}">Спросить SOVA</a>`
   );
+
+  actions.push(`<button
+          class="action-button specs-button"
+          type="button"
+          aria-expanded="false"
+          aria-controls="specsPanel"
+        >
+          Характеристики
+        </button>`);
 
   if (equipment.guideUrl) {
     actions.push(
@@ -154,6 +154,15 @@ function getEquipmentCardActions(equipment, isDetail) {
       `<a class="action-button" href="${escapeHtmlAttr(safeUrl(equipment.manualUrl))}" target="_blank" rel="noopener noreferrer">Инструкции / схемы</a>`
     );
   }
+
+  actions.push(
+    `<button
+        type="button"
+        class="action-button support-open-button"
+        data-equipment-id="${escapeHtmlAttr(equipment.id)}"
+        data-equipment-name="${escapeHtmlAttr(equipment.name)}"
+      >Техподдержка</button>`
+  );
 
   return actions.join("");
 }
@@ -296,14 +305,6 @@ function renderDetailCard(equipment, accountSerialsHtml = "") {
       ${renderEquipmentImage(equipment)}
 
       <div class="actions">
-        <button
-          class="action-button specs-button"
-          type="button"
-          aria-expanded="false"
-          aria-controls="specsPanel"
-        >
-          Характеристики
-        </button>
         ${getEquipmentCardActions(equipment, true)}
       </div>
 
